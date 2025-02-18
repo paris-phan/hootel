@@ -1,0 +1,59 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Librarian Dashboard - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Librarian Dashboard</h1>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Staff Profile</h5>
+                <p class="card-text">Name: {{ user.get_full_name }}</p>
+                <p class="card-text">Email: {{ user.email }}</p>
+                <p class="card-text">Role: Librarian</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Current Occupancy</h5>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary">View All Rooms</button>
+                    <button class="btn btn-success">Add New Room</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Pending Requests</h5>
+                <div class="list-group">
+                    <!-- Placeholder for requests -->
+                    <div class="list-group-item">
+                        <p class="mb-1">No pending requests</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Quick Actions</h5>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-info">Generate Reports</button>
+                    <button class="btn btn-warning">Manage Users</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
