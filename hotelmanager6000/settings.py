@@ -62,7 +62,7 @@ ROOT_URLCONF = "hotelmanager6000.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -142,3 +142,8 @@ try:
         django_heroku.settings(locals())
 except ImportError:
     found = False
+    
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/patron/'  # Default redirect
+LOGOUT_REDIRECT_URL = '/'
+    
