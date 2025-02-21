@@ -119,14 +119,15 @@ WSGI_APPLICATION = "hotelmanager6000.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
 }
 
-if 'HEROKU' in os.environ:
-    DATABASES['default'] = dj_database_url.config(default=os.getenv('DATABASE_URL'))
+# Configure Django for Heroku deployment
+import django_heroku
+django_heroku.settings(locals())
 
 
 # Password validation
@@ -174,16 +175,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
-
-try:
-    if 'HEROKU' in os.environ:
-        import django_heroku
-        django_heroku.settings(locals())
-except ImportError:
-    found = False
     
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'  # Default redirect
 LOGOUT_REDIRECT_URL = '/'
-    
+
