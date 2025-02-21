@@ -16,8 +16,15 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.contrib.auth.views import LogoutView
+from django.views.generic import TemplateView
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path('admin/', admin.site.urls),
+    path('app/',include('auth_app.urls')), #app_auth urls
+
+    path('', TemplateView.as_view(template_name='index.html')),
+    path('accounts/', include('allauth.urls')), # all OAuth operations will be performed under this route
+    path('logout', LogoutView.as_view()) # default Django logout view at /logout
 ]
