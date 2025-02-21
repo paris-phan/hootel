@@ -1,0 +1,21 @@
+{% extends 'base/base.html' %}
+{% load socialaccount %}
+{% providers_media_js %}
+
+{% block title %}Home - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h2 class="card-title">Welcome!</h2>
+                <h3 class="card-subtitle mb-4">Hello {{ name }}!</h3>
+                <div class="d-grid">
+                    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
