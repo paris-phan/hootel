@@ -82,9 +82,9 @@ WSGI_APPLICATION = "hotelmanager6000.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -134,7 +134,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 
-DATABASES['default'] = dj_database_url.config(default=os.getenv('DATABASE_URL'))
+#DATABASES['default'] = dj_database_url.config(default=os.getenv('DATABASE_URL'))
 
 try:
     if 'HEROKU' in os.environ:

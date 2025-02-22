@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; margin-top: 50px; }
+        .search-container { display: inline-block; }
+        input[type="text"] { width: 300px; padding: 10px; font-size: 16px; }
+        button { display: block; margin: 10px auto; padding: 10px 20px; font-size: 16px; }
+        .results { margin-top: 20px; }
+        .results {
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .results ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .results li {
+            font-size: 18px;
+            font-family: Arial, sans-serif;
+            font-weight: 500;
+            margin-bottom: 5px;
+            text-align: left;
+            padding: 5px 0;
+            border-bottom: 1px solid #ccc;
+        }
+        .results li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+<form method="GET" action="/">
+    <div class="search-container">
+        <input type="text" name="query" value="{{ query|default:'' }}" placeholder="🔍  Search hotels...">
+        <button type="submit">Search</button>
+    </div>
+</form>
+
+<div class="results">
+    {% if hotels %}
+        <ul>
+            {% for name, location in hotels %}
+                <li>{{ name }} - {{ location }}</li>
+            {% endfor %}
+        </ul>
+    {% elif query %}
+        <p>No results found.</p>
+    {% endif %}
+</div>
+</body>
+</html>
+
+
+
