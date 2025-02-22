@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [
     "hotelmanager6000-f8a0706d6818.herokuapp.com",
     "127.0.0.1",  # Keep this if running locally
     "localhost",
+    "*"
 ]
 
 
@@ -44,7 +45,42 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    #django apps
+    "google_login",
+
+    #packages
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
+
+#allauth settings
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+SITE_ID = 1
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+
+
+
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -55,6 +91,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "hotelmanager6000.urls"
@@ -82,11 +119,15 @@ WSGI_APPLICATION = "hotelmanager6000.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
 }
+
+# Configure Django for Heroku deployment
+import django_heroku
+django_heroku.settings(locals())
 
 
 # Password validation
@@ -134,16 +175,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 
-DATABASES['default'] = dj_database_url.config(default=os.getenv('DATABASE_URL'))
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
-try:
-    if 'HEROKU' in os.environ:
-        import django_heroku
-        django_heroku.settings(locals())
-except ImportError:
-    found = False
     
 LOGIN_URL = '/'
-LOGIN_REDIRECT_URL = '/patron/'  # Default redirect
+LOGIN_REDIRECT_URL = '/'  # Default redirect
 LOGOUT_REDIRECT_URL = '/'
-    
+
