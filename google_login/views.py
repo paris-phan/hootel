@@ -11,32 +11,33 @@ from django.contrib.auth.decorators import login_required
 from .models import UserProfile
 
 def home(request):
-    if request.user.is_authenticated:
-        # Get or create user profile
-        user_profile, created = UserProfile.objects.get_or_create(
-            user=request.user,
-            defaults={'user_type': 'PATRON'}
-        )
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/login/')
         
-        context = {
-            'name': request.user.username,
-            'email': request.user.email,
-            'user_type': user_profile.user_type
-        }
-        
-        # different templates based on user type
-        if user_profile.user_type == 'PATRON':
-            return render(request, "google_login/patron_home.html", context)
-        else:
-            return render(request, "google_login/librarian_home.html", context)
-
-    return HttpResponseRedirect('/login')
+    # Get or create user profile
+    user_profile, created = UserProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'user_type': 'PATRON'}
+    )
+    
+    context = {
+        'name': request.user.username,
+        'email': request.user.email,
+        'user_type': user_profile.user_type
+    }
+    
+    # Handle user types
+    if user_profile.user_type == 'PATRON':
+        return render(request, "google_login/patron_home.html", context)
+    else:
+        # TODO: Implement librarian home page in Part 3
+        return render(request, "google_login/home.html", context)
 
 
 def login(request):
     if request.user.is_authenticated:
-        return redirect('/')
-
+        return HttpResponseRedirect('/')
+        
     # Check if Google app is configured
     if not SocialApp.objects.filter(provider='google').exists():
         messages.error(request, 'Google authentication is not configured properly.')
