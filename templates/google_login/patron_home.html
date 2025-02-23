@@ -1,0 +1,32 @@
+{% extends 'base/base.html' %}
+{% load socialaccount %}
+
+{% block title %}Patron Home - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Welcome Patron!</h2>
+                <div class="user-info mb-4">
+                    <p><strong>Name:</strong> {{ name }}</p>
+                    <p><strong>Email:</strong> {{ email }}</p>
+                    <p><strong>Account Type:</strong> {{ user_type }}</p>
+                </div>
+                <div class="patron-features">
+                    <h3>Patron Features</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item">Browse Catalog</li>
+                        <li class="list-group-item">Request Items</li>
+                        <li class="list-group-item">View Borrowing History</li>
+                    </ul>
+                </div>
+                <div class="d-grid gap-2 mt-4">
+                    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
