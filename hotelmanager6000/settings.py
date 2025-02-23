@@ -183,6 +183,7 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 
     
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'  # Default redirect
+LIBRARIAN_LOGIN_REDIRECT_URL = '/librarian/' # Librarian redirect
 LOGOUT_REDIRECT_URL = '/login/'
 

@@ -30,8 +30,7 @@ def home(request):
     if user_profile.user_type == 'PATRON':
         return render(request, "google_login/patron_home.html", context)
     else:
-        # TODO: Implement librarian home page in Part 3
-        return render(request, "google_login/home.html", context)
+        return render(request, "google_login/librarian_home.html", context)
 
 
 def login(request):
