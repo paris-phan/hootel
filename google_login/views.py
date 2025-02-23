@@ -6,11 +6,29 @@ from django.contrib.auth import login as auth_login
 from django.contrib import messages
 from allauth.socialaccount.models import SocialApp
 
+# added these for login redirection 
+from django.contrib.auth.decorators import login_required
+from .models import UserProfile
+
 def home(request):
     if request.user.is_authenticated:
-
-        context = {'name': request.user.username}
-        return render(request, "google_login/home.html", context)
+        # Get or create user profile
+        user_profile, created = UserProfile.objects.get_or_create(
+            user=request.user,
+            defaults={'user_type': 'PATRON'}
+        )
+        
+        context = {
+            'name': request.user.username,
+            'email': request.user.email,
+            'user_type': user_profile.user_type
+        }
+        
+        # different templates based on user type
+        if user_profile.user_type == 'PATRON':
+            return render(request, "google_login/patron_home.html", context)
+        else:
+            return render(request, "google_login/librarian_home.html", context)
 
     return HttpResponseRedirect('/login')
 
