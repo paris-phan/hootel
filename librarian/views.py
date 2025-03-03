@@ -4,6 +4,8 @@ from django.shortcuts import render
 
 from django.contrib.auth.decorators import login_required
 
+def create_hotel(request):
+    return render(request, 'librarian/create_hotel.html')
 @login_required
 def librarian_dashboard(request):
     context = {

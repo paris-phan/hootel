@@ -14,15 +14,10 @@
                     <p><strong>Email:</strong> {{ email }}</p>
                     <p><strong>Account Type:</strong> {{ user_type }}</p>
                 </div>
-                <div class="librarian-features">
-                    <h3>Librarian Features</h3>
-                    <ul class="list-group">
-                        <li class="list-group-item">Make Catalog</li>
-                        <li class="list-group-item">Approve Item Requests</li>
-                        <li class="list-group-item">View Borrowing History</li>
-                    </ul>
-                </div>
                 <div class="d-grid gap-2 mt-4">
+                    <a href="{% url 'create_hotel' %}" class="btn btn-primary">Create Hotel</a>
+                    <a href="{% url 'search' %}" class="btn btn-primary">Approve Item Requests</a>
+                    <a href="{% url 'search' %}" class="btn btn-primary">View Borrowing History</a>
                     <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
                 </div>
             </div>
