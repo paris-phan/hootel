@@ -1,0 +1,26 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run migrations (optional for testing DB schema)
+        run: python manage.py migrate --noinput
+
+      - name: Run tests
+        run: python manage.py test
