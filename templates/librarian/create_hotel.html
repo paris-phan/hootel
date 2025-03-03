@@ -8,7 +8,13 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title">Create a Hotel</h2>
+                <h2 class="card-title" style = "text-align: center;">Create a Hotel</h2><br>
+                <form action="{%url 'create_hotel' %}" method="post">
+                    {% csrf_token %}
+                    <label for="name" style = "margin-bottom: 10px;">Name:</label> <input type="text" name="name_field" id="name"><br>
+                    <label for="location" style = "margin-bottom: 10px;">Location:</label> <input type="text" name="location_field" id="location"><br>
+                    <input type="submit" value="Create Hotel">
+                </form>
             </div>
         </div>
     </div>
