@@ -8,7 +8,6 @@ def create_hotel(request):
     if request.method == "POST":
         name = request.POST["name_field"]
         location = request.POST["location_field"]
-        print(name, location)
         hotel = Hotel(name = name, location = location, rating = 0, created_at = timezone.now())
         hotel.save()
         return redirect('/')
