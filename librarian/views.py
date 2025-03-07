@@ -8,7 +8,7 @@ def create_hotel(request):
     if request.method == "POST":
         name = request.POST["name_field"]
         location = request.POST["location_field"]
-        hotel = Hotel(name = name, location = location, rating = 0, created_at = timezone.now())
+        hotel = Hotel(name = name, owner = request.user.username, location = location, rating = 0, created_at = timezone.now())
         hotel.save()
         return redirect('/')
     return render(request, 'librarian/create_hotel.html')
