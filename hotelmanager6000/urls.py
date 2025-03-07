@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('google_login.urls')),
+    path('patron/', include('patron.urls')),
 ]
