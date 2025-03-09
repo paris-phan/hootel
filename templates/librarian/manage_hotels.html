@@ -1,0 +1,28 @@
+{% extends 'base/base.html' %}
+{% load socialaccount %}
+
+{% block title %}Manage Hotels - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title" style="text-align: center;">Manage Hotels</h2><br>
+                {% if hotels %}
+                <ul>
+                    {% for hotel in hotels %}
+                    <li>{{ hotel.name }} - {{ hotel.location }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No hotels.</p>
+                {% endif %}
+                <div class="d-grid gap-2 mt-4">
+                    <a href="{% url 'home' %}" class="btn btn-primary mt-2">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

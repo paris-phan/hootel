@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from django.contrib.auth.decorators import login_required
 from hotelmanager6000.models import Hotel
+
 def create_hotel(request):
     if request.method == "POST":
         name = request.POST["name_field"]
@@ -12,6 +13,12 @@ def create_hotel(request):
         hotel.save()
         return redirect('/')
     return render(request, 'librarian/create_hotel.html')
+
+def manage_hotels(request):
+    hotels = Hotel.objects.all()
+    hotels = hotels.filter(owner=request.user.id)
+    return render(request, 'librarian/manage_hotels.html', {'hotels': hotels})
+
 @login_required
 def librarian_dashboard(request):
     context = {

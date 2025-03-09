@@ -3,5 +3,6 @@ from librarian import views
 
 urlpatterns = [
     # path('', views.home, name='home'),
-    path('create_hotel/', views.create_hotel, name='create_hotel')
+    path('create_hotel/', views.create_hotel, name='create_hotel'),
+    path('manage_hotels/', views.manage_hotels, name='manage_hotels')
 ]
