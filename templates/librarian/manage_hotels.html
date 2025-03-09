@@ -12,7 +12,12 @@
                 {% if hotels %}
                 <ul>
                     {% for hotel in hotels %}
-                    <li>{{ hotel.name }} - {{ hotel.location }}</li>
+                    <div>
+                        <li>{{ hotel.name }} - {{ hotel.location }}</li>
+                        <a href = "" class="btn btn-primary mt-2">Edit</a>
+                        <a href = "" class="btn btn-danger mt-2">Delete</a>         
+                    </div>
+                    <br />
                     {% endfor %}
                 </ul>
                 {% else %}
