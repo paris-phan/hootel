@@ -1,0 +1,27 @@
+{% extends 'base/base.html' %}
+{% load socialaccount %}
+
+{% block title %}Edit Hotel - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title" style = "text-align: center;">Edit Hotel</h2><br>
+                <form action="{%url 'edit' hotel.id %}" method="post">
+                    {% csrf_token %}
+                    <label for="name" style = "margin-bottom: 10px;">Name:</label> 
+                    <input type="text" name="name_field" id="name" placeholder="{{ hotel.name }}"><br>
+                    <label for="location" style = "margin-bottom: 10px;">Location:</label>
+                    <input type="text" name="location_field" id="location" placeholder="{{ hotel.location }}"><br>
+                    <input type="submit" value="Save Changes">
+                </form>
+                <div class="d-grid gap-2 mt-4">
+                    <a href="{% url 'home' %}" class="btn btn-primary mt-2">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

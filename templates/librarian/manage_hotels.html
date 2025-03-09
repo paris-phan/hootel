@@ -14,8 +14,8 @@
                     {% for hotel in hotels %}
                     <div>
                         <li>{{ hotel.name }} - {{ hotel.location }}</li>
-                        <a href = "" class="btn btn-primary mt-2">Edit</a>
-                        <a href = "" class="btn btn-danger mt-2">Delete</a>         
+                        <a href = "{% url 'edit' hotel.id %}" class="btn btn-primary mt-2">Edit</a>
+                        <a href = "{% url 'delete' hotel.id %}" class="btn btn-danger mt-2">Delete</a>         
                     </div>
                     <br />
                     {% endfor %}
