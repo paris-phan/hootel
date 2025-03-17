@@ -56,14 +56,11 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-<<<<<<< HEAD
-    'patron',
-=======
 
     #local apps
     "google_login",
     'hotelmanager6000',
->>>>>>> main
+    'patron',
 ]
 
 #allauth settings
