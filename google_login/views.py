@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth import logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
@@ -9,6 +9,7 @@ from allauth.socialaccount.models import SocialApp
 # added these for login redirection 
 from django.contrib.auth.decorators import login_required
 from .models import UserProfile
+from django.views.decorators.http import require_POST
 
 def home(request):
     if not request.user.is_authenticated:
@@ -23,7 +24,9 @@ def home(request):
     context = {
         'name': request.user.username,
         'email': request.user.email,
-        'user_type': user_profile.user_type
+        'user_type': user_profile.user_type,
+        'profile_picture': user_profile.profile_picture,
+        'profile_picture_url': user_profile.profile_picture_url
     }
     
     # Handle user types
@@ -56,3 +59,29 @@ def login(request):
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/login')
+
+@require_POST
+@login_required
+def update_profile_picture(request):
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            
+            # Delete old profile picture if it exists to avoid storage buildup
+            if user_profile.profile_picture:
+                user_profile.profile_picture.delete(save=False)
+                
+            # Save the new profile picture
+            user_profile.profile_picture = request.FILES.get('profile_picture')
+            user_profile.save()
+            
+            return JsonResponse({
+                'success': True,
+                'image_url': user_profile.profile_picture_url
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
