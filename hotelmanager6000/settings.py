@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 import dj_database_url
 from pathlib import Path
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -132,7 +133,9 @@ DATABASES = {
 
 # Configure Django for Heroku deployment
 import django_heroku
-django_heroku.settings(locals())
+# Only configure Django for Heroku in non-test environments
+if 'test' not in sys.argv:
+    django_heroku.settings(locals())
 
 
 # Password validation
@@ -234,4 +237,16 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'  # Default redirect
 LIBRARIAN_LOGIN_REDIRECT_URL = '/librarian/' # Librarian redirect
 LOGOUT_REDIRECT_URL = '/login/'
+
+# Add to your settings.py for testing
+if 'test' in sys.argv:
+    # Use simple test runner for CI
+    TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+    # Use in-memory SQLite for tests
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
 
