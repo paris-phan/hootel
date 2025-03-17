@@ -15,28 +15,36 @@
         button { display: block; margin: 10px auto; padding: 10px 20px; font-size: 16px; }
         .results { margin-top: 20px; }
         .results {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
             background-color: #f0f0f0;
             border: 1px solid #ccc;
             padding: 10px;
             margin-top: 10px;
         }
-        .results ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .results li {
-            font-size: 18px;
-            font-family: Arial, sans-serif;
-            font-weight: 500;
-            margin-bottom: 5px;
-            text-align: left;
-            padding: 5px 0;
+        .hotel-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
             border-bottom: 1px solid #ccc;
+            text-align: left;
         }
-        .results li:last-child {
-            border-bottom: none;
+        .hotel-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+        .hotel-info {
+            flex-grow: 1;
+        }
+        .hotel-name {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .hotel-location {
+            color: #666;
         }
     </style>
 </head>
@@ -50,11 +58,34 @@
 
 <div class="results">
     {% if hotels %}
-    <ul>
+    <div class="hotels-list">
         {% for hotel in hotels %}
-        <li>{{ hotel.name }} - {{ hotel.location }}</li>
+        <div class="hotel-item">
+            {% if is_librarian %}
+            <!-- For librarians: clickable image with hidden form -->
+            <form id="hotelImageForm-{{ hotel.id }}" method="post" enctype="multipart/form-data" style="display:none;">
+                {% csrf_token %}
+                <input type="file" id="hotelImageInput-{{ hotel.id }}" name="hotel_image" accept="image/*">
+            </form>
+            <div class="hotel-image-container" style="position: relative; cursor: pointer;" 
+                 data-id="{{ hotel.id }}"
+                 onclick="document.getElementById('hotelImageInput-{{ hotel.id }}').click();">
+                <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}" class="hotel-image">
+                <div style="position: absolute; bottom: 0; width: 85%; background-color: rgba(0,0,0,0.5); color: white; padding: 2px 0; font-size: 10px; text-align: center;">
+                    Update image
+                </div>
+            </div>
+            {% else %}
+            <!-- For patrons: non-clickable image -->
+            <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}" class="hotel-image">
+            {% endif %}
+            <div class="hotel-info">
+                <div class="hotel-name">{{ hotel.name }}</div>
+                <div class="hotel-location">{{ hotel.location }}</div>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
     {% elif query %}
     <p>No results found.</p>
     {% endif %}
@@ -64,6 +95,58 @@
     <a href="{% url 'home' %}" class="btn btn-primary mt-2">Back to Home</a>
 </div>
 
+{% if is_librarian %}
+<!-- JavaScript for handling hotel image uploads -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Use class-based selection rather than generating IDs dynamically
+    const uploadForms = document.querySelectorAll('form[id^="hotelImageForm-"]');
+    
+    uploadForms.forEach(function(form) {
+        const hotelId = form.id.split('-')[1];
+        const fileInput = document.getElementById(`hotelImageInput-${hotelId}`);
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (!this.files || !this.files[0]) return;
+                
+                const formData = new FormData(form);
+                const imageContainer = document.querySelector(`.hotel-image-container[data-id="${hotelId}"]`);
+                const hotelImage = imageContainer.querySelector('img');
+                
+                // Show loading state
+                hotelImage.style.opacity = '0.5';
+                
+                // Use a URL without template tags
+                const updateUrl = `/update_hotel_image/${hotelId}/`;
+                
+                fetch(updateUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        hotelImage.src = `${data.image_url}?t=${new Date().getTime()}`;
+                    } else {
+                        alert(`Failed to upload image: ${data.error}`);
+                    }
+                    hotelImage.style.opacity = '1';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while uploading the image.');
+                    hotelImage.style.opacity = '1';
+                });
+            });
+        }
+    });
+});
+</script>
+{% endif %}
 
 </body>
 </html>

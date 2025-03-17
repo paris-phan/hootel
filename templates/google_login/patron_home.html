@@ -10,6 +10,22 @@
             <div class="card-body">
                 <h2 class="card-title">Welcome Patron!</h2>
                 <div class="user-info mb-4">
+                    <!-- Hidden file input -->
+                    <form id="profilePictureForm" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*" style="display:none;">
+                    </form>
+                    
+                    <!-- Profile picture circle (clickable) -->
+                    <div class="text-center mb-3">
+                        <div id="profilePictureContainer" style="width: 150px; height: 150px; overflow: hidden; border-radius: 50%; margin: 0 auto; cursor: pointer; position: relative;">
+                            <img id="profileImage" src="{{ profile_picture_url }}" 
+                                 alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div style="position: absolute; bottom: 0; width: 100%; background-color: rgba(0,0,0,0.5); color: white; padding: 10px 0; font-size: 10px;">
+                                Click to change
+                            </div>
+                        </div>
+                    </div>
                     <p><strong>Name:</strong> {{ name }}</p>
                     <p><strong>Email:</strong> {{ email }}</p>
                     <p><strong>Account Type:</strong> {{ user_type }}</p>
@@ -30,4 +46,54 @@
         </div>
     </div>
 </div>
+
+<!-- JavaScript for handling the profile picture upload -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const profilePictureContainer = document.getElementById('profilePictureContainer');
+    const profilePictureInput = document.getElementById('profilePictureInput');
+    const profilePictureForm = document.getElementById('profilePictureForm');
+    const profileImage = document.getElementById('profileImage');
+    
+    // Click on profile picture opens file explorer
+    profilePictureContainer.addEventListener('click', function() {
+        profilePictureInput.click();
+    });
+    
+    // When a file is selected, upload it automatically
+    profilePictureInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            // Display loading state
+            profileImage.style.opacity = '0.5';
+            
+            const formData = new FormData(profilePictureForm);
+            
+            // Send AJAX request to upload the image
+            fetch('{% url "update_profile_picture" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the profile picture with the new one
+                    profileImage.src = data.image_url + '?t=' + new Date().getTime(); // Add timestamp to prevent caching
+                    profileImage.style.opacity = '1';
+                } else {
+                    alert('Failed to upload image: ' + data.error);
+                    profileImage.style.opacity = '1';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while uploading the image.');
+                profileImage.style.opacity = '1';
+            });
+        }
+    });
+});
+</script>
 {% endblock %}
