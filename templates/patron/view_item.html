@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ item.title }} - CLA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h2>{{ item.title }}</h2>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">
+                {% if item.collection %}
+                Part of collection: 
+                <a href="{% url 'view_collection_items' item.collection.id %}">{{ item.collection.name }}</a>
+                {% if item.collection.is_private %}
+                    <span class="badge bg-warning">Private Collection</span>
+                {% else %}
+                    <span class="badge bg-success">Public Collection</span>
+                {% endif %}
+                {% else %}
+                Not part of any collection
+                {% endif %}
+            </p>
+            <p>Created by: {{ item.creator.username }}</p>
+            <div class="mt-3">
+                <h4>Description</h4>
+                <p>{{ item.description }}</p>
+            </div>
+            
+            <div class="mt-4">
+                {% if borrowing_status %}
+                    {% if borrowing_status.status == 'PENDING' %}
+                        <div class="alert alert-warning">
+                            You have a pending request to borrow this item.
+                        </div>
+                    {% elif borrowing_status.status == 'APPROVED' %}
+                        <div class="alert alert-success">
+                            You are currently borrowing this item.
+                            <p><strong>Due date:</strong> {{ borrowing_status.due_date|date:"F j, Y" }}</p>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'request_item_borrow' item.id %}" class="btn btn-success">Request to Borrow</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        {% if item.collection %}
+            <a href="{% url 'view_collection_items' item.collection.id %}" class="btn btn-secondary">Back to Collection</a>
+        {% else %}
+            <a href="{% url 'view_collections' %}" class="btn btn-secondary">Back to Collections</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

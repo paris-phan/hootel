@@ -17,10 +17,13 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from .views import search
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('google_login.urls')),
     path('patron/', include('patron.urls')),
+    path('', include('librarian.urls')),
+    path('search/', search, name='search'),
 ]

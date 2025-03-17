@@ -12,12 +12,15 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 import dj_database_url
-
 from pathlib import Path
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# For local development with .env file
+from dotenv import load_dotenv
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -39,23 +42,28 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    #django apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    #django apps
-    "google_login",
-
-    #packages
     'django.contrib.sites',
+
+    #third party apps
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+<<<<<<< HEAD
     'patron',
+=======
+
+    #local apps
+    "google_login",
+    'hotelmanager6000',
+>>>>>>> main
 ]
 
 #allauth settings
@@ -65,7 +73,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-SITE_ID = 1
+SITE_ID = 2
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -78,6 +86,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
 
 
 
@@ -128,7 +137,9 @@ DATABASES = {
 
 # Configure Django for Heroku deployment
 import django_heroku
-django_heroku.settings(locals())
+# Only configure Django for Heroku in non-test environments
+if 'test' not in sys.argv:
+    django_heroku.settings(locals())
 
 
 # Password validation
@@ -176,6 +187,49 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 
+
+
+
+
+
+
+
+#AWS Configuration - Using environment variables
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+
+
+#S3 Configuration
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', 'hoo-tel-bucket')
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_FILE_OVERWRITE = True
+
+#Django Storage Configuration
+STORAGES = {
+    #media file (image) management
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    #static file (css, js, images) management
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+    },
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_LOGIN_METHODS = {'email'}
@@ -184,6 +238,19 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 
     
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'  # Default redirect
+LIBRARIAN_LOGIN_REDIRECT_URL = '/librarian/' # Librarian redirect
 LOGOUT_REDIRECT_URL = '/login/'
+
+# Add to your settings.py for testing
+if 'test' in sys.argv:
+    # Use simple test runner for CI
+    TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+    # Use in-memory SQLite for tests
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
 
