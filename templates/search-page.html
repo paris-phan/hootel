@@ -68,6 +68,7 @@
                 <input type="file" id="hotelImageInput-{{ hotel.id }}" name="hotel_image" accept="image/*">
             </form>
             <div class="hotel-image-container" style="position: relative; cursor: pointer;" 
+                 data-id="{{ hotel.id }}"
                  onclick="document.getElementById('hotelImageInput-{{ hotel.id }}').click();">
                 <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}" class="hotel-image">
                 <div style="position: absolute; bottom: 0; width: 85%; background-color: rgba(0,0,0,0.5); color: white; padding: 2px 0; font-size: 10px; text-align: center;">
@@ -98,21 +99,28 @@
 <!-- JavaScript for handling hotel image uploads -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    {% for hotel in hotels %}
-    // Set up file input change handler for each hotel
-    const hotelImageInput{{ hotel.id }} = document.getElementById('hotelImageInput-{{ hotel.id }}');
+    // Use class-based selection rather than generating IDs dynamically
+    const uploadForms = document.querySelectorAll('form[id^="hotelImageForm-"]');
     
-    if (hotelImageInput{{ hotel.id }}) {
-        hotelImageInput{{ hotel.id }}.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const formData = new FormData(document.getElementById('hotelImageForm-{{ hotel.id }}'));
+    uploadForms.forEach(function(form) {
+        const hotelId = form.id.split('-')[1];
+        const fileInput = document.getElementById(`hotelImageInput-${hotelId}`);
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (!this.files || !this.files[0]) return;
                 
-                // Get the hotel image element
-                const hotelImage = this.closest('.hotel-image-container').querySelector('img');
+                const formData = new FormData(form);
+                const imageContainer = document.querySelector(`.hotel-image-container[data-id="${hotelId}"]`);
+                const hotelImage = imageContainer.querySelector('img');
+                
+                // Show loading state
                 hotelImage.style.opacity = '0.5';
                 
-                // Send AJAX request to update the image
-                fetch('{% url "update_hotel_image" hotel.id %}', {
+                // Use a URL without template tags
+                const updateUrl = `/update_hotel_image/${hotelId}/`;
+                
+                fetch(updateUrl, {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -122,22 +130,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        hotelImage.src = data.image_url + '?t=' + new Date().getTime();
-                        hotelImage.style.opacity = '1';
+                        hotelImage.src = `${data.image_url}?t=${new Date().getTime()}`;
                     } else {
-                        alert('Failed to upload image: ' + data.error);
-                        hotelImage.style.opacity = '1';
+                        alert(`Failed to upload image: ${data.error}`);
                     }
+                    hotelImage.style.opacity = '1';
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('An error occurred while uploading the image.');
                     hotelImage.style.opacity = '1';
                 });
-            }
-        });
-    }
-    {% endfor %}
+            });
+        }
+    });
 });
 </script>
 {% endif %}
