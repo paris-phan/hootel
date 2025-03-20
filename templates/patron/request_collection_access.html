@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Request Access to {{ collection.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2>Request Access</h2>
+                </div>
+                <div class="card-body">
+                    <h4>{{ collection.name }}</h4>
+                    <p class="text-muted">Created by: {{ collection.creator.username }}</p>
+                    
+                    {% if existing_request %}
+                        <div class="alert alert-info">
+                            <h5>You already have a request for this collection</h5>
+                            <p>Status: <strong>{{ existing_request.get_status_display }}</strong></p>
+                            <p>Requested on: {{ existing_request.request_date|date:"F j, Y" }}</p>
+                            
+                            {% if existing_request.status == 'rejected' %}
+                                <p>Your previous request was rejected. You can submit a new request.</p>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary">Request Access Again</button>
+                                </form>
+                            {% elif existing_request.status == 'pending' %}
+                                <p>Your request is still pending approval from the collection owner.</p>
+                            {% elif existing_request.status == 'approved' %}
+                                <p>Your request has been approved! You now have access to this collection.</p>
+                                <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-success">View Collection</a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p>This is a private collection. To view its contents, you need to request access from the collection owner.</p>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="reason" class="form-label">Reason for Access Request (Optional)</label>
+                                <textarea class="form-control" id="reason" name="reason" rows="3" placeholder="Explain why you need access to this collection"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Request Access</button>
+                        </form>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'patron:view_collections' %}" class="btn btn-secondary">Back to Collections</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

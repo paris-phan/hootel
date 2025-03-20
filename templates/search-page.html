@@ -82,6 +82,11 @@
             <div class="hotel-info">
                 <div class="hotel-name">{{ hotel.name }}</div>
                 <div class="hotel-location">{{ hotel.location }}</div>
+                {% if not is_librarian %}
+                <div class="mt-2">
+                    <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-primary btn-sm">Book Now</a>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% endfor %}

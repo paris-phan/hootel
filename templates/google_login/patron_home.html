@@ -31,10 +31,9 @@
                     <p><strong>Account Type:</strong> {{ user_type }}</p>
                 </div>
                 <div class="d-grid gap-2 mt-4">
-                    <a href="{% url 'view_hotels' %}" class="btn btn-primary">View Hotels</a>
-                    <a href="{% url 'my_bookings' %}" class="btn btn-info">My Bookings</a>
+                    <a href="{% url 'patron:my_bookings' %}" class="btn btn-info">My Bookings</a>
+                    <a href="{% url 'patron:search' %}" class="btn btn-primary">Search Hotels</a>
                     <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
-                    <a href="{% url 'search' %}" class="btn btn-primary mt-2">Search Hotels</a>
                 </div>
             </div>
         </div>

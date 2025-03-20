@@ -1,115 +1,96 @@
 {% extends 'base/base.html' %}
 
-{% block title %}My Borrowed Items - CLA{% endblock %}
+{% block title %}My Borrowed Items{% endblock %}
 
 {% block content %}
 <div class="container">
     <h2 class="mb-4">My Borrowed Items</h2>
-    
-    <div class="card">
-        <div class="card-header">
-            <ul class="nav nav-tabs card-header-tabs" id="borrowingTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">Pending Requests</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab">Currently Borrowed</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">Borrowing History</button>
-                </li>
-            </ul>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4>Currently Borrowed</h4>
         </div>
         <div class="card-body">
-            <div class="tab-content" id="borrowingTabsContent">
-                <!-- Pending Requests -->
-                <div class="tab-pane fade show active" id="pending" role="tabpanel">
-                    <div class="row">
-                        {% for borrowing in borrowings %}
-                        {% if borrowing.status == 'PENDING' %}
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ borrowing.item.title }}</h5>
-                                    <p class="card-text">{{ borrowing.item.description|truncatechars:100 }}</p>
-                                    <p><strong>Requested on:</strong> {{ borrowing.request_date|date:"F j, Y" }}</p>
-                                    <span class="badge bg-warning">Pending Approval</span>
-                                    <div class="mt-2">
-                                        <a href="{% url 'view_item' borrowing.item.id %}" class="btn btn-sm btn-primary">View Item</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Collection</th>
+                            <th>Borrowed Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for borrowing in current_borrowings %}
+                        <tr>
+                            <td><a href="{% url 'patron:view_item' borrowing.item.id %}">{{ borrowing.item.title }}</a></td>
+                            <td><a href="{% url 'patron:view_collection_items' borrowing.item.collection.id %}">{{ borrowing.item.collection.name }}</a></td>
+                            <td>{{ borrowing.request_date|date:"F j, Y" }}</td>
+                            <td>{{ borrowing.due_date|date:"F j, Y" }}</td>
+                            <td>
+                                <span class="badge {% if borrowing.status == 'approved' %}bg-success{% elif borrowing.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ borrowing.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'patron:view_item' borrowing.item.id %}" class="btn btn-sm btn-info">View</a>
+                            </td>
+                        </tr>
                         {% empty %}
-                        <div class="col-12">
-                            <p>You don't have any pending borrowing requests.</p>
-                        </div>
+                        <tr>
+                            <td colspan="6" class="text-center">You don't have any currently borrowed items.</td>
+                        </tr>
                         {% endfor %}
-                    </div>
-                </div>
-                
-                <!-- Currently Borrowed -->
-                <div class="tab-pane fade" id="approved" role="tabpanel">
-                    <div class="row">
-                        {% for borrowing in borrowings %}
-                        {% if borrowing.status == 'APPROVED' %}
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ borrowing.item.title }}</h5>
-                                    <p class="card-text">{{ borrowing.item.description|truncatechars:100 }}</p>
-                                    <p><strong>Due date:</strong> {{ borrowing.due_date|date:"F j, Y" }}</p>
-                                    <span class="badge bg-success">Currently Borrowing</span>
-                                    <div class="mt-2">
-                                        <a href="{% url 'view_item' borrowing.item.id %}" class="btn btn-sm btn-primary">View Item</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h4>Borrowing History</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Collection</th>
+                            <th>Borrowed Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for borrowing in past_borrowings %}
+                        <tr>
+                            <td><a href="{% url 'patron:view_item' borrowing.item.id %}">{{ borrowing.item.title }}</a></td>
+                            <td><a href="{% url 'patron:view_collection_items' borrowing.item.collection.id %}">{{ borrowing.item.collection.name }}</a></td>
+                            <td>{{ borrowing.request_date|date:"F j, Y" }}</td>
+                            <td>{{ borrowing.return_date|date:"F j, Y" }}</td>
+                            <td>
+                                <span class="badge {% if borrowing.status == 'approved' %}bg-success{% elif borrowing.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ borrowing.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'patron:view_item' borrowing.item.id %}" class="btn btn-sm btn-info">View</a>
+                                <a href="{% url 'patron:request_item_borrow' borrowing.item.id %}" class="btn btn-sm btn-success">Borrow Again</a>
+                            </td>
+                        </tr>
                         {% empty %}
-                        <div class="col-12">
-                            <p>You don't have any items currently borrowed.</p>
-                        </div>
+                        <tr>
+                            <td colspan="6" class="text-center">You don't have any borrowing history.</td>
+                        </tr>
                         {% endfor %}
-                    </div>
-                </div>
-                
-                <!-- Borrowing History -->
-                <div class="tab-pane fade" id="history" role="tabpanel">
-                    <div class="row">
-                        {% for borrowing in borrowings %}
-                        {% if borrowing.status == 'RETURNED' or borrowing.status == 'REJECTED' %}
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ borrowing.item.title }}</h5>
-                                    <p class="card-text">{{ borrowing.item.description|truncatechars:100 }}</p>
-                                    <p><strong>Status:</strong> 
-                                        {% if borrowing.status == 'RETURNED' %}
-                                        <span class="badge bg-info">Returned</span>
-                                        {% elif borrowing.status == 'REJECTED' %}
-                                        <span class="badge bg-danger">Request Rejected</span>
-                                        {% endif %}
-                                    </p>
-                                    {% if borrowing.status == 'RETURNED' %}
-                                    <p><strong>Return date:</strong> {{ borrowing.return_date|date:"F j, Y" }}</p>
-                                    {% endif %}
-                                    <div class="mt-2">
-                                        <a href="{% url 'view_item' borrowing.item.id %}" class="btn btn-sm btn-primary">View Item</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-                        {% empty %}
-                        <div class="col-12">
-                            <p>You don't have any borrowing history.</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

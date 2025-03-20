@@ -1,0 +1,44 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ collection.name }} - Items{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">{{ collection.name }}</h2>
+    <p class="lead">{{ collection.description }}</p>
+    <p class="text-muted">Created by: {{ collection.creator.username }} on {{ collection.created_at|date:"F j, Y" }}</p>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4>Items in this Collection</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for item in items %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.title }}</h5>
+                            <p class="card-text">{{ item.description|truncatechars:100 }}</p>
+                            <p class="text-muted">Added: {{ item.created_at|date:"F j, Y" }}</p>
+                            <div class="d-flex">
+                                <a href="{% url 'patron:view_item' item.id %}" class="btn btn-sm btn-info me-2">View Details</a>
+                                <a href="{% url 'patron:request_item_borrow' item.id %}" class="btn btn-sm btn-success">Borrow</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p>No items in this collection yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'patron:view_collections' %}" class="btn btn-secondary">Back to Collections</a>
+    </div>
+</div>
+{% endblock %} 

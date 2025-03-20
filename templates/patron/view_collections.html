@@ -6,7 +6,7 @@
 <div class="container">
     <h2 class="mb-4">Collections</h2>
     <div class="d-flex justify-content-end mb-3">
-        <a href="{% url 'create_collection' %}" class="btn btn-primary">Create Collection</a>
+        <a href="{% url 'patron:create_collection' %}" class="btn btn-primary">Create Collection</a>
     </div>
 
     <!-- Public Collections -->
@@ -23,7 +23,7 @@
                             <h5 class="card-title">{{ collection.name }}</h5>
                             <p class="card-text">{{ collection.description|truncatechars:100 }}</p>
                             <p class="text-muted">Created by: {{ collection.creator.username }}</p>
-                            <a href="{% url 'view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Items</a>
+                            <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Items</a>
                         </div>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                             <h5 class="card-title">{{ collection.name }}</h5>
                             <p class="card-text">{{ collection.description|truncatechars:100 }}</p>
                             <p class="text-muted">Created by: {{ collection.creator.username }}</p>
-                            <a href="{% url 'view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Items</a>
+                            <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Items</a>
                         </div>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                             <h5 class="card-title">{{ collection.name }}</h5>
                             <p class="card-text">This is a private collection. Request access to view its contents.</p>
                             <p class="text-muted">Created by: {{ collection.creator.username }}</p>
-                            <a href="{% url 'request_collection_access' collection.id %}" class="btn btn-sm btn-warning">Request Access</a>
+                            <a href="{% url 'patron:request_collection_access' collection.id %}" class="btn btn-sm btn-warning">Request Access</a>
                         </div>
                     </div>
                 </div>
