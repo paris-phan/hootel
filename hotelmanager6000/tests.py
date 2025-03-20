@@ -34,7 +34,7 @@ class S3ConnectionTests(TestCase):
     def test_hotel_image_default_url(self, mock_url):
         # Test default hotel image URL
         mock_url.__get__ = MagicMock(return_value='https://example.com/default_hotel.png')
-        response = self.client.get(reverse('search'))
+        response = self.client.get(reverse('search'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn('hotels', response.context)
         
