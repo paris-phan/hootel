@@ -1,0 +1,76 @@
+{% extends 'base/base.html' %}
+
+{% block title %}My Bookings - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">My Bookings</h2>
+    
+    {% if messages %}
+    <div class="row">
+        <div class="col-12">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="row">
+        {% for booking in bookings %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %} text-white">
+                    <h5 class="mb-0">{{ booking.hotel.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><strong>Location:</strong> {{ booking.hotel.location }}</p>
+                    <p class="card-text"><strong>Check-in:</strong> {{ booking.check_in_date }}</p>
+                    <p class="card-text"><strong>Check-out:</strong> {{ booking.check_out_date }}</p>
+                    <p class="card-text">
+                        <strong>Status:</strong> 
+                        <span class="badge {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ booking.get_status_display }}
+                        </span>
+                    </p>
+                    
+                    {% if booking.status == 'PENDING' %}
+                    <div class="alert alert-info">
+                        Your booking request is awaiting approval from a librarian.
+                        <div class="mt-2">
+                            <a href="{% url 'patron:cancel_booking' booking.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?')">Cancel Booking</a>
+                        </div>
+                    </div>
+                    {% elif booking.status == 'APPROVED' %}
+                    <div class="alert alert-success">
+                        Your booking has been approved. Enjoy your stay!
+                    </div>
+                    {% elif booking.status == 'REJECTED' %}
+                    <div class="alert alert-danger">
+                        Your booking request was declined. Please contact a librarian for more information.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Requested on: {{ booking.created_at|date:"F j, Y" }}</small>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <p>You don't have any bookings yet.</p>
+                <a href="{% url 'patron:search' %}" class="btn btn-primary">Search Hotels</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+        <a href="{% url 'patron:search' %}" class="btn btn-primary">Book Another Hotel</a>
+    </div>
+</div>
+{% endblock %} 

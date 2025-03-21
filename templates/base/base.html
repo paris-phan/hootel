@@ -10,15 +10,68 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="/">HotelManager6000</a>
-            <div class="navbar-nav ms-auto">
-                {% if user.is_authenticated %}
-                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                {% endif %}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patron:search' %}">Search Hotels</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patron:my_bookings' %}">My Bookings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patron:view_collections' %}">Collections</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patron:my_borrowed_items' %}">My Borrowed Items</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patron:manage_hotels' %}">Manage Hotels</a>
+                    </li>
+                    {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patron:manage_booking_requests' %}">Manage Bookings</a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="nav-link">Welcome, {{ user.username }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </nav>
 
     <div class="container mt-4">
+        {% if messages %}
+        <div class="row">
+            <div class="col-12">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
         {% block content %}{% endblock %}
     </div>
 

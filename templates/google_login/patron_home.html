@@ -8,7 +8,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title">Welcome Patron!</h2>
+                <h2 class="card-title">Welcome Patron {{ name }}!</h2>
                 <div class="user-info mb-4">
                     <!-- Hidden file input -->
                     <form id="profilePictureForm" method="post" enctype="multipart/form-data">
@@ -30,17 +30,10 @@
                     <p><strong>Email:</strong> {{ email }}</p>
                     <p><strong>Account Type:</strong> {{ user_type }}</p>
                 </div>
-                <div class="patron-features">
-                    <h3>Patron Features</h3>
-                    <ul class="list-group">
-                        <li class="list-group-item">Browse Catalog</li>
-                        <li class="list-group-item">Request Items</li>
-                        <li class="list-group-item">View Borrowing History</li>
-                    </ul>
-                </div>
                 <div class="d-grid gap-2 mt-4">
+                    <a href="{% url 'patron:my_bookings' %}" class="btn btn-info">My Bookings</a>
+                    <a href="{% url 'patron:search' %}" class="btn btn-primary">Search Hotels</a>
                     <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
-                    <a href="{% url 'search' %}" class="btn btn-primary mt-2">Search Hotels</a>
                 </div>
             </div>
         </div>

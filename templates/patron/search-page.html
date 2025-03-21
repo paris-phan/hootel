@@ -1,0 +1,68 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Search Hotels - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Available Hotels</h2>
+    
+    {% if messages %}
+    <div class="row">
+        <div class="col-12">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <form method="GET" action="{% url 'patron:search' %}" class="mb-4">
+        <div class="input-group">
+            <input type="text" class="form-control" name="query" value="{{ query|default:'' }}" placeholder="🔍 Search hotels by name or location">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+    
+    <div class="row">
+        {% for hotel in hotels %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ hotel.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ hotel.location }}</h6>
+                    <p class="card-text">{{ hotel.description|truncatechars:150 }}</p>
+                    {% if hotel.created_by %}
+                    <p class="card-text"><small class="text-muted">Created by: {{ hotel.created_by.username }}</small></p>
+                    {% endif %}
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-primary">Book Now</a>
+                        <a href="{% url 'patron:view_hotel' hotel.id %}" class="btn btn-secondary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <p>No hotels are currently available.</p>
+                {% if user.is_staff %}
+                <p>As a librarian, you can <a href="{% url 'patron:create_hotel' %}">add hotels</a> to the system.</p>
+                {% else %}
+                <p>Please check back later or contact a librarian to add hotels.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'patron:create_hotel' %}" class="btn btn-primary">Add New Hotel</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

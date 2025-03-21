@@ -1,0 +1,70 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ item.title }} - Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2>{{ item.title }}</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4>Description</h4>
+                    <p>{{ item.description }}</p>
+                    
+                    <h4>Collection</h4>
+                    <p><a href="{% url 'patron:view_collection_items' item.collection.id %}">{{ item.collection.name }}</a></p>
+                    
+                    <h4>Created by</h4>
+                    <p>{{ item.creator.username }}</p>
+                    
+                    <h4>Added on</h4>
+                    <p>{{ item.created_at|date:"F j, Y" }}</p>
+                    
+                    {% if borrowing %}
+                        <div class="alert alert-info">
+                            <h4>Borrowing Status</h4>
+                            <p>Status: <strong>{{ borrowing.get_status_display }}</strong></p>
+                            <p>Requested on: {{ borrowing.request_date|date:"F j, Y" }}</p>
+                            {% if borrowing.due_date %}
+                                <p>Due on: {{ borrowing.due_date|date:"F j, Y" }}</p>
+                            {% endif %}
+                            {% if borrowing.return_date %}
+                                <p>Returned on: {{ borrowing.return_date|date:"F j, Y" }}</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-secondary text-white">
+                            Actions
+                        </div>
+                        <div class="card-body">
+                            {% if not borrowing %}
+                                <a href="{% url 'patron:request_item_borrow' item.id %}" class="btn btn-success btn-block mb-2">Request to Borrow</a>
+                            {% elif borrowing.status == 'approved' and not borrowing.return_date %}
+                                <p class="text-success">You have this item borrowed until {{ borrowing.due_date|date:"F j, Y" }}.</p>
+                            {% elif borrowing.status == 'pending' %}
+                                <p class="text-warning">Your borrow request is pending approval.</p>
+                            {% elif borrowing.status == 'rejected' %}
+                                <p class="text-danger">Your borrow request was rejected.</p>
+                                <a href="{% url 'patron:request_item_borrow' item.id %}" class="btn btn-success btn-block mb-2">Request Again</a>
+                            {% elif borrowing.return_date %}
+                                <p class="text-info">You returned this item on {{ borrowing.return_date|date:"F j, Y" }}.</p>
+                                <a href="{% url 'patron:request_item_borrow' item.id %}" class="btn btn-success btn-block mb-2">Borrow Again</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'patron:view_collection_items' item.collection.id %}" class="btn btn-secondary">Back to Collection</a>
+    </div>
+</div>
+{% endblock %} 

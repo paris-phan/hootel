@@ -1,0 +1,51 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ collection.name }} Items - CLA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="mb-4">
+        <h2>{{ collection.name }}</h2>
+        <p class="text-muted">
+            {{ collection.description }}
+            {% if collection.is_private %}
+                <span class="badge bg-warning">Private Collection</span>
+            {% else %}
+                <span class="badge bg-success">Public Collection</span>
+            {% endif %}
+        </p>
+        <p>Created by: {{ collection.creator.username }}</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Items in this Collection</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for item in items %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.title }}</h5>
+                            <p class="card-text">{{ item.description|truncatechars:100 }}</p>
+                            <p class="text-muted">Added: {{ item.created_at|date:"F j, Y" }}</p>
+                            <a href="{% url 'view_item' item.id %}" class="btn btn-sm btn-primary">View Details</a>
+                            <a href="{% url 'request_item_borrow' item.id %}" class="btn btn-sm btn-success">Borrow</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p>No items in this collection yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'view_collections' %}" class="btn btn-secondary">Back to Collections</a>
+    </div>
+</div>
+{% endblock %} 

@@ -17,12 +17,13 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from .views import search
+from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('google_login.urls')),
+    path('patron/', include('patron.urls', namespace='patron')),
     path('', include('librarian.urls')),
-    path('search/', search, name='search'),
+    path('search/', lambda request: redirect('patron:search'), name='search'),
 ]

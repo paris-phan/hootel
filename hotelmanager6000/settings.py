@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     #local apps
     "google_login",
     'hotelmanager6000',
+    'patron',
 ]
 
 #allauth settings
