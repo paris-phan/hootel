@@ -1,6 +1,6 @@
-{% extends 'base/base.html' %}
+{% extends base_template %}
 
-{% block title %}Create Collection{% endblock %}
+{% block title %}Create Collection - HotelManager6000{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -8,20 +8,21 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h2>Create a New Collection</h2>
+                    <h2>Create a New Booking Collection</h2>
                 </div>
                 <div class="card-body">
+                    <p class="lead">Collections help you organize your hotel bookings. Create a collection like "Business Trips", "Family Vacations", or "Weekend Getaways".</p>
                     <form method="post">
                         {% csrf_token %}
                         
                         <div class="mb-3">
                             <label for="name" class="form-label">Collection Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="e.g. Summer Trips, Business Stays, etc.">
                         </div>
                         
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Describe this collection of bookings..."></textarea>
                         </div>
                         
                         {% if user.is_staff %}

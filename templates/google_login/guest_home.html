@@ -1,0 +1,55 @@
+{% extends base_template %}
+
+{% block title %}Welcome to HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="jumbotron py-5 text-center">
+        <h1 class="display-4">Welcome to HotelManager6000</h1>
+        <p class="lead">Browse our collection of hotels and discover your next dream vacation</p>
+        
+        <hr class="my-4">
+        
+        <p>You are currently browsing as a guest. You can view hotels and collections without an account.</p>
+        <p>To book hotels or create your own collections, please sign in.</p>
+        
+        <div class="mt-4">
+            <a href="{% url 'patron:search' %}" class="btn btn-primary btn-lg me-2">Browse Hotels</a>
+            <a href="{% url 'patron:view_collections' %}" class="btn btn-success btn-lg me-2">View Collections</a>
+            <a href="{% url 'login' %}" class="btn btn-dark btn-lg">Sign In</a>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Browse Hotels</h3>
+                    <p class="card-text">Explore our selection of premium hotels from around the world.</p>
+                    <a href="{% url 'patron:search' %}" class="btn btn-primary">Search Hotels</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title">View Collections</h3>
+                    <p class="card-text">Discover curated collections of the finest accommodations.</p>
+                    <a href="{% url 'patron:view_collections' %}" class="btn btn-success">Browse Collections</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Create Account</h3>
+                    <p class="card-text">Sign in to book hotels and create your own collections.</p>
+                    <a href="{% url 'login' %}" class="btn btn-dark">Sign In Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %}
+{% extends base_template %}
 
 {% block title %}Manage Hotels - HotelManager6000{% endblock %}
 
@@ -19,7 +19,7 @@
     {% endif %}
     
     <div class="d-flex justify-content-end mb-4">
-        <a href="{% url 'patron:create_hotel' %}" class="btn btn-primary">Add New Hotel</a>
+        <a href="{% url 'create_hotel' %}" class="btn btn-primary">Add New Hotel</a>
     </div>
     
     <div class="row">
@@ -57,7 +57,8 @@
                     {% endif %}
                     <div class="d-flex justify-content-between mt-3">
                         <a href="{% url 'patron:view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View</a>
-                        <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-sm btn-success">Book</a>
+                        <a href="{% url 'patron:update_hotel' hotel.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                        <a href="{% url 'patron:delete_hotel' hotel.id %}" class="btn btn-sm btn-danger">Delete</a>
                     </div>
                 </div>
             </div>
@@ -65,7 +66,7 @@
         {% empty %}
         <div class="col-12">
             <div class="alert alert-info">
-                No hotels available. <a href="{% url 'patron:create_hotel' %}">Create one now</a>.
+                No hotels available. <a href="{% url 'create_hotel' %}">Create one now</a>.
             </div>
         </div>
         {% endfor %}
@@ -96,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 img.style.opacity = '0.5';
                 
                 // Send AJAX request to update the image
-                fetch(`{% url 'patron:update_hotel_image' 0 %}`.replace('0', hotelId), {
+                fetch(`{% url 'update_hotel_image' 0 %}`.replace('0', hotelId), {
                     method: 'POST',
                     body: formData,
                     headers: {
