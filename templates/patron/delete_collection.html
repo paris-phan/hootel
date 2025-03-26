@@ -1,0 +1,31 @@
+{% extends base_template %}
+
+{% block title %}Delete Collection - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Delete Collection</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-danger">Are you sure you want to delete this collection?</h5>
+            <p class="card-text">You are about to delete the collection "<strong>{{ collection.name }}</strong>".</p>
+            <p class="card-text">This action cannot be undone. All hotels saved in this collection will be removed from the collection.</p>
+            
+            {% if collection.bookings.count > 0 %}
+            <div class="alert alert-warning">
+                <p><i class="bi bi-exclamation-triangle-fill"></i> This collection contains <strong>{{ collection.bookings.count }}</strong> hotel{% if collection.bookings.count != 1 %}s{% endif %}.</p>
+            </div>
+            {% endif %}
+            
+            <form method="POST">
+                {% csrf_token %}
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-danger">Yes, Delete Collection</button>
+                    <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

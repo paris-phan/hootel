@@ -8,6 +8,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.db import models
 from django.views.decorators.http import require_POST
+from django.urls import reverse
 
 # Create your views here.
 
@@ -78,24 +79,33 @@ def view_collections(request):
     # Get all public collections
     public_collections = Collection.objects.filter(is_private=False)
     
-    # Get private collections (just titles)
-    private_collections = Collection.objects.filter(is_private=True)
+    # Get user's own collections (both public and private)
+    user_collections = Collection.objects.filter(creator=request.user)
     
-    # Get private collections the user has access to
+    # Get private collections the user has explicit access to through requests
     user_access_requests = CollectionAccessRequest.objects.filter(
         user=request.user, 
         status='APPROVED'
     ).values_list('collection_id', flat=True)
     
+    # Combine user's own private collections with those they have explicit access to
     accessible_private_collections = Collection.objects.filter(
-        id__in=user_access_requests, 
+        (Q(creator=request.user) | Q(id__in=user_access_requests)) & 
+        Q(is_private=True)
+    ).distinct()
+    
+    # Get other private collections (that user doesn't have access to)
+    private_collections = Collection.objects.filter(
         is_private=True
+    ).exclude(
+        id__in=accessible_private_collections.values_list('id', flat=True)
     )
     
     context = {
         'public_collections': public_collections,
         'private_collections': private_collections,
-        'accessible_private_collections': accessible_private_collections
+        'accessible_private_collections': accessible_private_collections,
+        'user_collections': user_collections
     }
     
     return render(request, 'patron/view_collections.html', context)
@@ -128,9 +138,19 @@ def view_collection_items(request, collection_id):
     # Get bookings in this collection
     collection_bookings = CollectionBooking.objects.filter(collection=collection).select_related('booking')
     
+    # Get users with access (for collection owners)
+    users_with_access = []
+    if collection.creator == request.user and collection.is_private:
+        users_with_access = CollectionAccessRequest.objects.filter(
+            collection=collection,
+            status='APPROVED'
+        ).select_related('user').order_by('user__username')
+    
     return render(request, 'patron/view_collection_items.html', {
         'collection': collection,
-        'collection_bookings': collection_bookings
+        'collection_bookings': collection_bookings,
+        'users_with_access': users_with_access,
+        'is_owner': collection.creator == request.user
     })
 
 @login_required
@@ -170,22 +190,18 @@ def create_collection(request):
         name = request.POST.get('name')
         description = request.POST.get('description')
         
-        # Patrons can only create public collections
-        try:
-            is_librarian = request.user.userprofile.user_type == 'LIBRARIAN'
-        except:
-            is_librarian = False
-            
-        is_private = request.POST.get('is_private') == 'on' and is_librarian
+        # Allow any user to set privacy
+        is_private = request.POST.get('is_private') == 'on'
         
-        Collection.objects.create(
+        collection = Collection.objects.create(
             name=name,
             description=description,
             creator=request.user,
             is_private=is_private
         )
         
-        messages.success(request, "Collection created successfully!")
+        privacy_status = "private" if is_private else "public"
+        messages.success(request, f"Collection created successfully! It is {privacy_status}.")
         return redirect('patron:view_collections')
         
     return render(request, 'patron/create_collection.html')
@@ -287,6 +303,11 @@ def search(request):
             Q(description__icontains=query)
         )
     
+    # Get user collections for the bookmark feature
+    user_collections = []
+    if request.user.is_authenticated:
+        user_collections = Collection.objects.filter(creator=request.user)
+    
     # Always use patron base template for consistent patron experience
     base_template = 'base/patron_base.html'
     
@@ -294,7 +315,8 @@ def search(request):
         'hotels': hotels,
         'query': query,
         'is_librarian': False,  # Always render as patron view
-        'base_template': base_template
+        'base_template': base_template,
+        'user_collections': user_collections
     })
 
 @login_required
@@ -321,6 +343,9 @@ def librarian_search(request):
             Q(description__icontains=query)
         )
     
+    # Get user collections for the bookmark feature
+    user_collections = Collection.objects.filter(creator=request.user)
+    
     # Always use librarian base template
     base_template = 'base/librarian_base.html'
     
@@ -328,7 +353,8 @@ def librarian_search(request):
         'hotels': hotels,
         'query': query,
         'is_librarian': True,  # Always render as librarian view
-        'base_template': base_template
+        'base_template': base_template,
+        'user_collections': user_collections
     })
 
 @login_required
@@ -816,3 +842,200 @@ def remove_booking_from_collection(request, collection_id, booking_id):
     messages.success(request, "Booking removed from collection successfully.")
     
     return redirect('patron:view_collection_items', collection_id=collection_id)
+
+@login_required
+def add_hotel_to_collection(request, hotel_id):
+    """
+    View function to add a hotel directly to a collection.
+    Creates a booking entry with null status to represent a saved hotel.
+    """
+    hotel = get_object_or_404(Hotel, id=hotel_id)
+    
+    if request.method == 'POST':
+        collection_id = request.POST.get('collection_id')
+        notes = request.POST.get('notes', '')
+        
+        # Check if collection exists and belongs to the user
+        try:
+            collection = Collection.objects.get(id=collection_id, creator=request.user)
+        except Collection.DoesNotExist:
+            messages.error(request, "The selected collection does not exist or you don't have permission to add hotels to it.")
+            return redirect('patron:patron_view_hotel', hotel_id=hotel_id)
+        
+        # Add the hotel to the collection by creating a booking with null status
+        booking, created = HotelBooking.objects.get_or_create(
+            user=request.user,
+            hotel=hotel,
+            status=None,  # Using null status for saved hotels
+            check_in_date=None,
+            check_out_date=None
+        )
+        
+        # Check if booking is already in the collection
+        if CollectionBooking.objects.filter(collection=collection, booking=booking).exists():
+            messages.info(request, f"{hotel.name} is already in your collection.")
+        else:
+            # Add booking to collection
+            CollectionBooking.objects.create(
+                collection=collection,
+                booking=booking,
+                notes=notes
+            )
+            messages.success(request, f"{hotel.name} added to your collection.")
+        
+        # Return to the search page with the same query
+        query = request.GET.get('query', '')
+        if query:
+            return redirect(f"{reverse('patron:search')}?query={query}")
+        return redirect('patron:search')
+    
+    # If GET request, redirect to view hotel
+    return redirect('patron:patron_view_hotel', hotel_id=hotel_id)
+
+@login_required
+def edit_collection(request, collection_id):
+    """
+    View to edit a collection's name, description, and privacy status.
+    Only the creator of the collection can edit it and change its privacy status.
+    """
+    collection = get_object_or_404(Collection, id=collection_id)
+    
+    # Check if user is the creator of the collection
+    if collection.creator != request.user:
+        messages.error(request, "You don't have permission to edit this collection.")
+        return redirect('patron:view_collections')
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        
+        # Allow any collection owner to set privacy
+        is_private = request.POST.get('is_private') == 'on'
+        
+        if name:
+            collection.name = name
+            collection.description = description
+            collection.is_private = is_private
+            collection.save()
+            
+            privacy_status = "private" if is_private else "public"
+            messages.success(request, f"Collection updated successfully! It is now {privacy_status}.")
+            return redirect('patron:view_collection_items', collection_id=collection.id)
+        else:
+            messages.error(request, "Collection name cannot be empty.")
+    
+    context = {
+        'collection': collection,
+        'base_template': 'base/patron_base.html' if not request.user.is_staff else 'base/librarian_base.html'
+    }
+    return render(request, 'patron/edit_collection.html', context)
+
+@login_required
+def delete_collection(request, collection_id):
+    """
+    View to delete a collection.
+    Only the creator of the collection can delete it.
+    """
+    collection = get_object_or_404(Collection, id=collection_id)
+    
+    # Check if user is the creator of the collection
+    if collection.creator != request.user:
+        messages.error(request, "You don't have permission to delete this collection.")
+        return redirect('patron:view_collections')
+    
+    # If POST request, perform the deletion
+    if request.method == 'POST':
+        collection_name = collection.name
+        collection.delete()
+        messages.success(request, f'Collection "{collection_name}" has been deleted successfully.')
+        return redirect('patron:view_collections')
+    
+    # If GET request, show confirmation page
+    return render(request, 'patron/delete_collection.html', {
+        'collection': collection
+    })
+
+@login_required
+def manage_collection_requests(request):
+    """
+    View for users to manage access requests for their private collections.
+    Shows all pending requests that other users have made to access the user's collections.
+    """
+    # Get all collections created by the user
+    user_collections = Collection.objects.filter(creator=request.user)
+    
+    # Get all pending access requests for those collections
+    pending_requests = CollectionAccessRequest.objects.filter(
+        collection__in=user_collections,
+        status='PENDING'
+    ).select_related('user', 'collection').order_by('-request_date')
+    
+    # Get all approved/rejected requests for historical reference
+    processed_requests = CollectionAccessRequest.objects.filter(
+        collection__in=user_collections,
+        status__in=['APPROVED', 'REJECTED']
+    ).select_related('user', 'collection').order_by('-request_date')
+    
+    return render(request, 'patron/manage_collection_requests.html', {
+        'pending_requests': pending_requests,
+        'processed_requests': processed_requests,
+        'base_template': 'base/patron_base.html' if not request.user.is_staff else 'base/librarian_base.html'
+    })
+
+@login_required
+def process_access_request(request, request_id, action):
+    """
+    View to approve or reject a collection access request.
+    Only the collection creator can approve/reject requests.
+    """
+    access_request = get_object_or_404(CollectionAccessRequest, id=request_id)
+    
+    # Verify that the current user is the collection creator
+    if access_request.collection.creator != request.user:
+        messages.error(request, "You don't have permission to process this request.")
+        return redirect('patron:manage_collection_requests')
+    
+    # Process the request based on the action
+    if action == 'approve':
+        access_request.status = 'APPROVED'
+        access_request.save()
+        messages.success(request, f"Access request from {access_request.user.username} has been approved.")
+    elif action == 'reject':
+        access_request.status = 'REJECTED'
+        access_request.save()
+        messages.warning(request, f"Access request from {access_request.user.username} has been rejected.")
+    else:
+        messages.error(request, "Invalid action.")
+    
+    return redirect('patron:manage_collection_requests')
+
+@login_required
+def revoke_collection_access(request, collection_id, user_id):
+    """
+    View to revoke a user's access to a private collection.
+    Only the collection creator can revoke access.
+    """
+    collection = get_object_or_404(Collection, id=collection_id)
+    
+    # Verify that the current user is the collection creator
+    if collection.creator != request.user:
+        messages.error(request, "You don't have permission to manage access to this collection.")
+        return redirect('patron:view_collection_items', collection_id=collection.id)
+    
+    # Find the access request and change its status to REJECTED
+    try:
+        access_request = CollectionAccessRequest.objects.get(
+            collection=collection,
+            user_id=user_id,
+            status='APPROVED'
+        )
+        
+        user_name = access_request.user.username
+        access_request.status = 'REJECTED'
+        access_request.save()
+        
+        messages.success(request, f"Access for {user_name} has been revoked successfully.")
+    except CollectionAccessRequest.DoesNotExist:
+        messages.error(request, "No active access found for this user.")
+    
+    return redirect('patron:view_collection_items', collection_id=collection.id)

@@ -71,9 +71,9 @@ class HotelBooking(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
-    check_in_date = models.DateField()
-    check_out_date = models.DateField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    check_in_date = models.DateField(null=True, blank=True)
+    check_out_date = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -81,6 +81,8 @@ class HotelBooking(models.Model):
     
     def get_status_display(self):
         """Return the human-readable status name."""
+        if not self.status:
+            return "Saved"
         return dict(self.STATUS_CHOICES).get(self.status, self.status)
 
 class Collection(models.Model):
