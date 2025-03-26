@@ -203,7 +203,9 @@ AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_FILE_OVERWRITE = True
 
+
 #Django Storage Configuration
+'''
 STORAGES = {
     #media file (image) management
     "default": {
@@ -214,6 +216,14 @@ STORAGES = {
         "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
     },
 }
+'''
+STATIC_URL = "/static/"
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'staticfiles'),  # where your /img folder is
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 
