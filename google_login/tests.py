@@ -66,10 +66,11 @@ class LoginTests(TestCase):
         self.assertTemplateUsed(response, 'google_login/librarian_home.html')
     
     def test_unauthenticated_user_redirected(self):
-        # Use follow=False to avoid following the redirect
+        # This test name is now a misnomer - unauthenticated users see the guest home page
+        # rather than being redirected as in the old implementation
         response = self.client.get(reverse('home'))
-        self.assertEqual(response.status_code, 302)  # Check for redirect status code
-        self.assertEqual(response.url, '/login/')  # Check redirect URL directly
+        self.assertEqual(response.status_code, 200)  # Now expecting 200 OK instead of redirect
+        self.assertTemplateUsed(response, 'google_login/guest_home.html')  # Check for guest home template
 
     @patch('google_login.views.UserProfile.profile_picture_url', new_callable=MagicMock)
     def test_profile_picture_url_default(self, mock_url):
