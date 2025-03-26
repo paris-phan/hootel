@@ -25,13 +25,11 @@
                             <textarea class="form-control" id="description" name="description" rows="4" placeholder="Describe this collection of bookings..."></textarea>
                         </div>
                         
-                        {% if user.is_staff %}
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="is_private" name="is_private">
                             <label class="form-check-label" for="is_private">Make this collection private</label>
                             <small class="form-text text-muted d-block">Private collections are only visible to you and users you grant access to.</small>
                         </div>
-                        {% endif %}
                         
                         <div class="d-flex justify-content-between">
                             <button type="submit" class="btn btn-primary">Create Collection</button>

@@ -27,7 +27,13 @@ urlpatterns = [
     path('collections/', views.view_collections, name='view_collections'),
     path('collections/<int:collection_id>/', views.view_collection_items, name='view_collection_items'),
     path('collections/create/', views.create_collection, name='create_collection'),
+    path('collections/<int:collection_id>/edit/', views.edit_collection, name='edit_collection'),
+    path('collections/<int:collection_id>/delete/', views.delete_collection, name='delete_collection'),
     path('collections/request-access/<int:collection_id>/', views.request_collection_access, name='request_collection_access'),
+    # Collection access management
+    path('collections/access-requests/', views.manage_collection_requests, name='manage_collection_requests'),
+    path('collections/process-access-request/<int:request_id>/<str:action>/', views.process_access_request, name='process_access_request'),
+    path('collections/<int:collection_id>/revoke-access/<int:user_id>/', views.revoke_collection_access, name='revoke_collection_access'),
     path('rooms/<int:room_id>/add-to-collection/', views.add_room_to_collection, name='add_room_to_collection'),
     path('collections/<int:collection_id>/remove-room/<int:room_id>/', views.remove_room_from_collection, name='remove_room_from_collection'),
     path('bookings/<int:booking_id>/add-to-collection/', views.add_booking_to_collection, name='add_booking_to_collection'),
@@ -41,4 +47,7 @@ urlpatterns = [
     path('update-hotel-image/<int:hotel_id>/', views.update_hotel_image, name='update_hotel_image'),
     path('hotels/<int:hotel_id>/update/', views.update_hotel, name='update_hotel'),
     path('hotels/<int:hotel_id>/delete/', views.delete_hotel, name='delete_hotel'),
+    
+    # Add hotel directly to collection (for bookmark feature)
+    path('hotels/<int:hotel_id>/add-to-collection/', views.add_hotel_to_collection, name='add_hotel_to_collection'),
 ] 
