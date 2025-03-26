@@ -1,13 +1,17 @@
-{% extends 'base/base.html' %}
+{% extends base_template %}
 
-{% block title %}Collections - CLA{% endblock %}
+{% block title %}Collections - HotelManager6000{% endblock %}
 
 {% block content %}
 <div class="container">
     <h2 class="mb-4">Collections</h2>
+    <p class="lead">Browse collections of hotel bookings</p>
+    
+    {% if user.is_authenticated %}
     <div class="d-flex justify-content-end mb-3">
         <a href="{% url 'patron:create_collection' %}" class="btn btn-primary">Create Collection</a>
     </div>
+    {% endif %}
 
     <!-- Public Collections -->
     <div class="card mb-4">
@@ -23,19 +27,23 @@
                             <h5 class="card-title">{{ collection.name }}</h5>
                             <p class="card-text">{{ collection.description|truncatechars:100 }}</p>
                             <p class="text-muted">Created by: {{ collection.creator.username }}</p>
-                            <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Items</a>
+                            <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Bookings</a>
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12">
-                    <p>No public collections available.</p>
+                    <p>No public booking collections available.</p>
+                    {% if user.is_authenticated %}
+                    <p>Create your first collection to organize your hotel bookings!</p>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 
+    {% if user.is_authenticated %}
     <!-- Private Collections You Have Access To -->
     <div class="card mb-4">
         <div class="card-header bg-info text-white">
@@ -50,13 +58,13 @@
                             <h5 class="card-title">{{ collection.name }}</h5>
                             <p class="card-text">{{ collection.description|truncatechars:100 }}</p>
                             <p class="text-muted">Created by: {{ collection.creator.username }}</p>
-                            <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Items</a>
+                            <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Bookings</a>
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12">
-                    <p>You don't have access to any private collections.</p>
+                    <p>You don't have access to any private booking collections.</p>
                 </div>
                 {% endfor %}
             </div>
@@ -67,7 +75,7 @@
     <div class="card">
         <div class="card-header bg-secondary text-white">
             <h4>Private Collections</h4>
-            <small>You can request access to these collections</small>
+            <small>You can request access to these booking collections</small>
         </div>
         <div class="card-body">
             <div class="row">
@@ -78,7 +86,7 @@
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title">{{ collection.name }}</h5>
-                            <p class="card-text">This is a private collection. Request access to view its contents.</p>
+                            <p class="card-text">This is a private booking collection. Request access to view its contents.</p>
                             <p class="text-muted">Created by: {{ collection.creator.username }}</p>
                             <a href="{% url 'patron:request_collection_access' collection.id %}" class="btn btn-sm btn-warning">Request Access</a>
                         </div>
@@ -87,12 +95,18 @@
                 {% endif %}
                 {% empty %}
                 <div class="col-12">
-                    <p>No private collections available.</p>
+                    <p>No private booking collections available.</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p>Sign in to create your own collections or access private collections.</p>
+        <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+    </div>
+    {% endif %}
 
     <div class="mt-4">
         <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>

@@ -1,6 +1,6 @@
-{% extends 'base/base.html' %}
+{% extends base_template %}
 
-{% block title %}{{ collection.name }} - Items{% endblock %}
+{% block title %}{{ collection.name }} - HotelManager6000{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -8,29 +8,54 @@
     <p class="lead">{{ collection.description }}</p>
     <p class="text-muted">Created by: {{ collection.creator.username }} on {{ collection.created_at|date:"F j, Y" }}</p>
 
+    <!-- Bookings in this Collection Section -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h4>Items in this Collection</h4>
+            <h4>Bookings in this Collection</h4>
         </div>
         <div class="card-body">
             <div class="row">
-                {% for item in items %}
+                {% for collection_booking in collection_bookings %}
                 <div class="col-md-4 mb-3">
                     <div class="card h-100">
+                        <div class="card-header {% if collection_booking.booking.status == 'PENDING' %}bg-warning{% elif collection_booking.booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %} text-white">
+                            <h5 class="mb-0">{{ collection_booking.booking.hotel.name }}</h5>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">{{ item.title }}</h5>
-                            <p class="card-text">{{ item.description|truncatechars:100 }}</p>
-                            <p class="text-muted">Added: {{ item.created_at|date:"F j, Y" }}</p>
-                            <div class="d-flex">
-                                <a href="{% url 'patron:view_item' item.id %}" class="btn btn-sm btn-info me-2">View Details</a>
-                                <a href="{% url 'patron:request_item_borrow' item.id %}" class="btn btn-sm btn-success">Borrow</a>
+                            <p class="card-text"><strong>Location:</strong> {{ collection_booking.booking.hotel.location }}</p>
+                            <p class="card-text"><strong>Check-in:</strong> {{ collection_booking.booking.check_in_date }}</p>
+                            <p class="card-text"><strong>Check-out:</strong> {{ collection_booking.booking.check_out_date }}</p>
+                            <p class="card-text">
+                                <strong>Status:</strong> 
+                                <span class="badge {% if collection_booking.booking.status == 'PENDING' %}bg-warning{% elif collection_booking.booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ collection_booking.booking.get_status_display }}
+                                </span>
+                            </p>
+                            
+                            {% if collection_booking.notes %}
+                            <div class="alert alert-info">
+                                <small>Your notes: {{ collection_booking.notes }}</small>
                             </div>
+                            {% endif %}
+                            
+                            {% if user.is_authenticated %}
+                            <div class="d-flex mt-3">
+                                <form action="{% url 'patron:remove_booking_from_collection' collection.id collection_booking.booking.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                </form>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12">
-                    <p>No items in this collection yet.</p>
+                    <p>No bookings in this collection yet.</p>
+                    {% if user.is_authenticated %}
+                    <p>You can add your bookings to collections to better organize them.</p>
+                    <a href="{% url 'patron:my_bookings' %}" class="btn btn-primary">View My Bookings</a>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>

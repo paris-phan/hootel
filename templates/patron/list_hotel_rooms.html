@@ -1,0 +1,92 @@
+{% extends base_template %}
+
+{% block title %}{{ hotel.name }} - Rooms{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>{{ hotel.name }} - Available Rooms</h2>
+            <p class="lead">{{ hotel.description }}</p>
+            <p><strong>Location:</strong> {{ hotel.location }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}" class="img-fluid rounded" style="max-height: 200px;">
+            {% if user.is_staff %}
+            <div class="mt-2">
+                <a href="{% url 'patron:add_room' %}" class="btn btn-success">Add Room</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for room in rooms %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{{ room.image_url }}" class="card-img-top" alt="Room {{ room.number }}" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">Room {{ room.number }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ room.type }}</h6>
+                    <p class="card-text">{{ room.description|truncatechars:100 }}</p>
+                    <p><strong>${{ room.price_per_night }}</strong> per night</p>
+                    <p><strong>Capacity:</strong> {{ room.capacity }} person{{ room.capacity|pluralize }}</p>
+                    <p>
+                        {% if room.is_available %}
+                        <span class="badge bg-success">Available</span>
+                        {% else %}
+                        <span class="badge bg-danger">Unavailable</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'patron:view_room' room.id %}" class="btn btn-sm btn-primary">View Details</a>
+                        {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton-{{ room.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                Add to Collection
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ room.id }}">
+                                {% for collection in user_collections %}
+                                <li>
+                                    <form method="post" action="{% url 'patron:add_room_to_collection' room.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="collection_id" value="{{ collection.id }}">
+                                        <button type="submit" class="dropdown-item">{{ collection.name }}</button>
+                                    </form>
+                                </li>
+                                {% empty %}
+                                <li><a class="dropdown-item disabled" href="#">No collections yet</a></li>
+                                {% endfor %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'patron:create_collection' %}">Create new collection</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No rooms available for this hotel yet.
+                {% if user.is_staff %}
+                <a href="{% url 'create_hotel' %}">Add rooms as a librarian</a>.
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="mt-4">
+        {% if user.is_staff %}
+        <a href="{% url 'patron:view_hotel' hotel.id %}" class="btn btn-secondary">Back to Hotel</a>
+        {% else %}
+        <a href="{% url 'patron:patron_view_hotel' hotel.id %}" class="btn btn-secondary">Back to Hotel</a>
+        {% endif %}
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">Back to Home</a>
+    </div>
+</div>
+{% endblock %} 

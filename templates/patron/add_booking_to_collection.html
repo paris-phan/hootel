@@ -1,0 +1,62 @@
+{% extends base_template %}
+
+{% block title %}Add Booking to Collection - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2>Add Booking to Collection</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h4>Booking Details</h4>
+                        <p><strong>Hotel:</strong> {{ booking.hotel.name }}</p>
+                        <p><strong>Check-in:</strong> {{ booking.check_in_date }}</p>
+                        <p><strong>Check-out:</strong> {{ booking.check_out_date }}</p>
+                        <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
+                    </div>
+                    
+                    {% if collections %}
+                    <form method="post" action="{% url 'patron:add_booking_to_collection' booking.id %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="collection_id" class="form-label">Select Collection</label>
+                            <select name="collection_id" id="collection_id" class="form-select" required>
+                                <option value="">Choose a collection...</option>
+                                {% for collection in collections %}
+                                <option value="{{ collection.id }}">{{ collection.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes (optional)</label>
+                            <textarea name="notes" id="notes" class="form-control" rows="3" placeholder="Add any notes about this booking..."></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Add to Collection</button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <p>You don't have any collections yet. Create one first to add this booking.</p>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <a href="{% url 'patron:create_collection' %}" class="btn btn-primary">Create Collection</a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'patron:my_bookings' %}" class="btn btn-secondary">Back to My Bookings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
