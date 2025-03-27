@@ -57,8 +57,8 @@
                     {% endif %}
                     <div class="d-flex justify-content-between mt-3">
                         <a href="{% url 'patron:view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View</a>
-                        <a href="{% url 'patron:update_hotel' hotel.id %}" class="btn btn-sm btn-secondary">Edit</a>
-                        <a href="{% url 'patron:delete_hotel' hotel.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        <a href="{% url 'update_hotel' hotel.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                        <a href="{% url 'delete_hotel' hotel.id %}" class="btn btn-sm btn-danger">Delete</a>
                     </div>
                 </div>
             </div>
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 img.style.opacity = '0.5';
                 
                 // Send AJAX request to update the image
-                fetch(`{% url 'patron:update_hotel_image' 0 %}`.replace('0', hotelId), {
+                fetch(`{% url 'update_hotel_image' 0 %}`.replace('0', hotelId), {
                     method: 'POST',
                     body: formData,
                     headers: {
