@@ -13,7 +13,10 @@ from django.views.decorators.http import require_POST
 
 def home(request):
     if not request.user.is_authenticated:
-        return HttpResponseRedirect('/login/')
+        # Show guest home page instead of redirecting to login
+        return render(request, "google_login/guest_home.html", {
+            'title': 'Welcome to HotelManager6000'
+        })
         
     # Get or create user profile
     user_profile, created = UserProfile.objects.get_or_create(

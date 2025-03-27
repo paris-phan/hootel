@@ -1,13 +1,36 @@
-{% extends 'base/base.html' %}
+{% extends base_template %}
 
-{% block title %}Collections - CLA{% endblock %}
+{% block title %}Collections - HotelManager6000{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<style>
+    .item-counter {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 0.8rem;
+        border: 1px solid #dee2e6;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
     <h2 class="mb-4">Collections</h2>
-    <div class="d-flex justify-content-end mb-3">
+    <p class="lead">Browse collections of hotel bookings</p>
+    
+    {% if user.is_authenticated %}
+    <div class="d-flex justify-content-between mb-3">
+        <a href="{% url 'patron:manage_collection_requests' %}" class="btn btn-info">
+            <i class="bi bi-people"></i> Manage Access Requests
+        </a>
         <a href="{% url 'patron:create_collection' %}" class="btn btn-primary">Create Collection</a>
     </div>
+    {% endif %}
 
     <!-- Public Collections -->
     <div class="card mb-4">
@@ -18,24 +41,44 @@
             <div class="row">
                 {% for collection in public_collections %}
                 <div class="col-md-4 mb-3">
-                    <div class="card h-100">
+                    <div class="card h-100 position-relative">
+                        <span class="item-counter">Number of Items: {{ collection.bookings.count }}</span>
                         <div class="card-body">
-                            <h5 class="card-title">{{ collection.name }}</h5>
+                            <h5 class="card-title">
+                                {{ collection.name }}
+                                {% if user == collection.creator %}
+                                <span class="badge bg-primary">Your Collection</span>
+                                {% endif %}
+                            </h5>
                             <p class="card-text">{{ collection.description|truncatechars:100 }}</p>
                             <p class="text-muted">Created by: {{ collection.creator.username }}</p>
-                            <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Items</a>
+                            <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Collection Items</a>
+                            {% if user == collection.creator %}
+                            <div class="mt-2">
+                                <a href="{% url 'patron:edit_collection' collection.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a href="{% url 'patron:delete_collection' collection.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12">
-                    <p>No public collections available.</p>
+                    <p>No public booking collections available.</p>
+                    {% if user.is_authenticated %}
+                    <p>Create your first collection to organize your hotel bookings!</p>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 
+    {% if user.is_authenticated %}
     <!-- Private Collections You Have Access To -->
     <div class="card mb-4">
         <div class="card-header bg-info text-white">
@@ -45,18 +88,34 @@
             <div class="row">
                 {% for collection in accessible_private_collections %}
                 <div class="col-md-4 mb-3">
-                    <div class="card h-100">
+                    <div class="card h-100 position-relative">
+                        <span class="item-counter">Number of Items: {{ collection.bookings.count }}</span>
                         <div class="card-body">
-                            <h5 class="card-title">{{ collection.name }}</h5>
+                            <h5 class="card-title">
+                                {{ collection.name }}
+                                {% if user == collection.creator %}
+                                <span class="badge bg-primary">Your Collection</span>
+                                {% endif %}
+                            </h5>
                             <p class="card-text">{{ collection.description|truncatechars:100 }}</p>
                             <p class="text-muted">Created by: {{ collection.creator.username }}</p>
-                            <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Items</a>
+                            <a href="{% url 'patron:view_collection_items' collection.id %}" class="btn btn-sm btn-primary">View Collection Items</a>
+                            {% if user == collection.creator %}
+                            <div class="mt-2">
+                                <a href="{% url 'patron:edit_collection' collection.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a href="{% url 'patron:delete_collection' collection.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12">
-                    <p>You don't have access to any private collections.</p>
+                    <p>You don't have access to any private booking collections.</p>
                 </div>
                 {% endfor %}
             </div>
@@ -67,32 +126,51 @@
     <div class="card">
         <div class="card-header bg-secondary text-white">
             <h4>Private Collections</h4>
-            <small>You can request access to these collections</small>
+            <small>You can request access to these booking collections</small>
         </div>
         <div class="card-body">
             <div class="row">
                 {% for collection in private_collections %}
-                <!-- Don't show collections the user already has access to -->
-                {% if collection not in accessible_private_collections %}
                 <div class="col-md-4 mb-3">
-                    <div class="card h-100">
+                    <div class="card h-100 position-relative">
+                        <span class="item-counter">Number of Items: {{ collection.bookings.count }}</span>
                         <div class="card-body">
-                            <h5 class="card-title">{{ collection.name }}</h5>
-                            <p class="card-text">This is a private collection. Request access to view its contents.</p>
+                            <h5 class="card-title">
+                                {{ collection.name }}
+                                {% if user == collection.creator %}
+                                <span class="badge bg-primary">Your Collection</span>
+                                {% endif %}
+                            </h5>
+                            <p class="card-text">This is a private booking collection. Request access to view its contents.</p>
                             <p class="text-muted">Created by: {{ collection.creator.username }}</p>
                             <a href="{% url 'patron:request_collection_access' collection.id %}" class="btn btn-sm btn-warning">Request Access</a>
+                            {% if user == collection.creator %}
+                            <div class="mt-2">
+                                <a href="{% url 'patron:edit_collection' collection.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a href="{% url 'patron:delete_collection' collection.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                {% endif %}
                 {% empty %}
                 <div class="col-12">
-                    <p>No private collections available.</p>
+                    <p>No private booking collections available.</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p>Sign in to create your own collections or access private collections.</p>
+        <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+    </div>
+    {% endif %}
 
     <div class="mt-4">
         <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>

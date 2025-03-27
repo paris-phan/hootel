@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %}
+{% extends base_template %}
 
 {% block title %}Search Hotels - HotelManager6000{% endblock %}
 
@@ -122,8 +122,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show loading state
                 hotelImage.style.opacity = '0.5';
                 
-                // Use a URL without template tags
-                const updateUrl = `/update_hotel_image/${hotelId}/`;
+                // Use Django URL template tag for consistency
+                const updateUrl = `{% url 'update_hotel_image' 0 %}`.replace('0', hotelId);
                 
                 fetch(updateUrl, {
                     method: 'POST',
