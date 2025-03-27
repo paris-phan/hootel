@@ -3,7 +3,6 @@ from librarian import views
 from patron import views as patron_views
 
 urlpatterns = [
-    # path('', views.home, name='home'),
     path('create_hotel/', views.create_hotel, name='create_hotel'),
     path('manage_hotels/', views.manage_hotels, name='manage_hotels'),
     path('update-hotel-image/<int:hotel_id>/', views.update_hotel_image, name='update_hotel_image'),

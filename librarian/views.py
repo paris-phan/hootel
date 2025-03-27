@@ -1,11 +1,18 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 # Create your views here.
 
 from django.contrib.auth.decorators import login_required
-from hotelmanager6000.models import Hotel
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Q
+from patron.models import Hotel, HotelBooking, Collection, Item, Borrowing, CollectionAccessRequest, CollectionRoom, Room, CollectionBooking
+from datetime import datetime
+from django.utils import timezone
+from django.db import models
+from django.urls import reverse
 
 @login_required
 def create_hotel(request):
