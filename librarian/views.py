@@ -41,11 +41,11 @@ def create_hotel(request):
             hotel.save()
             
             messages.success(request, 'Hotel created successfully!')
-            return redirect('patron:manage_hotels')
+            return redirect('manage_hotels')
         else:
             messages.error(request, 'Please provide both name and location for the hotel.')
     
-    return render(request, '/create_hotel.html')
+    return render(request, 'librarian/create_hotel.html')
 
 
 @login_required
@@ -60,7 +60,7 @@ def manage_hotels(request):
         # For regular users, only show hotels they created
         hotels = Hotel.objects.filter(created_by=request.user).order_by('-created_at')
     
-    return render(request, '/manage_hotels.html', {
+    return render(request, 'librarian/manage_hotels.html', {
         'hotels': hotels
     })
 
@@ -127,7 +127,7 @@ def update_hotel(request, hotel_id):
     # Check permissions - must be staff or the hotel creator
     if not request.user.is_staff and hotel.created_by != request.user:
         messages.error(request, "You don't have permission to update this hotel.")
-        return redirect('patron:manage_hotels')
+        return redirect('manage_hotels')
     
     if request.method == 'POST':
         name = request.POST.get('name_field')
@@ -152,7 +152,7 @@ def update_hotel(request, hotel_id):
         else:
             messages.error(request, 'Please provide both name and location for the hotel.')
     
-    return render(request, 'patron/update_hotel.html', {'hotel': hotel})
+    return render(request, 'librarian/update_hotel.html', {'hotel': hotel})
 
 @login_required
 def delete_hotel(request, hotel_id):
@@ -164,7 +164,7 @@ def delete_hotel(request, hotel_id):
     # Check permissions - must be staff or the hotel creator
     if not request.user.is_staff and hotel.created_by != request.user:
         messages.error(request, "You don't have permission to delete this hotel.")
-        return redirect('patron:manage_hotels')
+        return redirect('manage_hotels')
     
     if request.method == 'POST':
         # Check for associated bookings
@@ -178,9 +178,9 @@ def delete_hotel(request, hotel_id):
         hotel_name = hotel.name
         hotel.delete()
         messages.success(request, f'Hotel "{hotel_name}" has been deleted successfully.')
-        return redirect('patron:manage_hotels')
+        return redirect('manage_hotels')
     
-    return render(request, 'patron/delete_hotel.html', {'hotel': hotel})
+    return render(request, 'librarian/delete_hotel.html', {'hotel': hotel})
 
 @login_required
 def librarian_dashboard(request):
