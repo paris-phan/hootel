@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 img.style.opacity = '0.5';
                 
                 // Send AJAX request to update the image
-                fetch(`{% url 'update_hotel_image' 0 %}`.replace('0', hotelId), {
+                fetch(`{% url 'patron:update_hotel_image' 0 %}`.replace('0', hotelId), {
                     method: 'POST',
                     body: formData,
                     headers: {
