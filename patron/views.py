@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Q
-from .models import Hotel, HotelBooking, Collection, Item, Borrowing, CollectionAccessRequest, CollectionRoom, Room, CollectionBooking
+from .models import Hotel, HotelBooking, Collection, Item, CollectionAccessRequest, CollectionBooking
 from datetime import datetime
 from django.utils import timezone
 from django.db import models
@@ -15,7 +15,7 @@ from django.urls import reverse
 @login_required
 def view_hotels(request):
     """
-    Redirects to the search view, where rooms from the main hotel are displayed.
+    Redirects to the search view, where hotels are displayed.
     This maintains backward compatibility with existing URLs.
     """
     return redirect('patron:search')
@@ -207,32 +207,6 @@ def create_collection(request):
     return render(request, 'patron/create_collection.html')
 
 @login_required
-def request_item_borrow(request, item_id):
-    item = get_object_or_404(Item, id=item_id)
-    
-    # Check if user already has a pending or approved request
-    existing_request = Borrowing.objects.filter(
-        user=request.user,
-        item=item,
-        status__in=['PENDING', 'APPROVED']
-    ).first()
-    
-    if existing_request:
-        if existing_request.status == 'PENDING':
-            messages.info(request, "You already have a pending request for this item.")
-        else:
-            messages.info(request, "You are currently borrowing this item.")
-    else:
-        # Create new borrow request
-        Borrowing.objects.create(
-            user=request.user,
-            item=item
-        )
-        messages.success(request, "Your borrowing request has been submitted.")
-    
-    return redirect('patron:view_item', item_id=item.id)
-
-@login_required
 def view_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     
@@ -249,50 +223,19 @@ def view_item(request, item_id):
             messages.error(request, "You don't have permission to view this item.")
             return redirect('patron:view_collections')
     
-    # Get current borrowing status
-    borrowing = Borrowing.objects.filter(
-        user=request.user,
-        item=item
-    ).order_by('-request_date').first()
-    
     return render(request, 'patron/view_item.html', {
-        'item': item,
-        'borrowing': borrowing
-    })
-
-@login_required
-def my_borrowed_items(request):
-    # Get all borrowings for the current user
-    all_borrowings = Borrowing.objects.filter(
-        user=request.user
-    ).order_by('-request_date')
-    
-    # Separate current (active) borrowings from past borrowings
-    current_borrowings = all_borrowings.filter(
-        status__in=['PENDING', 'APPROVED'],
-        return_date__isnull=True
-    )
-    
-    past_borrowings = all_borrowings.filter(
-        models.Q(status='REJECTED') | 
-        models.Q(status='RETURNED') | 
-        models.Q(return_date__isnull=False)
-    )
-    
-    return render(request, 'patron/my_borrowed_items.html', {
-        'borrowings': all_borrowings,  # Keep for backward compatibility
-        'current_borrowings': current_borrowings,
-        'past_borrowings': past_borrowings
+        'item': item
     })
 
 def search(request):
     """
     View for the search page where patrons can search for available hotels.
     This view always uses the patron interface regardless of user type.
+    Shows all hotels created by librarians, with search functionality.
     """
     query = request.GET.get('query', '').strip()
     
-    # Get all hotels
+    # Get all hotels - no filtering by user type, show all hotels created by librarians
     hotels = Hotel.objects.all().order_by('-created_at')
     
     # Apply search filter if query exists
@@ -424,33 +367,6 @@ def create_hotel(request):
     return redirect('create_hotel')
 
 @login_required
-def list_hotel_rooms(request, hotel_id):
-    """
-    View for listing all rooms in a hotel.
-    """
-    hotel = get_object_or_404(Hotel, id=hotel_id)
-    rooms = Room.objects.filter(hotel=hotel)
-    
-    # Use appropriate base template based on user type
-    if request.user.is_staff:
-        base_template = 'base/librarian_base.html'
-    else:
-        base_template = 'base/patron_base.html'
-    
-    # Get user collections for the "Add to Collection" features
-    if request.user.is_authenticated:
-        user_collections = Collection.objects.filter(creator=request.user)
-    else:
-        user_collections = []
-    
-    return render(request, 'patron/list_hotel_rooms.html', {
-        'hotel': hotel,
-        'rooms': rooms,
-        'user_collections': user_collections,
-        'base_template': base_template
-    })
-
-@login_required
 def manage_hotels(request):
     """
     View for managing hotels.
@@ -528,15 +444,24 @@ def view_hotel(request, hotel_id):
     View function for displaying hotel details with librarian features.
     This is the administrative view showing all details and management options.
     """
+    # Only staff can access this view
+    if not request.user.is_staff:
+        messages.error(request, "You don't have permission to access this view.")
+        return redirect('patron:patron_view_hotel', hotel_id=hotel_id)
+    
     hotel = get_object_or_404(Hotel, id=hotel_id)
     
     # Get recent bookings
     recent_bookings = HotelBooking.objects.filter(hotel=hotel).order_by('-created_at')[:10]
     
+    # Always use librarian base template for this view
+    base_template = 'base/librarian_base.html'
+    
     return render(request, 'patron/hotel_view.html', {
         'hotel': hotel,
         'recent_bookings': recent_bookings,
-        'base_template': 'base/librarian_base.html'
+        'base_template': base_template,
+        'is_librarian': True  # Always render as librarian view
     })
 
 @login_required
@@ -556,17 +481,14 @@ def patron_view_hotel(request, hotel_id):
             user=request.user
         ).order_by('-created_at')
     
-    # Use appropriate base template based on user type, but maintain separation 
-    # by routing librarian users to the librarian view if they try to access this
-    if request.user.is_staff:
-        return redirect('patron:view_hotel', hotel_id=hotel.id)
-    
+    # Always use patron base template for this view
     base_template = 'base/patron_base.html'
     
     return render(request, 'patron/patron_hotel_view.html', {
         'hotel': hotel,
         'user_bookings': user_bookings,
-        'base_template': base_template
+        'base_template': base_template,
+        'is_librarian': False  # Always render as patron view
     })
 
 @login_required
@@ -637,158 +559,6 @@ def delete_hotel(request, hotel_id):
     
     return render(request, 'patron/delete_hotel.html', {
         'hotel': hotel,
-        'base_template': 'base/librarian_base.html'
-    })
-
-@login_required
-def add_room_to_collection(request, room_id):
-    room = get_object_or_404(Room, id=room_id)
-    
-    if request.method == 'POST':
-        collection_id = request.POST.get('collection_id')
-        notes = request.POST.get('notes', '')
-        
-        # Check if collection exists and belongs to the user
-        try:
-            collection = Collection.objects.get(id=collection_id, creator=request.user)
-        except Collection.DoesNotExist:
-            messages.error(request, "The selected collection does not exist or you don't have permission to add rooms to it.")
-            return redirect('patron:view_room', room_id=room_id)
-        
-        # Check if room is already in the collection
-        if CollectionRoom.objects.filter(collection=collection, room=room).exists():
-            messages.info(request, "This room is already in your collection.")
-        else:
-            # Add room to collection
-            CollectionRoom.objects.create(
-                collection=collection,
-                room=room,
-                notes=notes
-            )
-            messages.success(request, f"Room {room.number} from {room.hotel.name} added to your collection.")
-        
-        return redirect('patron:view_collection_items', collection_id=collection.id)
-    
-    # If GET request, show the form to select a collection
-    collections = Collection.objects.filter(creator=request.user)
-    
-    return render(request, 'patron/add_room_to_collection.html', {
-        'room': room,
-        'collections': collections
-    })
-
-@login_required
-def remove_room_from_collection(request, collection_id, room_id):
-    collection_room = get_object_or_404(
-        CollectionRoom, 
-        collection_id=collection_id, 
-        room_id=room_id,
-        collection__creator=request.user
-    )
-    
-    collection_room.delete()
-    messages.success(request, "Room removed from collection successfully.")
-    
-    return redirect('patron:view_collection_items', collection_id=collection_id)
-
-@login_required
-def view_room(request, room_id):
-    """
-    View function for displaying room details.
-    """
-    room = get_object_or_404(Room, id=room_id)
-    
-    # Use appropriate base template based on user type
-    if request.user.is_staff:
-        base_template = 'base/librarian_base.html'
-    else:
-        base_template = 'base/patron_base.html'
-    
-    # Get user collections for the "Add to Collection" feature
-    if request.user.is_authenticated:
-        user_collections = Collection.objects.filter(creator=request.user)
-    else:
-        user_collections = []
-    
-    return render(request, 'patron/view_room.html', {
-        'room': room,
-        'user_collections': user_collections,
-        'base_template': base_template
-    })
-
-@login_required
-def redirect_to_collections(request):
-    """
-    Redirect function for backwards compatibility with the old 'my_borrowed_items' URL.
-    Redirects users to the collections page.
-    """
-    messages.info(request, "We've moved from borrowing items to collections of hotel bookings. Use collections to organize your bookings!")
-    return redirect('patron:view_collections')
-
-@login_required
-def add_room(request):
-    """
-    View for librarians to add rooms to the main hotel.
-    """
-    # Only staff can access this page
-    if not request.user.is_staff:
-        messages.error(request, "Only librarians can add rooms.")
-        return redirect('home')
-    
-    # Get the main hotel
-    main_hotel = Hotel.objects.first()
-    if not main_hotel:
-        messages.error(request, "No hotel exists. Please create a hotel first.")
-        return redirect('home')
-    
-    if request.method == 'POST':
-        number = request.POST.get('number')
-        room_type = request.POST.get('type')
-        description = request.POST.get('description')
-        price_per_night = request.POST.get('price_per_night')
-        capacity = request.POST.get('capacity', 1)
-        is_available = request.POST.get('is_available') == 'on'
-        
-        # Basic validation
-        if not (number and room_type and price_per_night):
-            messages.error(request, "Please fill in all required fields.")
-            return render(request, 'patron/add_room.html', {
-                'hotel': main_hotel,
-                'base_template': 'base/librarian_base.html'
-            })
-        
-        # Check if room number already exists in this hotel
-        if Room.objects.filter(hotel=main_hotel, number=number).exists():
-            messages.error(request, f"Room {number} already exists in this hotel.")
-            return render(request, 'patron/add_room.html', {
-                'hotel': main_hotel,
-                'base_template': 'base/librarian_base.html'
-            })
-        
-        try:
-            # Create room
-            room = Room(
-                hotel=main_hotel,
-                number=number,
-                type=room_type,
-                description=description,
-                price_per_night=price_per_night,
-                capacity=capacity,
-                is_available=is_available
-            )
-            
-            # Handle image upload
-            if 'room_image' in request.FILES:
-                room.image = request.FILES['room_image']
-                
-            room.save()
-            messages.success(request, f"Room {number} added successfully!")
-            return redirect('patron:list_hotel_rooms', hotel_id=main_hotel.id)
-        except Exception as e:
-            messages.error(request, f"Error creating room: {str(e)}")
-    
-    return render(request, 'patron/add_room.html', {
-        'hotel': main_hotel,
         'base_template': 'base/librarian_base.html'
     })
 

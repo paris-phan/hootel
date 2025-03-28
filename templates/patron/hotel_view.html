@@ -4,64 +4,34 @@
 
 {% block content %}
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">{{ hotel.name }}</h2>
-                    {% if user.is_staff %}
-                    <!-- Librarian-only actions - Edit/Delete buttons -->
-                    <div>
-                        <a href="{% url 'patron:update_hotel' hotel.id %}" class="btn btn-light btn-sm">Edit Hotel</a>
-                        <a href="{% url 'patron:delete_hotel' hotel.id %}" class="btn btn-danger btn-sm">Delete Hotel</a>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <div class="row g-0">
-                    <div class="col-md-6">
-                        <img src="{{ hotel.image_url }}" class="img-fluid" alt="{{ hotel.name }}" style="width: 100%; height: 350px; object-fit: cover;">
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="bi bi-geo-alt-fill"></i> {{ hotel.location }}</h5>
-                            <p class="card-text">{{ hotel.description|linebreaks }}</p>
-                            <p class="card-text"><small class="text-muted">Added on {{ hotel.created_at|date:"F j, Y" }}</small></p>
-                            
-                            {% if user.is_staff and hotel.created_by %}
-                            <!-- Librarian-only information -->
-                            <p class="card-text"><small class="text-muted">Added by {{ hotel.created_by.username }}</small></p>
-                            {% endif %}
-                            
-                            <div class="mt-4">
-                                {% if user.is_authenticated and not user.is_staff %}
-                                <!-- Patron-only action - Book Now button -->
-                                <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-success">Book Now</a>
-                                {% endif %}
-                                <a href="{% url 'patron:list_hotel_rooms' hotel.id %}" class="btn btn-primary">View Rooms</a>
-                                <a href="{% url 'patron:librarian_search' %}" class="btn btn-secondary">Back to Search</a>
-                                {% if user.is_staff %}
-                                <!-- Librarian-only action - Manage Hotels button -->
-                                <a href="{% url 'patron:manage_hotels' %}" class="btn btn-outline-secondary">Manage Hotels</a>
-                                {% endif %}
-                            </div>
-                        </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">{{ hotel.name }}</h2>
+                    <h5 class="card-subtitle mb-3 text-muted">{{ hotel.location }}</h5>
+                    <p class="card-text">{{ hotel.description|linebreaks }}</p>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'patron:manage_hotels' %}" class="btn btn-secondary">Back to Manage Hotels</a>
+                        <a href="{% url 'patron:update_hotel' hotel.id %}" class="btn btn-primary">Edit Hotel</a>
+                        <a href="{% url 'patron:delete_hotel' hotel.id %}" class="btn btn-danger">Delete Hotel</a>
                     </div>
                 </div>
             </div>
             
-            <!-- Recent Bookings Section (Only visible to staff/librarians) -->
-            {% if user.is_staff %}
-            <div class="card mb-4">
-                <div class="card-header bg-secondary text-white">
-                    <h3>Recent Bookings</h3>
+            <!-- Recent Bookings Section -->
+            {% if recent_bookings %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Recent Bookings</h4>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped">
+                        <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Guest</th>
+                                    <th>User</th>
                                     <th>Check-in</th>
                                     <th>Check-out</th>
                                     <th>Status</th>
@@ -72,76 +42,23 @@
                                 {% for booking in recent_bookings %}
                                 <tr>
                                     <td>{{ booking.user.username }}</td>
-                                    <td>{{ booking.check_in|date:"M d, Y" }}</td>
-                                    <td>{{ booking.check_out|date:"M d, Y" }}</td>
+                                    <td>{{ booking.check_in_date|date:"F j, Y" }}</td>
+                                    <td>{{ booking.check_out_date|date:"F j, Y" }}</td>
                                     <td>
-                                        {% if booking.status == 'pending' %}
-                                        <span class="badge bg-warning text-dark">Pending</span>
-                                        {% elif booking.status == 'approved' %}
+                                        {% if booking.status == 'PENDING' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% elif booking.status == 'APPROVED' %}
                                         <span class="badge bg-success">Approved</span>
-                                        {% elif booking.status == 'declined' %}
-                                        <span class="badge bg-danger">Declined</span>
                                         {% else %}
-                                        <span class="badge bg-secondary">{{ booking.status|title }}</span>
+                                        <span class="badge bg-danger">Rejected</span>
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if booking.status == 'pending' %}
-                                        <div class="btn-group btn-group-sm">
-                                            <a href="{% url 'patron:approve_booking' booking.id %}" class="btn btn-success">Approve</a>
-                                            <a href="{% url 'patron:decline_booking' booking.id %}" class="btn btn-danger">Decline</a>
-                                        </div>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center">No bookings for this hotel yet.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            
-            {% if user.is_authenticated and not user.is_staff %}
-            <!-- User's Own Bookings for this Hotel (Only for authenticated non-staff users/patrons) -->
-            <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h3>Your Bookings at This Hotel</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Check-in</th>
-                                    <th>Check-out</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for booking in user_bookings %}
-                                <tr>
-                                    <td>{{ booking.check_in_date|date:"M d, Y" }}</td>
-                                    <td>{{ booking.check_out_date|date:"M d, Y" }}</td>
-                                    <td>
-                                        <span class="badge {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %}">
-                                            {{ booking.get_status_display }}
-                                        </span>
                                     </td>
                                     <td>
                                         {% if booking.status == 'PENDING' %}
-                                        <a href="{% url 'patron:cancel_booking' booking.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this booking?')">Cancel</a>
+                                        <a href="{% url 'patron:update_booking_status' booking.id 'APPROVED' %}" class="btn btn-sm btn-success">Approve</a>
+                                        <a href="{% url 'patron:update_booking_status' booking.id 'REJECTED' %}" class="btn btn-sm btn-danger">Reject</a>
                                         {% endif %}
                                     </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center">You don't have any bookings at this hotel yet.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -150,6 +67,20 @@
                 </div>
             </div>
             {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">Location</h5>
+                    <p class="card-text">{{ hotel.location }}</p>
+                    <p class="card-text"><small class="text-muted">Added on {{ hotel.created_at|date:"F j, Y" }}</small></p>
+                    {% if hotel.created_by %}
+                    <p class="card-text"><small class="text-muted">Created by: {{ hotel.created_by.username }}</small></p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
