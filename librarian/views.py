@@ -23,7 +23,7 @@ def create_hotel(request):
         name = request.POST.get('name_field')
         street_address = request.POST.get('street_address_field')
         city = request.POST.get('city_field')
-        state = request.POST.get('name_field')
+        state = request.POST.get('state_field')
         country = request.POST.get('country_field')
         price = request.POST.get('price_field')
         description = request.POST.get('description')
@@ -136,16 +136,24 @@ def update_hotel(request, hotel_id):
     if not request.user.is_staff and hotel.created_by != request.user:
         messages.error(request, "You don't have permission to update this hotel.")
         return redirect('manage_hotels')
-    
     if request.method == 'POST':
         name = request.POST.get('name_field')
-        location = request.POST.get('location_field')
+        street_address = request.POST.get('street_address_field')
+        city = request.POST.get('city_field')
+        state = request.POST.get('state_field')
+        country = request.POST.get('country_field')
+        price = request.POST.get('price_field')
         description = request.POST.get('description')
         
-        if name and location:
-            hotel.name = name
-            hotel.location = location
-            hotel.description = description
+        if name and street_address and city and state and country and price:
+            # Update the hotel instance without saving to DB yet
+            hotel.name=name
+            hotel.street_address=street_address
+            hotel.city=city
+            hotel.state=state
+            hotel.country=country
+            hotel.price=price
+            hotel.description=description
             
             # Check if an image was uploaded
             if 'hotel_image' in request.FILES:
@@ -153,13 +161,13 @@ def update_hotel(request, hotel_id):
                 if hotel.image:
                     hotel.image.delete(save=False)
                 hotel.image = request.FILES['hotel_image']
-                
+
+            # Save the hotel to the database
             hotel.save()
             messages.success(request, 'Hotel updated successfully!')
-            return redirect('patron:view_hotel', hotel_id=hotel.id)
+            return redirect('view_hotel', hotel_id=hotel.id)
         else:
-            messages.error(request, 'Please provide both name and location for the hotel.')
-    
+            messages.error(request, 'Please provide the name, street address, city, state, country, and price for the hotel.')     
     return render(request, 'librarian/update_hotel.html', {'hotel': hotel})
 
 @login_required

@@ -52,15 +52,13 @@
                     <h3 class="card-title">{{ hotel.name }}</h3>
                     <h5 class="card-subtitle mb-2">${{ hotel.price }}</h5><br />
                     <h6 class="card-subtitle mb-2">{{ hotel.street_address }}</h6>
-                    <h6 class="card-subtitle mb-2">{{ hotel.city }}</h6>
-                    <h6 class="card-subtitle mb-2">{{ hotel.state }}</h6>
-                    <h6 class="card-subtitle mb-2">{{ hotel.country }}</h6>
+                    <h6 class="card-subtitle mb-2">{{ hotel.city }}, {{hotel.state}}, {{ hotel.country }}</h6>
                     <p class="card-text">{{ hotel.description|truncatechars:100 }}</p>
                     {% if hotel.created_by %}
                     <p class="card-text"><small class="text-muted">Created by: {{ hotel.created_by.username }}</small></p>
                     {% endif %}
                     <div class="d-flex justify-content-between mt-3">
-                        <a href="{% url 'patron:view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View</a>
+                        <a href="{% url 'view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View</a>
                         <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-sm btn-success">Book</a>
                     </div>
                 </div>
