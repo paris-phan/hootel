@@ -49,8 +49,12 @@
                 {% endif %}
                 
                 <div class="card-body">
-                    <h5 class="card-title">{{ hotel.name }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ hotel.location }}</h6>
+                    <h3 class="card-title">{{ hotel.name }}</h3>
+                    <h5 class="card-subtitle mb-2">${{ hotel.price }}</h5><br />
+                    <h6 class="card-subtitle mb-2">{{ hotel.street_address }}</h6>
+                    <h6 class="card-subtitle mb-2">{{ hotel.city }}</h6>
+                    <h6 class="card-subtitle mb-2">{{ hotel.state }}</h6>
+                    <h6 class="card-subtitle mb-2">{{ hotel.country }}</h6>
                     <p class="card-text">{{ hotel.description|truncatechars:100 }}</p>
                     {% if hotel.created_by %}
                     <p class="card-text"><small class="text-muted">Created by: {{ hotel.created_by.username }}</small></p>

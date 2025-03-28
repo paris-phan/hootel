@@ -18,14 +18,11 @@ def room_image_path(instance, filename):
 
 class Hotel(models.Model):
     name = models.CharField(max_length=100)
-    """
-    Fields to add in later:
+    street_address = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
-    price = models.DecimalField(decimal_places=2)
-    """
-    location = models.TextField(blank=True, null=True)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to=hotel_image_path, null=True, blank=True)

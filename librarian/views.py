@@ -21,14 +21,22 @@ def create_hotel(request):
     """
     if request.method == 'POST':
         name = request.POST.get('name_field')
-        location = request.POST.get('location_field')
+        street_address = request.POST.get('street_address_field')
+        city = request.POST.get('city_field')
+        state = request.POST.get('name_field')
+        country = request.POST.get('country_field')
+        price = request.POST.get('price_field')
         description = request.POST.get('description')
         
-        if name and location:
+        if name and street_address and city and state and country and price:
             # Create the hotel instance without saving to DB yet
             hotel = Hotel(
                 name=name,
-                location=location,
+                street_address=street_address,
+                city=city,
+                state=state,
+                country=country,
+                price=price,
                 description=description,
                 created_by=request.user
             )
@@ -43,7 +51,7 @@ def create_hotel(request):
             messages.success(request, 'Hotel created successfully!')
             return redirect('manage_hotels')
         else:
-            messages.error(request, 'Please provide both name and location for the hotel.')
+            messages.error(request, 'Please provide the name, street address, city, state, country, and price for the hotel.')
     
     return render(request, 'librarian/create_hotel.html')
 
