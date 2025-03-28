@@ -11,20 +11,31 @@
                 <h2 class="card-title" style="text-align: center;">Create a Hotel</h2><br>
                 <form action="{% url 'create_hotel' %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <label for="name" style="margin-bottom: 10px;">Name:</label> 
-                    <input type="text" name="name_field" id="name" required><br>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name:</label>
+                        <input type="text" class="form-control" name="name_field" id="name" required>
+                    </div>
                     
-                    <label for="location" style="margin-bottom: 10px;">Location:</label> 
-                    <input type="text" name="location_field" id="location" required><br>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location:</label>
+                        <input type="text" class="form-control" name="location_field" id="location" required>
+                    </div>
                     
-                    <label for="hotel_image" style="margin-bottom: 10px;">Hotel Image:</label> 
-                    <input type="file" name="hotel_image" id="hotel_image" accept="image/*"><br>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description:</label>
+                        <textarea class="form-control" name="description" id="description" rows="4"></textarea>
+                    </div>
                     
-                    <input type="submit" value="Create Hotel" class="btn btn-success mt-3">
+                    <div class="mb-3">
+                        <label for="hotel_image" class="form-label">Hotel Image:</label>
+                        <input type="file" class="form-control" name="hotel_image" id="hotel_image" accept="image/*">
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">Create Hotel</button>
+                        <a href="{% url 'patron:manage_hotels' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
                 </form>
-                <div class="d-grid gap-2 mt-4">
-                    <a href="{% url 'home' %}" class="btn btn-primary mt-2">Back to Home</a>
-                </div>
             </div>
         </div>
     </div>
