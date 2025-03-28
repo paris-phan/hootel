@@ -1,46 +1,109 @@
 {% extends base_template %}
+{% load static %}
 {% load socialaccount %}
 
 {% block title %}Patron Home - HotelManager6000{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title">Welcome Patron {{ name }}!</h2>
-                <div class="user-info mb-4">
-                    <!-- Hidden file input -->
-                    <form id="profilePictureForm" method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*" style="display:none;">
-                    </form>
-                    
-                    <!-- Profile picture circle (clickable) -->
-                    <div class="text-center mb-3">
-                        <div id="profilePictureContainer" style="width: 150px; height: 150px; overflow: hidden; border-radius: 50%; margin: 0 auto; cursor: pointer; position: relative;">
-                            <img id="profileImage" src="{{ profile_picture_url }}" 
-                                 alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
-                            <div style="position: absolute; bottom: 0; width: 100%; background-color: rgba(0,0,0,0.5); color: white; padding: 10px 0; font-size: 10px;">
-                                Click to change
-                            </div>
-                        </div>
-                    </div>
-                    <p><strong>Name:</strong> {{ name }}</p>
-                    <p><strong>Email:</strong> {{ email }}</p>
-                    <p><strong>Account Type:</strong> {{ user_type }}</p>
-                </div>
-                <div class="d-grid gap-2 mt-4">
-                    <a href="{% url 'patron:my_bookings' %}" class="btn btn-info">My Bookings</a>
-                    <a href="{% url 'patron:search' %}" class="btn btn-primary">Search Hotels</a>
-                    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
-                </div>
-            </div>
-        </div>
+<style>
+  body {
+    background: url("{% static 'hotel1.jpg' %}") no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  .frosted-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    padding: 2.5rem;
+    color: white;
+  }
+
+  .profile-pic-wrapper {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 1rem auto;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+  }
+
+  .profile-pic-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+  }
+
+  .profile-pic-overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    padding: 6px 0;
+  }
+
+  .btn-custom {
+    border-radius: 30px;
+    font-weight: 500;
+    padding: 0.75rem;
+  }
+
+  .info-label {
+    color: #f8f9fa;
+    font-weight: 500;
+  }
+
+  .container-min-height {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
+<div class="container container-min-height">
+  <div class="col-md-10 col-lg-6">
+    <div class="frosted-glass text-center">
+      <h2 class="mb-4">👋 Welcome, {{ name }}!</h2>
+
+      <form id="profilePictureForm" method="post" enctype="multipart/form-data" style="display: none;">
+        {% csrf_token %}
+        <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*">
+      </form>
+
+      <div id="profilePictureContainer" class="profile-pic-wrapper">
+        <img id="profileImage" src="{{ profile_picture_url }}" alt="Profile Picture">
+        <div class="profile-pic-overlay">Click to change</div>
+      </div>
+
+      <div class="text-start mt-4 mb-4" style="max-width: 320px; margin: 0 auto;">
+        <p><span class="info-label">Name:</span> {{ name }}</p>
+        <p><span class="info-label">Email:</span> {{ email }}</p>
+        <p><span class="info-label">Account Type:</span> {{ user_type }}</p>
+      </div>
+
+      <div class="d-grid gap-3 mt-4">
+        <a href="{% url 'patron:my_bookings' %}" class="btn btn-info btn-custom text-white">
+          📔 My Bookings
+        </a>
+        <a href="{% url 'patron:search' %}" class="btn btn-primary btn-custom">
+          🔍 Search Hotels
+        </a>
+        <a href="{% url 'logout' %}" class="btn btn-danger btn-custom">
+          🔓 Logout
+        </a>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- JavaScript for handling the profile picture upload -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const profilePictureContainer = document.getElementById('profilePictureContainer');
@@ -48,37 +111,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const profilePictureForm = document.getElementById('profilePictureForm');
     const profileImage = document.getElementById('profileImage');
     
-    // Click on profile picture opens file explorer
     profilePictureContainer.addEventListener('click', function() {
         profilePictureInput.click();
     });
     
-    // When a file is selected, upload it automatically
     profilePictureInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
-            // Display loading state
             profileImage.style.opacity = '0.5';
-            
             const formData = new FormData(profilePictureForm);
-            
-            // Send AJAX request to upload the image
+
             fetch('{% url "update_profile_picture" %}', {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                }
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update the profile picture with the new one
-                    profileImage.src = data.image_url + '?t=' + new Date().getTime(); // Add timestamp to prevent caching
-                    profileImage.style.opacity = '1';
+                    profileImage.src = data.image_url + '?t=' + new Date().getTime();
                 } else {
                     alert('Failed to upload image: ' + data.error);
-                    profileImage.style.opacity = '1';
                 }
+                profileImage.style.opacity = '1';
             })
             .catch(error => {
                 console.error('Error:', error);

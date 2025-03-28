@@ -3,131 +3,189 @@
 {% block title %}My Bookings - HotelManager6000{% endblock %}
 
 {% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<style>
+  body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    color: #333;
+    max-width: 1000px;
+    margin: 3rem auto;
+  }
+
+  .form-control,
+  .input-group-text {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+  }
+
+  .form-control {
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .input-group-text {
+    border-radius: 0.5rem 0 0 0.5rem;
+  }
+
+  .btn-login {
+    border-radius: 50px;
+    font-size: 1rem;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+  }
+
+  .card.booking {
+    background-color: #fff;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .card.booking .card-header {
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+  }
+
+  .card.booking .card-footer {
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+  }
+
+  .alert {
+    border-radius: 12px;
+  }
+
+  .search-bar .form-control {
+    border-radius: 30px 0 0 30px;
+  }
+
+  .search-bar .btn {
+    border-radius: 0 30px 30px 0;
+  }
+</style>
+
 <div class="container">
-    <h2 class="mb-4">My Bookings</h2>
-    
+  <div class="glass-card">
+    <h2 class="mb-4 fw-bold text-center">📔 My Bookings</h2>
+
     {% if messages %}
     <div class="row">
-        <div class="col-12">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-    
-    <!-- Search Bar -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="GET" action="{% url 'patron:my_bookings' %}" class="mb-0">
-                <div class="input-group">
-                    <input type="text" class="form-control" name="query" value="{{ query|default:'' }}" placeholder="🔍 Search bookings by hotel name, location, or dates">
-                    <button class="btn btn-primary" type="submit">Search</button>
-                    {% if query %}
-                    <a href="{% url 'patron:my_bookings' %}" class="btn btn-outline-secondary">Clear</a>
-                    {% endif %}
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <div class="row">
-        {% for booking in bookings %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %} text-white">
-                    <h5 class="mb-0">
-                        <a href="{% url 'patron:patron_view_hotel' booking.hotel.id %}" class="text-white text-decoration-none">
-                            {{ booking.hotel.name }}
-                        </a>
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text"><strong>Location:</strong> {{ booking.hotel.location }}</p>
-                    <p class="card-text"><strong>Check-in:</strong> {{ booking.check_in_date }}</p>
-                    <p class="card-text"><strong>Check-out:</strong> {{ booking.check_out_date }}</p>
-                    <p class="card-text">
-                        <strong>Status:</strong> 
-                        <span class="badge {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %}">
-                            {{ booking.get_status_display }}
-                        </span>
-                    </p>
-                    
-                    {% if booking.status == 'PENDING' %}
-                    <div class="alert alert-info">
-                        Your booking request is awaiting approval from a librarian.
-                        <div class="mt-2">
-                            <a href="{% url 'patron:cancel_booking' booking.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?')">Cancel Booking</a>
-                        </div>
-                    </div>
-                    {% elif booking.status == 'APPROVED' %}
-                    <div class="alert alert-success">
-                        Your booking has been approved. Enjoy your stay!
-                    </div>
-                    {% elif booking.status == 'REJECTED' %}
-                    <div class="alert alert-danger">
-                        Your booking request was declined. Please contact a librarian for more information.
-                    </div>
-                    {% endif %}
-                    
-                    <div class="d-flex mt-3 justify-content-between">
-                        <a href="{% url 'patron:patron_view_hotel' booking.hotel.id %}" class="btn btn-sm btn-primary">
-                            View Hotel
-                        </a>
-                        
-                        {% if user.is_authenticated %}
-                        <div>
-                            {% if user_collections %}
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton-{{ booking.id }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Add to Collection
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ booking.id }}">
-                                    {% for collection in user_collections %}
-                                    <li>
-                                        <form method="post" action="{% url 'patron:add_booking_to_collection' booking.id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="collection_id" value="{{ collection.id }}">
-                                            <button type="submit" class="dropdown-item">{{ collection.name }}</button>
-                                        </form>
-                                    </li>
-                                    {% endfor %}
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{% url 'patron:create_collection' %}">Create new collection</a></li>
-                                </ul>
-                            </div>
-                            {% else %}
-                            <a href="{% url 'patron:create_collection' %}" class="btn btn-sm btn-secondary">Create Collection</a>
-                            {% endif %}
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <small class="text-muted">Requested on: {{ booking.created_at|date:"F j, Y" }}</small>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">
-                {% if query %}
-                <p>No bookings matching "{{ query }}" were found.</p>
-                <a href="{% url 'patron:my_bookings' %}" class="btn btn-primary">View All Bookings</a>
-                {% else %}
-                <p>You don't have any bookings yet.</p>
-                <a href="{% url 'home' %}" class="btn btn-primary">Return to Home</a>
-                {% endif %}
-            </div>
+      <div class="col-12">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
         </div>
         {% endfor %}
+      </div>
     </div>
-    
-    <div class="mt-4">
-        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
-        <a href="{% url 'patron:view_collections' %}" class="btn btn-primary">View My Collections</a>
+    {% endif %}
+
+    <!-- Search Bar -->
+    <form method="GET" action="{% url 'patron:my_bookings' %}" class="mb-4">
+      <div class="input-group search-bar">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" name="query" class="form-control" placeholder="Search bookings by hotel name, location, or dates" value="{{ query|default:'' }}">
+        <button type="submit" class="btn btn-primary btn-login">Search</button>
+        {% if query %}
+        <a href="{% url 'patron:my_bookings' %}" class="btn btn-outline-secondary btn-login">Clear</a>
+        {% endif %}
+      </div>
+    </form>
+
+    <div class="row">
+      {% for booking in bookings %}
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card booking h-100">
+          <div class="card-header {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %} text-white">
+            <a href="{% url 'patron:patron_view_hotel' booking.hotel.id %}" class="text-white text-decoration-none">
+              {{ booking.hotel.name }}
+            </a>
+          </div>
+          <div class="card-body">
+            <p><strong>Location:</strong> {{ booking.hotel.location }}</p>
+            <p><strong>Check-in:</strong> {{ booking.check_in_date }}</p>
+            <p><strong>Check-out:</strong> {{ booking.check_out_date }}</p>
+            <p><strong>Status:</strong> 
+              <span class="badge {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %}">
+                {{ booking.get_status_display }}
+              </span>
+            </p>
+
+            {% if booking.status == 'PENDING' %}
+            <div class="alert alert-info mt-2">
+              Awaiting librarian approval.
+              <a href="{% url 'patron:cancel_booking' booking.id %}" class="btn btn-sm btn-danger mt-2" onclick="return confirm('Cancel this booking?')">Cancel</a>
+            </div>
+            {% elif booking.status == 'APPROVED' %}
+            <div class="alert alert-success mt-2">Approved. Enjoy your stay!</div>
+            {% elif booking.status == 'REJECTED' %}
+            <div class="alert alert-danger mt-2">Declined. Contact a librarian.</div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between mt-3">
+              <a href="{% url 'patron:patron_view_hotel' booking.hotel.id %}" class="btn btn-sm btn-primary">View Hotel</a>
+              {% if user.is_authenticated %}
+              {% if user_collections %}
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton-{{ booking.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                  Add to Collection
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ booking.id }}">
+                  {% for collection in user_collections %}
+                  <li>
+                    <form method="post" action="{% url 'patron:add_booking_to_collection' booking.id %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="collection_id" value="{{ collection.id }}">
+                      <button type="submit" class="dropdown-item">{{ collection.name }}</button>
+                    </form>
+                  </li>
+                  {% endfor %}
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{% url 'patron:create_collection' %}">Create new collection</a></li>
+                </ul>
+              </div>
+              {% else %}
+              <a href="{% url 'patron:create_collection' %}" class="btn btn-sm btn-outline-secondary">Create Collection</a>
+              {% endif %}
+              {% endif %}
+            </div>
+          </div>
+          <div class="card-footer bg-light text-muted small">
+            Requested on: {{ booking.created_at|date:"F j, Y" }}
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info text-center">
+          {% if query %}
+          <p>No bookings found for <strong>{{ query }}</strong>.</p>
+          <a href="{% url 'patron:my_bookings' %}" class="btn btn-secondary btn-login">View All</a>
+          {% else %}
+          <p>You don't have any bookings yet.</p>
+          <a href="{% url 'home' %}" class="btn btn-primary btn-login">Return to Home</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
     </div>
+
+    <div class="mt-4 text-center">
+      <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-login me-2">Back to Home</a>
+      <a href="{% url 'patron:view_collections' %}" class="btn btn-primary btn-login">View My Collections</a>
+    </div>
+  </div>
 </div>
-{% endblock %} 
+{% endblock %}
