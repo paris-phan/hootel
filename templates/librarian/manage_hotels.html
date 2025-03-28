@@ -1,11 +1,11 @@
-{% extends 'base/base.html' %}
+{% extends base_template %}
 
 {% block title %}Manage Hotels - HotelManager6000{% endblock %}
 
 {% block content %}
 <div class="container">
     <h2 class="mb-4">Manage Hotels</h2>
-    
+
     {% if messages %}
     <div class="row">
         <div class="col-12">
@@ -17,11 +17,11 @@
         </div>
     </div>
     {% endif %}
-    
+
     <div class="d-flex justify-content-end mb-4">
         <a href="{% url 'create_hotel' %}" class="btn btn-primary">Add New Hotel</a>
     </div>
-    
+
     <div class="row">
         {% for hotel in hotels %}
         <div class="col-md-4 mb-4">
@@ -31,10 +31,10 @@
                     {% csrf_token %}
                     <input type="file" id="hotelImageInput-{{ hotel.id }}" name="hotel_image" accept="image/*">
                 </form>
-                
+
                 <!-- Image container with click-to-update functionality -->
                 {% if user.is_staff or hotel.created_by == user %}
-                <div class="image-container" style="position: relative; cursor: pointer;" 
+                <div class="image-container" style="position: relative; cursor: pointer;"
                      data-id="{{ hotel.id }}"
                      onclick="document.getElementById('hotelImageInput-{{ hotel.id }}').click();">
                     <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
@@ -47,7 +47,7 @@
                     <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
                 </div>
                 {% endif %}
-                
+
                 <div class="card-body">
                     <h3 class="card-title">{{ hotel.name }}</h3>
                     <h5 class="card-subtitle mb-2">${{ hotel.price }}</h5><br />
@@ -72,7 +72,7 @@
         </div>
         {% endfor %}
     </div>
-    
+
     <div class="mt-4">
         <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
     </div>
@@ -80,50 +80,50 @@
 
 <!-- JavaScript for handling image uploads -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Get all file inputs for hotel images
-    const fileInputs = document.querySelectorAll('input[id^="hotelImageInput-"]');
-    
-    fileInputs.forEach(function(input) {
-        const hotelId = input.id.split('-')[1];
-        
-        input.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const form = document.getElementById(`hotelImageForm-${hotelId}`);
-                const formData = new FormData(form);
-                const imageContainer = this.closest('.image-container');
-                const img = imageContainer.querySelector('img');
-                
-                // Show loading state
-                img.style.opacity = '0.5';
-                
-                // Send AJAX request to update the image
-                fetch(`{% url 'update_hotel_image' 0 %}`.replace('0', hotelId), {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Add timestamp to prevent caching
-                        img.src = `${data.image_url}?t=${new Date().getTime()}`;
-                        img.style.opacity = '1';
-                    } else {
-                        alert('Failed to upload image: ' + (data.error || 'Unknown error'));
-                        img.style.opacity = '1';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while uploading the image.');
-                    img.style.opacity = '1';
-                });
-            }
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get all file inputs for hotel images
+        const fileInputs = document.querySelectorAll('input[id^="hotelImageInput-"]');
+
+        fileInputs.forEach(function (input) {
+            const hotelId = input.id.split('-')[1];
+
+            input.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    const form = document.getElementById(`hotelImageForm-${hotelId}`);
+                    const formData = new FormData(form);
+                    const imageContainer = this.closest('.image-container');
+                    const img = imageContainer.querySelector('img');
+
+                    // Show loading state
+                    img.style.opacity = '0.5';
+
+                    // Send AJAX request to update the image
+                    fetch(`{% url 'update_hotel_image' 0 %}`.replace('0', hotelId), {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Add timestamp to prevent caching
+                                img.src = `${data.image_url}?t=${new Date().getTime()}`;
+                                img.style.opacity = '1';
+                            } else {
+                                alert('Failed to upload image: ' + (data.error || 'Unknown error'));
+                                img.style.opacity = '1';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while uploading the image.');
+                            img.style.opacity = '1';
+                        });
+                }
+            });
         });
     });
-});
 </script>
 {% endblock %} 
