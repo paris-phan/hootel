@@ -15,22 +15,43 @@
                         <label for="name" class="form-label">Name:</label>
                         <input type="text" class="form-control" name="name_field" id="name" required>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="location" class="form-label">Location:</label>
                         <input type="text" class="form-control" name="location_field" id="location" required>
                     </div>
-                    
+
+                    <div class="mb-3">
+                       <select name="num_people" class="form-select">
+                           <option value="">Number of People</option>
+                           <option value="1">1</option>
+                           <option value="2">2</option>
+                           <option value="3">3</option>
+                           <option value="4+">4+</option>
+                       </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <select name="price_per_night" class="form-select">
+                            <option value="">Price per Night</option>
+                            <option value="<100">&lt;100</option>
+                            <option value="100-200">100-200</option>
+                            <option value="200-300">200-300</option>
+                            <option value="300-400">300-400</option>
+                            <option value="400+">400+</option>
+                        </select>
+                    </div>
+
                     <div class="mb-3">
                         <label for="description" class="form-label">Description:</label>
                         <textarea class="form-control" name="description" id="description" rows="4"></textarea>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="hotel_image" class="form-label">Hotel Image:</label>
                         <input type="file" class="form-control" name="hotel_image" id="hotel_image" accept="image/*">
                     </div>
-                    
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-success">Create Hotel</button>
                         <a href="{% url 'patron:manage_hotels' %}" class="btn btn-secondary">Cancel</a>
@@ -40,4 +61,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

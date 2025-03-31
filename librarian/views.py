@@ -24,6 +24,8 @@ def create_hotel(request):
         name = request.POST.get("name_field")
         location = request.POST.get("location_field")
         description = request.POST.get("description", "")
+        price = request.POST.get("price_per_night")
+        num_people = request.POST.get("num_people")
         
         if not name or not location:
             messages.error(request, "Name and location are required fields.")
@@ -33,7 +35,9 @@ def create_hotel(request):
             name=name,
             location=location,
             description=description,
-            created_by=request.user
+            created_by=request.user,
+            price=price,
+            num_people=num_people,
         )
         
         # Handle image upload if provided
