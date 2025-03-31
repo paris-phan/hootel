@@ -2,13 +2,19 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Q
-from .models import Hotel, HotelBooking, Collection, Item, CollectionAccessRequest, CollectionBooking
+from django.db.models import Q, Avg
+from django.views.decorators.csrf import csrf_exempt
+
+from .models import Hotel, HotelBooking, Collection, Item, CollectionAccessRequest, CollectionBooking, Review
 from datetime import datetime
 from django.utils import timezone
 from django.db import models
 from django.views.decorators.http import require_POST
 from django.urls import reverse
+from django.http import JsonResponse
+import json
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -105,7 +111,7 @@ def view_collections(request):
         'public_collections': public_collections,
         'private_collections': private_collections,
         'accessible_private_collections': accessible_private_collections,
-        'user_collections': user_collections
+        'user_collections': user_collections,
     }
     
     return render(request, 'patron/view_collections.html', context)
@@ -228,39 +234,47 @@ def view_item(request, item_id):
     })
 
 def search(request):
-    """
-    View for the search page where patrons can search for available hotels.
-    This view always uses the patron interface regardless of user type.
-    Shows all hotels created by librarians, with search functionality.
-    """
     query = request.GET.get('query', '').strip()
-    
-    # Get all hotels - no filtering by user type, show all hotels created by librarians
-    hotels = Hotel.objects.all().order_by('-created_at')
-    
-    # Apply search filter if query exists
+    sort_by = request.GET.get('sort_by', '')
+    num_people = request.GET.get('num_people', '')
+    price = request.GET.get('price_per_night', '')
+
+    hotels = Hotel.objects.annotate(average_rating=Avg('review__rating'))
+    for hotel in hotels:
+        hotel.average_rating = hotel.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
+
     if query:
         hotels = hotels.filter(
-            Q(name__icontains=query) | 
-            Q(location__icontains=query) | 
+            Q(name__icontains=query) |
+            Q(location__icontains=query) |
             Q(description__icontains=query)
         )
-    
-    # Get user collections for the bookmark feature
+
+    if sort_by == 'rating':
+        hotels = hotels.order_by('-average_rating', '-created_at')  # Highest rating first
+    else:  # Default to alphabetical if 'alphabetical' is selected
+        hotels = hotels.order_by('name')
+
+    if num_people != '👥 Travelers' and num_people != '':
+        hotels = hotels.filter(num_people=num_people)
+
+    if price != '💲Price per Night' and price != '':
+        hotels = hotels.filter(price=price)
+
     user_collections = []
     if request.user.is_authenticated:
         user_collections = Collection.objects.filter(creator=request.user)
-    
-    # Always use patron base template for consistent patron experience
+
     base_template = 'base/patron_base.html'
-    
+
     return render(request, 'patron/search-page.html', {
         'hotels': hotels,
         'query': query,
-        'is_librarian': False,  # Always render as patron view
+        'is_librarian': False,
         'base_template': base_template,
         'user_collections': user_collections
     })
+
 
 @login_required
 def librarian_search(request):
@@ -274,9 +288,15 @@ def librarian_search(request):
         return redirect('patron:search')
     
     query = request.GET.get('query', '').strip()
-    
+    sort_by = request.GET.get('sort_by', '')
+    num_people = request.GET.get('num_people', '')
+    price = request.GET.get('price_per_night', '')
+
     # Get all hotels
-    hotels = Hotel.objects.all().order_by('-created_at')
+    hotels = Hotel.objects.annotate(average_rating=Avg('review__rating'))
+    for hotel in hotels:
+        hotel.average_rating = hotel.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
+        print(hotel.average_rating)
     
     # Apply search filter if query exists
     if query:
@@ -285,6 +305,17 @@ def librarian_search(request):
             Q(location__icontains=query) | 
             Q(description__icontains=query)
         )
+
+    if sort_by == 'rating':
+        hotels = hotels.order_by('-average_rating', '-created_at')  # Highest rating first
+    else:  # Default to alphabetical if 'alphabetical' is selected
+        hotels = hotels.order_by('name')
+
+    if num_people != '👥 Travelers' and num_people != '':
+        hotels = hotels.filter(num_people=num_people)
+
+    if price != '💲Price per Night' and price != '':
+        hotels = hotels.filter(price=price)
     
     # Get user collections for the bookmark feature
     user_collections = Collection.objects.filter(creator=request.user)
@@ -450,12 +481,16 @@ def view_hotel(request, hotel_id):
         return redirect('patron:patron_view_hotel', hotel_id=hotel_id)
     
     hotel = get_object_or_404(Hotel, id=hotel_id)
-    
+    reviews = hotel.review_set.all()  # Fetching reviews
+    average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+
     # Get recent bookings
     recent_bookings = HotelBooking.objects.filter(hotel=hotel).order_by('-created_at')[:10]
     
     return render(request, 'librarian/librarian_hotel_view.html', {
         'hotel': hotel,
+        "reviews": reviews,
+        "average_rating": average_rating or "N/A",
         'recent_bookings': recent_bookings,
         'base_template': base_template,
         'is_librarian': True  # Always render as librarian view
@@ -469,7 +504,9 @@ def patron_view_hotel(request, hotel_id):
     using a template that never shows librarian features.
     """
     hotel = get_object_or_404(Hotel, id=hotel_id)
-    
+    reviews = hotel.review_set.all()  # Fetching reviews
+    average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+
     # Get only the current user's bookings for this hotel
     user_bookings = []
     if request.user.is_authenticated:
@@ -480,13 +517,53 @@ def patron_view_hotel(request, hotel_id):
     
     # Always use patron base template for this view
     base_template = 'base/patron_base.html'
-    
-    return render(request, 'patron/patron_hotel_view.html', {
-        'hotel': hotel,
-        'user_bookings': user_bookings,
-        'base_template': base_template,
-        'is_librarian': False  # Always render as patron view
+
+    return render(request, "patron/patron_hotel_view.html", {
+        "hotel": hotel,
+        "reviews": reviews,
+        "average_rating": average_rating or "N/A"
     })
+
+@login_required
+def add_review(request, hotel_id):
+    if request.method == "POST":
+        rating = request.POST.get("rating")
+        comment = request.POST.get("comment", "")  # Default to empty string if not provided
+        try:
+            rating = int(rating)
+            if rating < 1 or rating > 5:
+                return redirect('patron:patron_view_hotel', hotel_id=hotel_id)
+            hotel = get_object_or_404(Hotel, id=hotel_id)
+            Review.objects.create(user=request.user, hotel=hotel, rating=rating, comment=comment)
+            return redirect('patron:patron_view_hotel', hotel_id=hotel.id)
+        except (ValueError, TypeError):
+            return redirect('patron:patron_view_hotel', hotel_id=hotel_id)
+
+    return redirect('patron:patron_view_hotel', hotel_id=hotel_id)
+
+@login_required
+def my_reviews(request):
+    reviews = Review.objects.filter(user=request.user).select_related('hotel').order_by('-created_at')
+    return render(request, 'patron/my_reviews.html', {'reviews': reviews})
+
+@login_required
+def edit_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id)
+
+    if request.method == "POST":
+        # Directly update the review attributes
+        review.comment = request.POST.get('comment', review.comment)
+        review.rating = request.POST.get('rating', review.rating)
+        review.save()
+        return redirect('patron:my_reviews')  # Redirect to My Reviews page after saving
+
+    return render(request, 'patron/edit_review.html', {'review': review})
+
+@login_required
+def delete_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id)
+    review.delete()  # Delete the review
+    return redirect('patron:my_reviews')  # Redirect back to My Reviews page
 
 @login_required
 def update_hotel(request, hotel_id):
@@ -504,11 +581,15 @@ def update_hotel(request, hotel_id):
         name = request.POST.get('name_field')
         location = request.POST.get('location_field')
         description = request.POST.get('description')
+        num_people = request.POST.get('num_people')
+        price = request.POST.get('price_per_night')
         
         if name and location:
             hotel.name = name
             hotel.location = location
             hotel.description = description
+            hotel.price = price
+            hotel.num_people = num_people
             
             # Check if an image was uploaded
             if 'hotel_image' in request.FILES:

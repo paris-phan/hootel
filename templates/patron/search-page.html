@@ -25,89 +25,101 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2 class="mb-4">Search Hotels</h2>
-    
-    <!-- Search Bar -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="GET" action="{% if is_librarian %}{% url 'patron:librarian_search' %}{% else %}{% url 'patron:search' %}{% endif %}" class="mb-0">
-                <div class="input-group">
-                    <input type="text" class="form-control" name="query" value="{{ query|default:'' }}" placeholder="🔍 Search hotels by name, location, or description">
-                    <button class="btn btn-primary" type="submit">Search</button>
-                    {% if query %}
-                    <a href="{% if is_librarian %}{% url 'patron:librarian_search' %}{% else %}{% url 'patron:search' %}{% endif %}" class="btn btn-outline-secondary">Clear</a>
-                    {% endif %}
+    <div class="container">
+        <h2 class="mb-4">Search Hotels</h2>
+
+        <!-- Sort By Dropdown -->
+        <div class="mb-3">
+            <form method="GET" action="{% if is_librarian %}{% url 'patron:librarian_search' %}{% else %}{% url 'patron:search' %}{% endif %}">
+                <div class="mb-4">
+                    <div class="input-group">
+                        <div class="col-md-4 d-flex align-items-center flex-grow-1" style="margin-right: 6px; min_width: 60%">
+                            <input type="text" class="form-control" name="query" value="{{ query|default:'' }}" placeholder="🔍 Search hotels by name, location, or description">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                            {% if query %}
+                                <a href="{% if is_librarian %}{% url 'patron:librarian_search' %}{% else %}{% url 'patron:search' %}{% endif %}" class="btn btn-outline-secondary">Clear</a>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4" style="max-width: 15%; margin-right:4px;">
+                            <select name="num_people" class="form-select" onchange="this.form.submit();">
+                                <option value="">👥 Travelers</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4+">4+</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" style="max-width: 15%">
+                            <select name="price_per_night" class="form-select" onchange="this.form.submit();">
+                                <option value="">💲Price per Night</option>
+                                <option value="<100"><100</option>
+                                <option value="100-200">100-200</option>
+                                <option value="200-300">200-300</option>
+                                <option value="300-400">300-400</option>
+                                <option value="400+">400+</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <select name="sort_by" class="form-select" onchange="this.form.submit();">
+                            <option value="" disabled {% if not sort_by %}selected{% endif %}>Sort</option>
+                            <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Sort by Rating</option>
+                            <option value="alphabetical" {% if sort_by == 'alphabetical' %}selected{% endif %}>Sort Alphabetically (Default)</option>
+                        </select>
+                    </div>
                 </div>
             </form>
         </div>
-    </div>
-    
-    <!-- Hotel Listings -->
-    <div class="row">
-        {% for hotel in hotels %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 position-relative">
-                {% if user.is_authenticated and not is_librarian %}
-                <div class="dropdown">
-                    <div class="bookmark-icon" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-bookmark-plus" title="Add to Collection"></i>
+
+        <!-- Hotel Listings -->
+        <div class="row">
+            {% for hotel in hotels %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 position-relative">
+                        <!-- Hotel Image and Details -->
+                        <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ hotel.name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ hotel.location }}</h6>
+                            <p style="margin-bottom: 2px" class="card-text">Accommodates {{ hotel.num_people }}</p>
+                            <p style="margin-bottom: 12px" class="card-text">Price Per Night: {{ hotel.price }}</p>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                Average Rating: <span id="average-rating">{% if hotel.average_rating %}{{ hotel.average_rating|floatformat:1 }}{% else %}N/A{% endif %}</span>
+                            </h6>
+                            <p class="card-text">{{ hotel.description|truncatechars:100 }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between">
+                                {% if is_librarian %}
+                                    <a href="{% url 'patron:view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                {% else %}
+                                    <a href="{% url 'patron:patron_view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                {% endif %}
+                                {% if user.is_authenticated and not is_librarian %}
+                                    <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-sm btn-success">Book Now</a>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><h6 class="dropdown-header">Add to Collection</h6></li>
-                        {% if user_collections %}
-                            {% for collection in user_collections %}
-                            <li>
-                                <form method="post" action="{% url 'patron:add_hotel_to_collection' hotel.id %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="collection_id" value="{{ collection.id }}">
-                                    <button type="submit" class="dropdown-item">{{ collection.name }}</button>
-                                </form>
-                            </li>
-                            {% endfor %}
-                        {% else %}
-                            <li><span class="dropdown-item-text">No collections yet</span></li>
-                        {% endif %}
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'patron:create_collection' %}">Create new collection</a></li>
-                    </ul>
                 </div>
-                {% endif %}
-                <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title">{{ hotel.name }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ hotel.location }}</h6>
-                    <p class="card-text">{{ hotel.description|truncatechars:100 }}</p>
-                </div>
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between">
-                        {% if is_librarian %}
-                        <a href="{% url 'patron:view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View Details</a>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        {% if query %}
+                            <p>No hotels matching "{{ query }}" were found.</p>
+                            <a href="{% if is_librarian %}{% url 'patron:librarian_search' %}{% else %}{% url 'patron:search' %}{% endif %}" class="btn btn-primary">View All Hotels</a>
                         {% else %}
-                        <a href="{% url 'patron:patron_view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View Details</a>
-                        {% endif %}
-                        {% if user.is_authenticated and not is_librarian %}
-                        <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-sm btn-success">Book Now</a>
+                            <p>No hotels available at the moment.</p>
+                            {% if is_librarian %}
+                                <p>As a librarian, you can add hotels to the system.</p>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
-            </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">
-                {% if query %}
-                <p>No hotels matching "{{ query }}" were found.</p>
-                <a href="{% if is_librarian %}{% url 'patron:librarian_search' %}{% else %}{% url 'patron:search' %}{% endif %}" class="btn btn-primary">View All Hotels</a>
-                {% else %}
-                <p>No hotels available at the moment.</p>
-                {% if is_librarian %}
-                <p>As a librarian, you can add hotels to the system.</p>
-                {% endif %}
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
     </div>
-</div>
 {% endblock %} 
