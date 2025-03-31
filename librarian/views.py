@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from patron.models import Hotel, HotelBooking, Collection, Item, Borrowing, CollectionAccessRequest, CollectionRoom, Room, CollectionBooking
+from patron.models import Hotel, HotelBooking
 from datetime import datetime
 from django.utils import timezone
 from django.db import models
