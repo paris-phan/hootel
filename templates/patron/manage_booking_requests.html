@@ -2,140 +2,239 @@
 
 {% block title %}Manage Booking Requests - HotelManager6000{% endblock %}
 
+{% block extra_css %}
+<!-- Animate.css for smooth entrance animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+  body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  /* Hero Banner */
+  .manage-requests-hero {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    padding: 2rem 1rem;
+    border-radius: 0 0 25px 25px;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .manage-requests-hero h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* Card & Table Styles */
+  .card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+  }
+  .card-header {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    color: #fff;
+    padding: 1rem 1.5rem;
+  }
+  .card-header.bg-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+  }
+  .card-header.bg-success {
+    background: linear-gradient(135deg, #28a745, #218838);
+  }
+  .card-header.bg-danger {
+    background: linear-gradient(135deg, #dc3545, #b52a36);
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .table-striped tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+
+  /* Buttons */
+  .btn {
+    border-radius: 30px; /* Pill-shaped */
+    transition: all 0.3s ease;
+    box-shadow: none;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  }
+  .btn-success {
+    background: linear-gradient(135deg, #28a745, #218838);
+    border: none;
+    color: #fff;
+  }
+  .btn-success:hover {
+    background: linear-gradient(135deg, #218838, #1a6830);
+  }
+  .btn-danger {
+    background: linear-gradient(135deg, #dc3545, #b52a36);
+    border: none;
+    color: #fff;
+  }
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #b52a36, #941f29);
+  }
+  .btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #545b62);
+    border: none;
+    color: #fff;
+  }
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #545b62, #3e4549);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h2 class="mb-4">Manage Booking Requests</h2>
-    
-    {% if messages %}
-    <div class="row">
-        <div class="col-12">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-    
-    <!-- Pending Requests -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-white">
-            <h4>Pending Requests</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Hotel</th>
-                            <th>Check-in</th>
-                            <th>Check-out</th>
-                            <th>Requested On</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for booking in pending_bookings %}
-                        <tr>
-                            <td>{{ booking.user.username }}</td>
-                            <td>{{ booking.hotel.name }}</td>
-                            <td>{{ booking.check_in_date }}</td>
-                            <td>{{ booking.check_out_date }}</td>
-                            <td>{{ booking.created_at|date:"F j, Y" }}</td>
-                            <td>
-                                <a href="{% url 'patron:update_booking_status' booking.id 'APPROVED' %}" class="btn btn-sm btn-success">Approve</a>
-                                <a href="{% url 'patron:update_booking_status' booking.id 'REJECTED' %}" class="btn btn-sm btn-danger">Reject</a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center">No pending booking requests.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Approved Requests -->
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white">
-            <h4>Approved Bookings</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Hotel</th>
-                            <th>Check-in</th>
-                            <th>Check-out</th>
-                            <th>Requested On</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for booking in approved_bookings %}
-                        <tr>
-                            <td>{{ booking.user.username }}</td>
-                            <td>{{ booking.hotel.name }}</td>
-                            <td>{{ booking.check_in_date }}</td>
-                            <td>{{ booking.check_out_date }}</td>
-                            <td>{{ booking.created_at|date:"F j, Y" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center">No approved bookings.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Rejected Requests -->
-    <div class="card mb-4">
-        <div class="card-header bg-danger text-white">
-            <h4>Rejected Bookings</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Hotel</th>
-                            <th>Check-in</th>
-                            <th>Check-out</th>
-                            <th>Requested On</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for booking in rejected_bookings %}
-                        <tr>
-                            <td>{{ booking.user.username }}</td>
-                            <td>{{ booking.hotel.name }}</td>
-                            <td>{{ booking.check_in_date }}</td>
-                            <td>{{ booking.check_out_date }}</td>
-                            <td>{{ booking.created_at|date:"F j, Y" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center">No rejected bookings.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    
-    <div class="mt-4">
-        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
-    </div>
+<!-- Hero Section -->
+<div class="manage-requests-hero animate__animated animate__fadeInDown">
+  <h2>Manage Booking Requests</h2>
 </div>
-{% endblock %} 
+
+<div class="container animate__animated animate__fadeInUp">
+  {% if messages %}
+    <div class="row">
+      <div class="col-12">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Pending Requests -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary">
+      <h4 class="mb-0">Pending Requests</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Hotel</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Requested On</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in pending_bookings %}
+            <tr>
+              <td>{{ booking.user.username }}</td>
+              <td>{{ booking.hotel.name }}</td>
+              <td>{{ booking.check_in_date }}</td>
+              <td>{{ booking.check_out_date }}</td>
+              <td>{{ booking.created_at|date:"F j, Y" }}</td>
+              <td>
+                <a href="{% url 'patron:update_booking_status' booking.id 'APPROVED' %}" class="btn btn-sm btn-success">Approve</a>
+                <a href="{% url 'patron:update_booking_status' booking.id 'REJECTED' %}" class="btn btn-sm btn-danger">Reject</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center">No pending booking requests.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approved Bookings -->
+  <div class="card mb-4">
+    <div class="card-header bg-success">
+      <h4 class="mb-0">Approved Bookings</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Hotel</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Requested On</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in approved_bookings %}
+            <tr>
+              <td>{{ booking.user.username }}</td>
+              <td>{{ booking.hotel.name }}</td>
+              <td>{{ booking.check_in_date }}</td>
+              <td>{{ booking.check_out_date }}</td>
+              <td>{{ booking.created_at|date:"F j, Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center">No approved bookings.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rejected Bookings -->
+  <div class="card mb-4">
+    <div class="card-header bg-danger">
+      <h4 class="mb-0">Rejected Bookings</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Hotel</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Requested On</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in rejected_bookings %}
+            <tr>
+              <td>{{ booking.user.username }}</td>
+              <td>{{ booking.hotel.name }}</td>
+              <td>{{ booking.check_in_date }}</td>
+              <td>{{ booking.check_out_date }}</td>
+              <td>{{ booking.created_at|date:"F j, Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center">No rejected bookings.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Home Button -->
+  <div class="mt-4">
+    <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+  </div>
+</div>
+{% endblock %}

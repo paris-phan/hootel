@@ -1,28 +1,81 @@
 {% extends base_template %}
+{% load static %}
 {% load socialaccount %}
 
 {% block title %}Librarian Home - HotelManager6000{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title">Welcome Librarian!</h2>
-                <div class="user-info mb-4">
-                    <p><strong>Name:</strong> {{ name }}</p>
-                    <p><strong>Email:</strong> {{ email }}</p>
-                    <p><strong>Account Type:</strong> {{ user_type }}</p>
-                </div>
-                <div class="d-grid gap-2 mt-4">
-                    <a href="{% url 'create_hotel' %}" class="btn btn-primary">Create Hotel</a>
-                    <a href="{% url 'search' %}" class="btn btn-primary">Manage Hotels</a>
-                    <a href="{% url 'search' %}" class="btn btn-primary">Review Requests</a>
-                    <a href="{% url 'patron:search' %}" class="btn btn-primary">Search Hotels</a>
-                    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
-                </div>
-            </div>
-        </div>
+<style>
+  /* Full-screen background image */
+  body {
+    background: url("{% static 'hotel1.jpg' %}") no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  /* Container that vertically centers the frosted glass card */
+  .container-min-height {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Frosted glass styling */
+  .frosted-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    padding: 2.5rem;
+    color: white;
+    text-align: center;
+  }
+
+  /* Librarian info styling */
+  .user-info-librarian p {
+    margin-bottom: 0.5rem;
+  }
+  .info-label {
+    color: #f8f9fa;
+    font-weight: 500;
+  }
+
+  /* Modern pill-shaped buttons */
+  .btn-custom {
+    border-radius: 30px;
+    font-weight: 500;
+    padding: 0.75rem;
+    text-transform: uppercase;
+    box-shadow: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .btn-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<div class="container container-min-height">
+  <div class="col-md-10 col-lg-6">
+    <div class="frosted-glass">
+      <h2 class="mb-4">👋 Welcome Librarian!</h2>
+
+      <!-- Librarian Info -->
+      <div class="user-info-librarian text-start mb-4" style="max-width: 320px; margin: 0 auto;">
+        <p><span class="info-label">Name:</span> {{ name }}</p>
+        <p><span class="info-label">Email:</span> {{ email }}</p>
+        <p><span class="info-label">Account Type:</span> {{ user_type }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-grid gap-3 mt-4">
+        <a href="{% url 'create_hotel' %}" class="btn btn-primary btn-custom"> Create Hotel</a>
+        <a href="{% url 'search' %}" class="btn btn-primary btn-custom"> Manage Hotels</a>
+        <a href="{% url 'search' %}" class="btn btn-primary btn-custom"> Review Requests</a>
+        <a href="{% url 'patron:search' %}" class="btn btn-primary btn-custom"> Search Hotels</a>
+        <a href="{% url 'logout' %}" class="btn btn-danger btn-custom"> Logout</a>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %} 
+{% endblock %}

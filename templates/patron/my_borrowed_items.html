@@ -1,102 +1,260 @@
 {% extends base_template %}
+{% load static %}
 
 {% block title %}My Borrowed Items{% endblock %}
 
+{% block extra_css %}
+<!-- Animate.css for smooth entrance animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+  body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  /* Hero Banner */
+  .borrowed-hero {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    padding: 2rem 1rem;
+    border-radius: 0 0 25px 25px;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .borrowed-hero h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Card & Table Styles */
+  .card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+  }
+  .card-header {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    color: #fff;
+    padding: 1rem 1.5rem;
+  }
+  .card-header.bg-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+  }
+  .card-header.bg-secondary {
+    background: linear-gradient(135deg, #6c757d, #545b62);
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .table-striped tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+
+  /* Badge Colors (Green/Blue/Red) */
+  .badge.bg-success {
+    background-color: #28a745 !important;
+  }
+  .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529;
+  }
+  .badge.bg-danger {
+    background-color: #dc3545 !important;
+  }
+  .badge.bg-info {
+    background-color: #17a2b8 !important;
+  }
+
+  /* Buttons */
+  .btn {
+    border-radius: 30px; /* Pill-shaped */
+    transition: all 0.3s ease;
+    box-shadow: none;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  }
+  .btn-info {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    border: none;
+    color: #fff;
+  }
+  .btn-info:hover {
+    background: linear-gradient(135deg, #138496, #0d6170);
+  }
+  .btn-success {
+    background: linear-gradient(135deg, #28a745, #218838);
+    border: none;
+    color: #fff;
+  }
+  .btn-success:hover {
+    background: linear-gradient(135deg, #218838, #1a6830);
+  }
+  .btn-danger {
+    background: linear-gradient(135deg, #dc3545, #b52a36);
+    border: none;
+    color: #fff;
+  }
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #b52a36, #941f29);
+  }
+  .btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #545b62);
+    border: none;
+    color: #fff;
+  }
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #545b62, #3e4549);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h2 class="mb-4">My Borrowed Items</h2>
-
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h4>Currently Borrowed</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Collection</th>
-                            <th>Borrowed Date</th>
-                            <th>Due Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for borrowing in current_borrowings %}
-                        <tr>
-                            <td><a href="{% url 'patron:view_item' borrowing.item.id %}">{{ borrowing.item.title }}</a></td>
-                            <td><a href="{% url 'patron:view_collection_items' borrowing.item.collection.id %}">{{ borrowing.item.collection.name }}</a></td>
-                            <td>{{ borrowing.request_date|date:"F j, Y" }}</td>
-                            <td>{{ borrowing.due_date|date:"F j, Y" }}</td>
-                            <td>
-                                <span class="badge {% if borrowing.status == 'approved' %}bg-success{% elif borrowing.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
-                                    {{ borrowing.get_status_display }}
-                                </span>
-                            </td>
-                            <td>
-                                <a href="{% url 'patron:view_item' borrowing.item.id %}" class="btn btn-sm btn-info">View</a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center">You don't have any currently borrowed items.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-header bg-secondary text-white">
-            <h4>Borrowing History</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Collection</th>
-                            <th>Borrowed Date</th>
-                            <th>Return Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for borrowing in past_borrowings %}
-                        <tr>
-                            <td><a href="{% url 'patron:view_item' borrowing.item.id %}">{{ borrowing.item.title }}</a></td>
-                            <td><a href="{% url 'patron:view_collection_items' borrowing.item.collection.id %}">{{ borrowing.item.collection.name }}</a></td>
-                            <td>{{ borrowing.request_date|date:"F j, Y" }}</td>
-                            <td>{{ borrowing.return_date|date:"F j, Y" }}</td>
-                            <td>
-                                <span class="badge {% if borrowing.status == 'approved' %}bg-success{% elif borrowing.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
-                                    {{ borrowing.get_status_display }}
-                                </span>
-                            </td>
-                            <td>
-                                <a href="{% url 'patron:view_item' borrowing.item.id %}" class="btn btn-sm btn-info">View</a>
-                                <a href="{% url 'patron:request_item_borrow' borrowing.item.id %}" class="btn btn-sm btn-success">Borrow Again</a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center">You don't have any borrowing history.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="mt-4">
-        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
-    </div>
+<!-- Hero Section -->
+<div class="borrowed-hero animate__animated animate__fadeInDown">
+  <h2 class="mb-0">My Borrowed Items</h2>
 </div>
-{% endblock %} 
+
+<div class="container animate__animated animate__fadeInUp">
+  <!-- Currently Borrowed -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary">
+      <h4 class="mb-0">Currently Borrowed</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Collection</th>
+              <th>Borrowed Date</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for borrowing in current_borrowings %}
+            <tr>
+              <td>
+                <a href="{% url 'patron:view_item' borrowing.item.id %}">
+                  {{ borrowing.item.title }}
+                </a>
+              </td>
+              <td>
+                <a href="{% url 'patron:view_collection_items' borrowing.item.collection.id %}">
+                  {{ borrowing.item.collection.name }}
+                </a>
+              </td>
+              <td>{{ borrowing.request_date|date:"F j, Y" }}</td>
+              <td>{{ borrowing.due_date|date:"F j, Y" }}</td>
+              <td>
+                <span class="badge
+                  {% if borrowing.status == 'approved' %}
+                    bg-success
+                  {% elif borrowing.status == 'pending' %}
+                    bg-warning
+                  {% else %}
+                    bg-danger
+                  {% endif %}">
+                  {{ borrowing.get_status_display }}
+                </span>
+              </td>
+              <td>
+                <a href="{% url 'patron:view_item' borrowing.item.id %}" class="btn btn-sm btn-info">View</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center">
+                You don't have any currently borrowed items.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Borrowing History -->
+  <div class="card mb-4">
+    <div class="card-header bg-secondary">
+      <h4 class="mb-0">Borrowing History</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Collection</th>
+              <th>Borrowed Date</th>
+              <th>Return Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for borrowing in past_borrowings %}
+            <tr>
+              <td>
+                <a href="{% url 'patron:view_item' borrowing.item.id %}">
+                  {{ borrowing.item.title }}
+                </a>
+              </td>
+              <td>
+                <a href="{% url 'patron:view_collection_items' borrowing.item.collection.id %}">
+                  {{ borrowing.item.collection.name }}
+                </a>
+              </td>
+              <td>{{ borrowing.request_date|date:"F j, Y" }}</td>
+              <td>{{ borrowing.return_date|date:"F j, Y" }}</td>
+              <td>
+                <span class="badge
+                  {% if borrowing.status == 'approved' %}
+                    bg-success
+                  {% elif borrowing.status == 'pending' %}
+                    bg-warning
+                  {% else %}
+                    bg-danger
+                  {% endif %}">
+                  {{ borrowing.get_status_display }}
+                </span>
+              </td>
+              <td>
+                <a href="{% url 'patron:view_item' borrowing.item.id %}" class="btn btn-sm btn-info">View</a>
+                <a href="{% url 'patron:request_item_borrow' borrowing.item.id %}" class="btn btn-sm btn-success">
+                  Borrow Again
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center">
+                You don't have any borrowing history.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Home Button -->
+  <div class="mt-4">
+    <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+  </div>
+</div>
+{% endblock %}

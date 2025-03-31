@@ -1,88 +1,205 @@
 {% extends base_template %}
+{% load static %}
 
 {% block title %}{{ room.hotel.name }} - Room {{ room.number }}{% endblock %}
 
+{% block extra_css %}
+<!-- Optional: Animate.css for smooth entrance animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+  /* Overall Page Styling */
+  body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .room-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  /* Card Styling */
+  .card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  /* Image Styling with Hover Zoom */
+  .img-fluid {
+    height: 100%;
+    object-fit: cover;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    transition: transform 0.3s ease;
+  }
+  .img-fluid:hover {
+    transform: scale(1.05);
+  }
+
+  /* List Group Styling */
+  .list-group-item {
+    background-color: #fff;
+  }
+
+  /* Enhanced Button Styles */
+  .btn {
+    border-radius: 50px;       /* Pill-shaped buttons */
+    transition: all 0.3s ease;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    box-shadow: none;
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+  }
+
+  /* Gradient Buttons */
+  .btn-primary {
+    background: linear-gradient(135deg, #1E88E5, #1565C0);
+    border: none;
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #1565C0, #0D47A1);
+  }
+  .btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #545b62);
+    border: none;
+    color: #fff;
+  }
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #545b62, #343a40);
+  }
+  .btn-success {
+    background: linear-gradient(135deg, #43A047, #2E7D32);
+    border: none;
+    color: #fff;
+  }
+  .btn-success:hover {
+    background: linear-gradient(135deg, #2E7D32, #1B5E20);
+  }
+  .btn-danger {
+    background: linear-gradient(135deg, #E53935, #C62828);
+    border: none;
+    color: #fff;
+  }
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #C62828, #B71C1C);
+  }
+
+  /* Dropdown Button */
+  .dropdown-toggle {
+    border-radius: 50px;
+  }
+
+  /* Fade-in Animation for content */
+  .animate-fadeInUp {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s forwards;
+  }
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="card mb-4">
-        <div class="row g-0">
-            <div class="col-md-4">
-                <img src="{{ room.image_url }}" class="img-fluid rounded-start" alt="Room {{ room.number }}" style="height: 100%; object-fit: cover;">
+<div class="container room-container">
+  <div class="card mb-4">
+    <div class="row g-0">
+      <!-- Room Image -->
+      <div class="col-md-4">
+        <img src="{{ room.image_url }}" class="img-fluid rounded-start" alt="Room {{ room.number }}">
+      </div>
+      <!-- Room Details -->
+      <div class="col-md-8">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="card-title">Room {{ room.number }}</h2>
+            {% if room.is_available %}
+            <span class="badge bg-success">Available</span>
+            {% else %}
+            <span class="badge bg-danger">Unavailable</span>
+            {% endif %}
+          </div>
+          <h5 class="card-subtitle mb-2 text-muted">{{ room.type }}</h5>
+          <p class="card-text">{{ room.description }}</p>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <h5>Details</h5>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Price:</strong> ${{ room.price_per_night }} per night</li>
+                <li class="list-group-item"><strong>Capacity:</strong> {{ room.capacity }} person{{ room.capacity|pluralize }}</li>
+                <li class="list-group-item"><strong>Hotel:</strong> 
+                  {% if user.is_staff %}
+                  <a href="{% url 'patron:view_hotel' room.hotel.id %}">{{ room.hotel.name }}</a>
+                  {% else %}
+                  <a href="{% url 'patron:patron_view_hotel' room.hotel.id %}">{{ room.hotel.name }}</a>
+                  {% endif %}
+                </li>
+                <li class="list-group-item"><strong>Location:</strong> {{ room.hotel.location }}</li>
+              </ul>
             </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2 class="card-title">Room {{ room.number }}</h2>
-                        {% if room.is_available %}
-                        <span class="badge bg-success">Available</span>
-                        {% else %}
-                        <span class="badge bg-danger">Unavailable</span>
-                        {% endif %}
-                    </div>
-                    <h5 class="card-subtitle mb-2 text-muted">{{ room.type }}</h5>
-                    <p class="card-text">{{ room.description }}</p>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <h5>Details</h5>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item"><strong>Price:</strong> ${{ room.price_per_night }} per night</li>
-                                <li class="list-group-item"><strong>Capacity:</strong> {{ room.capacity }} person{{ room.capacity|pluralize }}</li>
-                                <li class="list-group-item"><strong>Hotel:</strong> 
-                                    {% if user.is_staff %}
-                                    <a href="{% url 'patron:view_hotel' room.hotel.id %}">{{ room.hotel.name }}</a>
-                                    {% else %}
-                                    <a href="{% url 'patron:patron_view_hotel' room.hotel.id %}">{{ room.hotel.name }}</a>
-                                    {% endif %}
-                                </li>
-                                <li class="list-group-item"><strong>Location:</strong> {{ room.hotel.location }}</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <h5>Add to Collection</h5>
-                            {% if user.is_authenticated %}
-                                {% if user_collections %}
-                                <form method="post" action="{% url 'patron:add_room_to_collection' room.id %}" class="mb-3">
-                                    {% csrf_token %}
-                                    <div class="input-group">
-                                        <select name="collection_id" class="form-select" required>
-                                            <option value="">Select a collection...</option>
-                                            {% for collection in user_collections %}
-                                            <option value="{{ collection.id }}">{{ collection.name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                        <button type="submit" class="btn btn-primary">Add</button>
-                                    </div>
-                                    <div class="form-group mt-2">
-                                        <label for="notes">Notes (optional):</label>
-                                        <textarea name="notes" id="notes" class="form-control" rows="2"></textarea>
-                                    </div>
-                                </form>
-                                {% else %}
-                                <p>You don't have any collections yet.</p>
-                                {% endif %}
-                                <a href="{% url 'patron:create_collection' %}" class="btn btn-outline-secondary">Create New Collection</a>
-                            {% else %}
-                                <p>Please <a href="{% url 'login' %}">login</a> to add this room to your collections.</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
+            
+            <div class="col-md-6">
+              <h5>Add to Collection</h5>
+              {% if user.is_authenticated %}
+                {% if user_collections %}
+                <form method="post" action="{% url 'patron:add_room_to_collection' room.id %}" class="mb-3">
+                  {% csrf_token %}
+                  <div class="input-group">
+                    <select name="collection_id" class="form-select" required>
+                      <option value="">Select a collection...</option>
+                      {% for collection in user_collections %}
+                      <option value="{{ collection.id }}">{{ collection.name }}</option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                  </div>
+                  <div class="form-group mt-2">
+                    <label for="notes">Notes (optional):</label>
+                    <textarea name="notes" id="notes" class="form-control" rows="2"></textarea>
+                  </div>
+                </form>
+                {% else %}
+                <p>You don't have any collections yet.</p>
+                {% endif %}
+                <a href="{% url 'patron:create_collection' %}" class="btn btn-outline-secondary">Create New Collection</a>
+              {% else %}
+                <p>Please <a href="{% url 'login' %}">login</a> to add this room to your collections.</p>
+              {% endif %}
             </div>
+          </div>
         </div>
+      </div>
     </div>
-    
-    <div class="mt-4">
-        <a href="{% url 'patron:list_hotel_rooms' room.hotel.id %}" class="btn btn-secondary">Back to All Rooms</a>
-        {% if user.is_staff %}
-        <a href="{% url 'patron:view_hotel' room.hotel.id %}" class="btn btn-outline-secondary">View Hotel</a>
-        {% else %}
-        <a href="{% url 'patron:patron_view_hotel' room.hotel.id %}" class="btn btn-outline-secondary">View Hotel</a>
-        {% endif %}
-        {% if room.is_available and not user.is_staff %}
-        <a href="{% url 'patron:book_hotel' room.hotel.id %}" class="btn btn-success">Book Now</a>
-        {% endif %}
-    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="mt-4">
+    <a href="{% url 'patron:list_hotel_rooms' room.hotel.id %}" class="btn btn-secondary">Back to All Rooms</a>
+    {% if user.is_staff %}
+    <a href="{% url 'patron:view_hotel' room.hotel.id %}" class="btn btn-outline-secondary">View Hotel</a>
+    {% else %}
+    <a href="{% url 'patron:patron_view_hotel' room.hotel.id %}" class="btn btn-outline-secondary">View Hotel</a>
+    {% endif %}
+    {% if room.is_available and not user.is_staff %}
+    <a href="{% url 'patron:book_hotel' room.hotel.id %}" class="btn btn-success">Book Now</a>
+    {% endif %}
+  </div>
 </div>
-{% endblock %} 
+{% endblock %}
