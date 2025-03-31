@@ -127,10 +127,10 @@ WSGI_APPLICATION = "hotelmanager6000.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 # Configure Django for Heroku deployment
@@ -203,9 +203,7 @@ AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_FILE_OVERWRITE = True
 
-
 #Django Storage Configuration
-'''
 STORAGES = {
     #media file (image) management
     "default": {
@@ -216,14 +214,6 @@ STORAGES = {
         "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
     },
 }
-'''
-STATIC_URL = "/static/"
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'staticfiles'),  # where your /img folder is
-]
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 
@@ -261,4 +251,3 @@ if 'test' in sys.argv:
             'NAME': ':memory:',
         }
     }
-
