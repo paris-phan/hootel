@@ -6,8 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="8b6090e3-ca27-4231-a430-c317a9c01b61" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/librarian/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/librarian/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/patron/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/patron/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patron/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/patron/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/google_login/librarian_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/google_login/librarian_home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/librarian/create_hotel.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/librarian/create_hotel.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/patron/hotel_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/hotel_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/patron/patron_hotel_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/patron_hotel_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/patron/search-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/search-page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/patron/update_hotel.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/update_hotel.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/patron/view_hotels.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/view_hotels.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -10,6 +10,8 @@
                     <div class="card-body">
                         <h2 class="card-title">{{ hotel.name }}</h2>
                         <h5 class="card-subtitle mb-3 text-muted">{{ hotel.location }}</h5>
+                        <p style="margin-bottom: 2px" class="card-text">Accommodates {{ hotel.num_people }}</p>
+                        <p style="margin-bottom: 2px" class="card-text">Price Per Night: {{ hotel.price }}</p>
                         <p class="card-text">{{ hotel.description|linebreaks }}</p>
 
                         <div class="mt-4">

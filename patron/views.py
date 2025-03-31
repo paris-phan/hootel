@@ -236,11 +236,12 @@ def view_item(request, item_id):
 def search(request):
     query = request.GET.get('query', '').strip()
     sort_by = request.GET.get('sort_by', '')
+    num_people = request.GET.get('num_people', '')
+    price = request.GET.get('price_per_night', '')
 
     hotels = Hotel.objects.annotate(average_rating=Avg('review__rating'))
     for hotel in hotels:
         hotel.average_rating = hotel.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
-        print(hotel.average_rating)
 
     if query:
         hotels = hotels.filter(
@@ -253,6 +254,12 @@ def search(request):
         hotels = hotels.order_by('-average_rating', '-created_at')  # Highest rating first
     else:  # Default to alphabetical if 'alphabetical' is selected
         hotels = hotels.order_by('name')
+
+    if num_people != '👥 Travelers' and num_people != '':
+        hotels = hotels.filter(num_people=num_people)
+
+    if price != '💲Price per Night' and price != '':
+        hotels = hotels.filter(price=price)
 
     user_collections = []
     if request.user.is_authenticated:
@@ -282,6 +289,8 @@ def librarian_search(request):
     
     query = request.GET.get('query', '').strip()
     sort_by = request.GET.get('sort_by', '')
+    num_people = request.GET.get('num_people', '')
+    price = request.GET.get('price_per_night', '')
 
     # Get all hotels
     hotels = Hotel.objects.annotate(average_rating=Avg('review__rating'))
@@ -301,6 +310,12 @@ def librarian_search(request):
         hotels = hotels.order_by('-average_rating', '-created_at')  # Highest rating first
     else:  # Default to alphabetical if 'alphabetical' is selected
         hotels = hotels.order_by('name')
+
+    if num_people != '👥 Travelers' and num_people != '':
+        hotels = hotels.filter(num_people=num_people)
+
+    if price != '💲Price per Night' and price != '':
+        hotels = hotels.filter(price=price)
     
     # Get user collections for the bookmark feature
     user_collections = Collection.objects.filter(creator=request.user)
@@ -569,11 +584,15 @@ def update_hotel(request, hotel_id):
         name = request.POST.get('name_field')
         location = request.POST.get('location_field')
         description = request.POST.get('description')
+        num_people = request.POST.get('num_people')
+        price = request.POST.get('price_per_night')
         
         if name and location:
             hotel.name = name
             hotel.location = location
             hotel.description = description
+            hotel.price = price
+            hotel.num_people = num_people
             
             # Check if an image was uploaded
             if 'hotel_image' in request.FILES:

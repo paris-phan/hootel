@@ -13,6 +13,8 @@ def hotel_image_path(instance, filename):
 class Hotel(models.Model):
     name = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
+    num_people = models.CharField(max_length=100)
+    price = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to=hotel_image_path, null=True, blank=True)
