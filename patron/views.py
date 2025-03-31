@@ -111,10 +111,34 @@ def view_collections(request):
         'public_collections': public_collections,
         'private_collections': private_collections,
         'accessible_private_collections': accessible_private_collections,
-        'user_collections': user_collections
+        'user_collections': user_collections,
+        'is_librarian': True
     }
     
     return render(request, 'patron/view_collections.html', context)
+
+@login_required
+def patron_view_collections(request):
+    # Get all public collections
+    public_collections = Collection.objects.filter(is_private=False)
+
+    # Get user's own collections (both public and private)
+    user_collections = Collection.objects.filter(creator=request.user)
+
+    # Get private collections the user has explicit access to through requests
+    user_access_requests = CollectionAccessRequest.objects.filter(
+        user=request.user,
+        status='APPROVED'
+    ).values_list('collection_id', flat=True)
+
+    context = {
+        'public_collections': public_collections,
+        'user_collections': user_collections,
+        'is_librarian': False
+    }
+
+    return render(request, 'patron/view_collections.html', context)
+
 
 @login_required
 def view_collection_items(request, collection_id):
@@ -210,7 +234,9 @@ def create_collection(request):
         messages.success(request, f"Collection created successfully! It is {privacy_status}.")
         return redirect('patron:view_collections')
         
-    return render(request, 'patron/create_collection.html')
+    return render(request, 'patron/create_collection.html', {
+        'is_librarian': True
+    })
 
 @login_required
 def view_item(request, item_id):

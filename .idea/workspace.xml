@@ -7,7 +7,11 @@
     <list default="true" id="8b6090e3-ca27-4231-a430-c317a9c01b61" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patron/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/patron/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/patron/hotel_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/hotel_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base/patron_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base/patron_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/patron/create_collection.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/create_collection.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/patron/edit_collection.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/edit_collection.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/patron/view_collection_items.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/view_collection_items.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/patron/view_collections.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/view_collections.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

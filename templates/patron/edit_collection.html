@@ -22,12 +22,13 @@
                     <label for="description" class="form-label">Description</label>
                     <textarea class="form-control" id="description" name="description" rows="3">{{ collection.description }}</textarea>
                 </div>
-                
+                {% if user.is_staff %}
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="is_private" name="is_private" {% if collection.is_private %}checked{% endif %}>
                     <label class="form-check-label" for="is_private">Make this collection private</label>
                     <div class="form-text">Private collections are only visible to you and users you grant access to.</div>
                 </div>
+                {% endif %}
                 
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">Save Changes</button>
