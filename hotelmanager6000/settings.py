@@ -178,6 +178,11 @@ STATIC_URL = "static/"
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Add this setting
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -204,6 +209,10 @@ AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_FILE_OVERWRITE = True
 
 #Django Storage Configuration
+<<<<<<< HEAD
+=======
+
+>>>>>>> UI-hotfix
 STORAGES = {
     #media file (image) management
     "default": {
@@ -215,6 +224,7 @@ STORAGES = {
     },
 }
 
+<<<<<<< HEAD
 
 
 
@@ -225,6 +235,9 @@ STORAGES = {
 
 
 
+=======
+STATIC_URL = "/static/"
+>>>>>>> UI-hotfix
 
 
 
