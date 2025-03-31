@@ -79,15 +79,9 @@
                 <div class="col-md-4 mb-3">
                     <div class="card h-100">
                         <div class="card-header {% if not collection_booking.booking.status %}bg-info{% elif collection_booking.booking.status == 'PENDING' %}bg-warning{% elif collection_booking.booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %} text-white">
-                            {% if user.is_staff %}
                             <a href="{% url 'patron:view_hotel' collection_booking.booking.hotel.id %}" class="text-white text-decoration-none">
                                 <h5 class="mb-0">{{ collection_booking.booking.hotel.name }}</h5>
                             </a>
-                            {% else %}
-                            <a href="{% url 'patron:patron_view_hotel' collection_booking.booking.hotel.id %}" class="text-white text-decoration-none">
-                                <h5 class="mb-0">{{ collection_booking.booking.hotel.name }}</h5>
-                            </a>
-                            {% endif %}
                         </div>
                         <div class="card-body">
                             <p class="card-text"><strong>Location:</strong> {{ collection_booking.booking.hotel.location }}</p>

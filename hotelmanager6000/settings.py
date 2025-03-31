@@ -70,7 +70,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-SITE_ID = 2
+SITE_ID = 1
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -127,10 +127,10 @@ WSGI_APPLICATION = "hotelmanager6000.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 # Configure Django for Heroku deployment

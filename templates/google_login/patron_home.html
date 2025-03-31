@@ -33,6 +33,7 @@
                 <div class="d-grid gap-2 mt-4">
                     <a href="{% url 'patron:my_bookings' %}" class="btn btn-info">My Bookings</a>
                     <a href="{% url 'patron:search' %}" class="btn btn-primary">Search Hotels</a>
+                    <a href="{% url 'patron:view_collections' %}" class="btn btn-success">View Collections</a>
                     <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
                 </div>
             </div>
@@ -56,35 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // When a file is selected, upload it automatically
     profilePictureInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
-            // Display loading state
-            profileImage.style.opacity = '0.5';
-            
-            const formData = new FormData(profilePictureForm);
-            
-            // Send AJAX request to upload the image
-            fetch('{% url "update_profile_picture" %}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update the profile picture with the new one
-                    profileImage.src = data.image_url + '?t=' + new Date().getTime(); // Add timestamp to prevent caching
-                    profileImage.style.opacity = '1';
-                } else {
-                    alert('Failed to upload image: ' + data.error);
-                    profileImage.style.opacity = '1';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while uploading the image.');
-                profileImage.style.opacity = '1';
-            });
+            profilePictureForm.submit();
         }
     });
 });
