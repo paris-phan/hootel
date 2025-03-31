@@ -6,13 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="8b6090e3-ca27-4231-a430-c317a9c01b61" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hotelmanager6000/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/hotelmanager6000/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patron/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/patron/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patron/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/patron/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patron/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/patron/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base/patron_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base/patron_base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/patron/patron_hotel_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/patron_hotel_view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/patron/search-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/search-page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/patron/hotel_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/patron/hotel_view.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,21 +35,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "Search-Page",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Search-Page&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="DjangoTestsConfigurationType">
       <option name="INTERPRETER_OPTIONS" value="" />

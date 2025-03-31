@@ -281,9 +281,13 @@ def librarian_search(request):
         return redirect('patron:search')
     
     query = request.GET.get('query', '').strip()
-    
+    sort_by = request.GET.get('sort_by', '')
+
     # Get all hotels
-    hotels = Hotel.objects.all().order_by('-created_at')
+    hotels = Hotel.objects.annotate(average_rating=Avg('review__rating'))
+    for hotel in hotels:
+        hotel.average_rating = hotel.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
+        print(hotel.average_rating)
     
     # Apply search filter if query exists
     if query:
@@ -292,6 +296,11 @@ def librarian_search(request):
             Q(location__icontains=query) | 
             Q(description__icontains=query)
         )
+
+    if sort_by == 'rating':
+        hotels = hotels.order_by('-average_rating', '-created_at')  # Highest rating first
+    else:  # Default to alphabetical if 'alphabetical' is selected
+        hotels = hotels.order_by('name')
     
     # Get user collections for the bookmark feature
     user_collections = Collection.objects.filter(creator=request.user)
@@ -457,7 +466,9 @@ def view_hotel(request, hotel_id):
         return redirect('patron:patron_view_hotel', hotel_id=hotel_id)
     
     hotel = get_object_or_404(Hotel, id=hotel_id)
-    
+    reviews = hotel.review_set.all()  # Fetching reviews
+    average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+
     # Get recent bookings
     recent_bookings = HotelBooking.objects.filter(hotel=hotel).order_by('-created_at')[:10]
     
@@ -466,6 +477,8 @@ def view_hotel(request, hotel_id):
     
     return render(request, 'patron/hotel_view.html', {
         'hotel': hotel,
+        "reviews": reviews,
+        "average_rating": average_rating or "N/A",
         'recent_bookings': recent_bookings,
         'base_template': base_template,
         'is_librarian': True  # Always render as librarian view

@@ -18,6 +18,26 @@
                         <a href="{% url 'patron:delete_hotel' hotel.id %}" class="btn btn-danger">Delete Hotel</a>
                     </div>
                 </div>
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h4>Reviews</h4>
+                        <p>Average Rating: <span id="average-rating">{% if average_rating %}{{ average_rating|floatformat:1 }}{% else %}N/A{% endif %}</span></p>
+                    </div>
+                    <div class="card-body">
+                        {% if reviews %}
+                            <ul class="list-group" id="review-list">
+                                {% for review in reviews %}
+                                    <li class="list-group-item">
+                                        <strong>{{ review.user.username }}</strong> - <span class="text-warning">{{ review.rating }}/5</span>
+                                        <p>{{ review.comment }}</p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No reviews yet. Be the first to leave one!</p>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             
             <!-- Recent Bookings Section -->
