@@ -53,6 +53,15 @@ class HotelBooking(models.Model):
             return "Saved"
         return dict(self.STATUS_CHOICES).get(self.status, self.status)
 
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    rating = models.IntegerField()  # Ensure that this field only accepts valid ratings (1-5)
+    comment = models.TextField(blank=True, null=True)  # Allow comments to be optional
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review by {self.user.username} for {self.hotel.name} - Rating: {self.rating}"
 class Collection(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
