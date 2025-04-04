@@ -1,6 +1,6 @@
 {% extends base_template %}
 
-{% block title %}Create Hotel - HotelManager6000{% endblock %}
+{% block title %}Update Hotel - HotelManager6000{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -8,7 +8,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h2>Create New Hotel</h2>
+                    <h2>Update Hotel</h2>
                 </div>
                 <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
@@ -16,47 +16,55 @@
 
                         <div class="mb-3">
                             <label for="name" class="form-label">Hotel Name</label>
-                            <input type="text" class="form-control" id="name" name="name_field" required>
+                            <input type="text" class="form-control" id="name" name="name_field" value="{{ hotel.name }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="street_address" class="form-label">Street Address</label>
-                            <input type="text" class="form-control" id="street_address" name="street_address_field" required>
+                            <input type="text" class="form-control" id="street_address" name="street_address_field" value="{{ hotel.street_address }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="city" class="form-label">City</label>
-                            <input type="text" class="form-control" id="city" name="city_field" required>
+                            <input type="text" class="form-control" id="city" name="city_field" value="{{ hotel.city }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="state" class="form-label">State</label>
-                            <input type="text" class="form-control" id="state" name="state_field" required>
+                            <input type="text" class="form-control" id="state" name="state_field" value="{{ hotel.state }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="country" class="form-label">Country</label>
-                            <input type="text" class="form-control" id="country" name="country_field" required>
+                            <input type="text" class="form-control" id="country" name="country_field" value="{{ hotel.country }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="price" class="form-label">Price</label>
-                            <input type="number" class="form-control" id="price" name="price_field" required>
+                            <input type="number" class="form-control" id="price" name="price_field" value="{{ hotel.price }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                            <textarea class="form-control" id="description" name="description" rows="4">{{ hotel.description }}</textarea>
                         </div>
 
                         <div class="mb-3">
-                            <label for="hotel_image" class="form-label">Hotel Image</label>
+                            <label class="form-label">Current Image</label>
+                            <div class="mb-2">
+                                <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="hotel_image" class="form-label">Update Image</label>
                             <input type="file" class="form-control" id="hotel_image" name="hotel_image" accept="image/*">
+                            <small class="text-muted">Leave empty to keep the current image</small>
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <button type="submit" class="btn btn-primary">Create Hotel</button>
-                            <a href="{% url 'manage_hotels' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Hotel</button>
+                            <a href="{% url 'view_hotel' hotel.id %}" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>
@@ -64,4 +72,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %} 

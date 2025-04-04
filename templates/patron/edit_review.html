@@ -1,0 +1,29 @@
+{% extends base_template %}
+
+{% block title %}Edit Review{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Edit Review for {{ review.hotel.name }}</h2>
+        <p>Current Rating: {{ review.rating }} Stars</p>
+        <p>Current Comment: {{ review.comment }}</p>
+
+        <form method="POST" action="{% url 'patron:edit_review' review.id %}">
+            {% csrf_token %}
+            <label for="rating">Rating (1-5):</label>
+            <select name="rating" class="form-select" required>
+                <option value="5">5 - Excellent</option>
+                <option value="4">4 - Good</option>
+                <option value="3">3 - Average</option>
+                <option value="2">2 - Poor</option>
+                <option value="1">1 - Terrible</option>
+            </select>
+            <label for="comment" class="mt-2">Comment:</label>
+            <textarea name="comment" class="form-control" required></textarea>
+            <p></p>
+            <button type="submit" class="btn btn-success">Submit Review</button>
+            <p></p>
+        </form>
+        <a href="{% url 'patron:my_reviews' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+{% endblock %}

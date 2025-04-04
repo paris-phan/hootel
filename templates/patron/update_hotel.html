@@ -23,7 +23,28 @@
                             <label for="location" class="form-label">Location</label>
                             <input type="text" class="form-control" id="location" name="location_field" value="{{ hotel.location }}" required>
                         </div>
-                        
+
+                        <div class="mb-3">
+                            <select name="num_people" class="form-select">
+                                <option value="">Number of People</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4+">4+</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <select name="price_per_night" class="form-select">
+                                <option value="">Price per Night</option>
+                                <option value="<100">&lt;100</option>
+                                <option value="100-200">100-200</option>
+                                <option value="200-300">200-300</option>
+                                <option value="300-400">300-400</option>
+                                <option value="400+">400+</option>
+                            </select>
+                        </div>
+
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
                             <textarea class="form-control" id="description" name="description" rows="4">{{ hotel.description }}</textarea>

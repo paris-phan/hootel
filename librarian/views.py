@@ -3,49 +3,97 @@ from django.utils import timezone
 # Create your views here.
 
 from django.contrib.auth.decorators import login_required
-from hotelmanager6000.models import Hotel
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from patron.models import Hotel as PatronHotel, HotelBooking, Collection, Item, CollectionAccessRequest, CollectionBooking
-from django.db.models import Q
+from django.db.models import Q, Avg
+from patron.models import Hotel, HotelBooking, Collection
+from datetime import datetime
+from django.utils import timezone
 from django.db import models
+from django.urls import reverse
 
 @login_required
 def create_hotel(request):
     """
-    View for creating new hotels. Only librarians can access this.
+    View for creating new hotels.
     """
-    if not request.user.is_staff:
-        messages.error(request, "Only librarians can create hotels.")
-        return redirect('home')
+    if request.method == 'POST':
+        name = request.POST.get('name_field')
+        street_address = request.POST.get('street_address_field')
+        city = request.POST.get('city_field')
+        state = request.POST.get('state_field')
+        country = request.POST.get('country_field')
+        price = request.POST.get('price_field')
+        description = request.POST.get('description')
         
-    if request.method == "POST":
-        name = request.POST.get("name_field")
-        location = request.POST.get("location_field")
-        description = request.POST.get("description", "")
-        
-        if not name or not location:
-            messages.error(request, "Name and location are required fields.")
-            return render(request, 'librarian/create_hotel.html')
-        
-        hotel = PatronHotel(
-            name=name,
-            location=location,
-            description=description,
-            created_by=request.user
-        )
-        
-        # Handle image upload if provided
-        if 'hotel_image' in request.FILES:
-            hotel.image = request.FILES['hotel_image']
+        if name and street_address and city and state and country and price:
+            # Create the hotel instance without saving to DB yet
+            hotel = Hotel(
+                name=name,
+                street_address=street_address,
+                city=city,
+                state=state,
+                country=country,
+                price=price,
+                description=description,
+                created_by=request.user
+            )
             
-        hotel.save()
-        messages.success(request, f"Hotel '{name}' created successfully!")
-        return redirect('patron:manage_hotels')
-        
+            # Check if an image was uploaded
+            if 'hotel_image' in request.FILES:
+                hotel.image = request.FILES['hotel_image']
+                
+            # Save the hotel to the database
+            hotel.save()
+            
+            messages.success(request, 'Hotel created successfully!')
+            return redirect('manage_hotels')
+        else:
+            messages.error(request, 'Please provide the name, street address, city, state, country, and price for the hotel.')
+   
     return render(request, 'librarian/create_hotel.html')
 
+
+@login_required
+def manage_hotels(request):
+    """
+    View for managing hotels.
+    """
+    # For staff, show all hotels
+    if request.user.is_staff:
+        hotels = Hotel.objects.all().order_by('-created_at')
+    else:
+        # For regular users, only show hotels they created
+        hotels = Hotel.objects.filter(created_by=request.user).order_by('-created_at')
+    
+    return render(request, 'librarian/manage_hotels.html', {
+        'hotels': hotels
+    })
+
+def edit(request, hotel_id):
+    hotel = Hotel.objects.get(pk = hotel_id)
+    if request.method == "POST":
+        if request.POST["name_field"] != "":
+            hotel.name = request.POST["name_field"]
+        if request.POST["location_field"] != "":
+            hotel.location = request.POST["location_field"]
+        hotel.save()
+        return update(request)
+    return render(request, 'librarian/edit_hotel.html', {'hotel': hotel})
+
+def delete(request, hotel_id):
+    hotel = Hotel.objects.get(pk = hotel_id)
+    hotel.delete()
+    return update(request)
+
+def update(request):
+    hotels = Hotel.objects.all()
+    hotels = hotels.filter(owner=request.user.id)
+    return render(request, 'librarian/manage_hotels.html', {'hotels': hotels})
+    
 @require_POST
 @login_required
 def update_hotel_image(request, hotel_id):
@@ -77,6 +125,79 @@ def update_hotel_image(request, hotel_id):
                 'error': str(e)
             })
     return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+@login_required
+def update_hotel(request, hotel_id):
+    """
+    View for updating an existing hotel.
+    """
+    hotel = get_object_or_404(Hotel, id=hotel_id)
+    
+    # Check permissions - must be staff or the hotel creator
+    if not request.user.is_staff and hotel.created_by != request.user:
+        messages.error(request, "You don't have permission to update this hotel.")
+        return redirect('manage_hotels')
+    if request.method == 'POST':
+        name = request.POST.get('name_field')
+        street_address = request.POST.get('street_address_field')
+        city = request.POST.get('city_field')
+        state = request.POST.get('state_field')
+        country = request.POST.get('country_field')
+        price = request.POST.get('price_field')
+        description = request.POST.get('description')
+        
+        if name and street_address and city and state and country and price:
+            # Update the hotel instance without saving to DB yet
+            hotel.name=name
+            hotel.street_address=street_address
+            hotel.city=city
+            hotel.state=state
+            hotel.country=country
+            hotel.price=price
+            hotel.description=description
+            
+            # Check if an image was uploaded
+            if 'hotel_image' in request.FILES:
+                # Delete old image if it exists
+                if hotel.image:
+                    hotel.image.delete(save=False)
+                hotel.image = request.FILES['hotel_image']
+
+            # Save the hotel to the database
+            hotel.save()
+            messages.success(request, 'Hotel updated successfully!')
+            return redirect('view_hotel', hotel_id=hotel.id)
+        else:
+            messages.error(request, 'Please provide the name, street address, city, state, country, and price for the hotel.')     
+    return render(request, 'librarian/update_hotel.html', {'hotel': hotel})
+
+@login_required
+def delete_hotel(request, hotel_id):
+    """
+    View for deleting a hotel.
+    """
+    hotel = get_object_or_404(Hotel, id=hotel_id)
+    
+    # Check permissions - must be staff or the hotel creator
+    if not request.user.is_staff and hotel.created_by != request.user:
+        messages.error(request, "You don't have permission to delete this hotel.")
+        return redirect('manage_hotels')
+    
+    if request.method == 'POST':
+        # Check for associated bookings
+        bookings = HotelBooking.objects.filter(hotel=hotel).exists()
+        
+        if bookings:
+            messages.warning(request, "Cannot delete hotel with associated bookings.")
+            return redirect('patron:view_hotel', hotel_id=hotel.id)
+        
+        # Delete the hotel
+        hotel_name = hotel.name
+        hotel.delete()
+        messages.success(request, f'Hotel "{hotel_name}" has been deleted successfully.')
+        return redirect('manage_hotels')
+    
+    return render(request, 'librarian/delete_hotel.html', {'hotel': hotel})
 
 @login_required
 def librarian_dashboard(request):
@@ -174,3 +295,58 @@ def view_item(request, item_id):
         'item': item,
         'borrowing': borrowing
     }) 
+
+@login_required
+def search_rooms(request):
+    """
+    View for librarians to search for hotels.
+    This view always uses the librarian interface.
+    """
+    # Only staff can access this page
+    if not request.user.is_staff:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('patron:search')
+    
+    query = request.GET.get('query', '').strip()
+    sort_by = request.GET.get('sort_by', '')
+    num_people = request.GET.get('num_people', '')
+    price = request.GET.get('price_per_night', '')
+
+    # Get all hotels
+    hotels = Hotel.objects.annotate(average_rating=Avg('review__rating'))
+    for hotel in hotels:
+        hotel.average_rating = hotel.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
+        print(hotel.average_rating)
+    
+    # Apply search filter if query exists
+    if query:
+        hotels = hotels.filter(
+            Q(name__icontains=query) | 
+            Q(location__icontains=query) | 
+            Q(description__icontains=query)
+        )
+
+    if sort_by == 'rating':
+        hotels = hotels.order_by('-average_rating', '-created_at')  # Highest rating first
+    else:  # Default to alphabetical if 'alphabetical' is selected
+        hotels = hotels.order_by('name')
+
+    if num_people != '👥 Travelers' and num_people != '':
+        hotels = hotels.filter(num_people=num_people)
+
+    if price != '💲Price per Night' and price != '':
+        hotels = hotels.filter(price=price)
+    
+    # Get user collections for the bookmark feature
+    user_collections = Collection.objects.filter(creator=request.user)
+    
+    # Always use librarian base template
+    base_template = 'base/librarian_base.html'
+    
+    return render(request, 'patron/search-page.html', {
+        'hotels': hotels,
+        'query': query,
+        'is_librarian': True,  # Always render as librarian view
+        'base_template': base_template,
+        'user_collections': user_collections
+    })

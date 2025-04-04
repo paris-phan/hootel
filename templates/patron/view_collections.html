@@ -77,7 +77,7 @@
             </div>
         </div>
     </div>
-
+    {% if user.is_staff %}
     {% if user.is_authenticated %}
     <!-- Private Collections You Have Access To -->
     <div class="card mb-4">
@@ -170,6 +170,7 @@
         <p>Sign in to create your own collections or access private collections.</p>
         <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
     </div>
+    {% endif %}
     {% endif %}
 
     <div class="mt-4">

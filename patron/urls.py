@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-
 app_name = 'patron'
 
 urlpatterns = [
@@ -9,7 +8,13 @@ urlpatterns = [
     path('hotels/<int:hotel_id>/', views.patron_view_hotel, name='patron_view_hotel'),
     path('hotels/<int:hotel_id>/book/', views.book_hotel, name='book_hotel'),
     path('hotels/<int:hotel_id>/add-to-collection/', views.add_hotel_to_collection, name='add_hotel_to_collection'),
-    
+
+    # Rating views
+    path('hotel/<int:hotel_id>/add_review/', views.add_review, name='add_review'),
+    path('my-reviews/', views.my_reviews, name='my_reviews'),
+    path('edit-review/<int:review_id>/', views.edit_review, name='edit_review'),
+    path('delete-review/<int:review_id>/', views.delete_review, name='delete_review'),
+
     # Booking management
     path('my-bookings/', views.my_bookings, name='my_bookings'),
     path('bookings/<int:booking_id>/cancel/', views.cancel_booking, name='cancel_booking'),
@@ -31,7 +36,6 @@ urlpatterns = [
     
     # Search and browse
     path('search/', views.search, name='search'),
-    path('librarian-search/', views.librarian_search, name='librarian_search'),
     
     # Hotel management (for librarians only)
     path('manage-hotels/', views.manage_hotels, name='manage_hotels'),

@@ -10,12 +10,34 @@
                 <div class="card-body">
                     <h2 class="card-title">{{ hotel.name }}</h2>
                     <h5 class="card-subtitle mb-3 text-muted">{{ hotel.location }}</h5>
+                    <p style="margin-bottom: 2px" class="card-text">Accommodates {{ hotel.num_people }}</p>
+                    <p style="margin-bottom: 2px" class="card-text">Price Per Night: {{ hotel.price }}</p>
                     <p class="card-text">{{ hotel.description|linebreaks }}</p>
                     
                     <div class="mt-4">
                         <a href="{% url 'patron:manage_hotels' %}" class="btn btn-secondary">Back to Manage Hotels</a>
                         <a href="{% url 'patron:update_hotel' hotel.id %}" class="btn btn-primary">Edit Hotel</a>
                         <a href="{% url 'patron:delete_hotel' hotel.id %}" class="btn btn-danger">Delete Hotel</a>
+                    </div>
+                </div>
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h4>Reviews</h4>
+                        <p>Average Rating: <span id="average-rating">{% if average_rating %}{{ average_rating|floatformat:1 }}{% else %}N/A{% endif %}</span></p>
+                    </div>
+                    <div class="card-body">
+                        {% if reviews %}
+                            <ul class="list-group" id="review-list">
+                                {% for review in reviews %}
+                                    <li class="list-group-item">
+                                        <strong>{{ review.user.username }}</strong> - <span class="text-warning">{{ review.rating }}/5</span>
+                                        <p>{{ review.comment }}</p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No reviews yet. Be the first to leave one!</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
