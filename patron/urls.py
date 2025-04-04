@@ -36,7 +36,6 @@ urlpatterns = [
     
     # Search and browse
     path('search/', views.search, name='search'),
-    path('librarian-search/', views.librarian_search, name='librarian_search'),
     
     # Hotel management (for librarians only)
     path('manage-hotels/', views.manage_hotels, name='manage_hotels'),

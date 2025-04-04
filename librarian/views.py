@@ -8,8 +8,8 @@ from django.views.decorators.http import require_POST
 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
-from patron.models import Hotel, HotelBooking
+from django.db.models import Q, Avg
+from patron.models import Hotel, HotelBooking, Collection
 from datetime import datetime
 from django.utils import timezone
 from django.db import models
@@ -295,3 +295,58 @@ def view_item(request, item_id):
         'item': item,
         'borrowing': borrowing
     }) 
+
+@login_required
+def search_rooms(request):
+    """
+    View for librarians to search for hotels.
+    This view always uses the librarian interface.
+    """
+    # Only staff can access this page
+    if not request.user.is_staff:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('patron:search')
+    
+    query = request.GET.get('query', '').strip()
+    sort_by = request.GET.get('sort_by', '')
+    num_people = request.GET.get('num_people', '')
+    price = request.GET.get('price_per_night', '')
+
+    # Get all hotels
+    hotels = Hotel.objects.annotate(average_rating=Avg('review__rating'))
+    for hotel in hotels:
+        hotel.average_rating = hotel.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
+        print(hotel.average_rating)
+    
+    # Apply search filter if query exists
+    if query:
+        hotels = hotels.filter(
+            Q(name__icontains=query) | 
+            Q(location__icontains=query) | 
+            Q(description__icontains=query)
+        )
+
+    if sort_by == 'rating':
+        hotels = hotels.order_by('-average_rating', '-created_at')  # Highest rating first
+    else:  # Default to alphabetical if 'alphabetical' is selected
+        hotels = hotels.order_by('name')
+
+    if num_people != '👥 Travelers' and num_people != '':
+        hotels = hotels.filter(num_people=num_people)
+
+    if price != '💲Price per Night' and price != '':
+        hotels = hotels.filter(price=price)
+    
+    # Get user collections for the bookmark feature
+    user_collections = Collection.objects.filter(creator=request.user)
+    
+    # Always use librarian base template
+    base_template = 'base/librarian_base.html'
+    
+    return render(request, 'patron/search-page.html', {
+        'hotels': hotels,
+        'query': query,
+        'is_librarian': True,  # Always render as librarian view
+        'base_template': base_template,
+        'user_collections': user_collections
+    })
