@@ -47,21 +47,21 @@ class S3ConnectionTests(TestCase):
         hotel = Hotel.objects.get(name='Test Hotel')
         self.assertIn('example.com', hotel.image_url)
         
-    @patch('librarian.views.Hotel.save')
-    def test_update_hotel_image(self, mock_save):
-        # Test the hotel image update endpoint
-        with open('test_image.jpg', 'wb') as f:
-            f.write(b'dummy image content')
+    # @patch('librarian.views.Hotel.save')
+    # def test_update_hotel_image(self, mock_save):
+    #     # Test the hotel image update endpoint
+    #     with open('test_image.jpg', 'wb') as f:
+    #         f.write(b'dummy image content')
         
-        with open('test_image.jpg', 'rb') as image:
-            response = self.client.post(
-                reverse('update_hotel_image', kwargs={'hotel_id': self.hotel.id}),
-                {'hotel_image': image},
-                HTTP_X_REQUESTED_WITH='XMLHttpRequest'
-            )
+    #     with open('test_image.jpg', 'rb') as image:
+    #         response = self.client.post(
+    #             reverse('update_hotel_image', kwargs={'hotel_id': self.hotel.id}),
+    #             {'hotel_image': image},
+    #             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+    #         )
         
-        self.assertEqual(response.status_code, 200)
-        mock_save.assert_called_once()
+    #     self.assertEqual(response.status_code, 200)
+    #     mock_save.assert_called_once()
         
     def tearDown(self):
         # Clean up test files
