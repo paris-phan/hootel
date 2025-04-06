@@ -431,6 +431,8 @@ def view_hotel(request, hotel_id):
     # Get recent bookings
     recent_bookings = HotelBooking.objects.filter(hotel=hotel).order_by('-created_at')[:10]
     
+    base_template = 'base/librarian_base.html'
+
     return render(request, 'librarian/librarian_hotel_view.html', {
         'hotel': hotel,
         "reviews": reviews,

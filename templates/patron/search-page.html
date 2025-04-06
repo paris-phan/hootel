@@ -94,7 +94,7 @@
                         <div class="card-footer">
                             <div class="d-flex justify-content-between">
                                 {% if is_librarian %}
-                                    <a href="{% url 'patron:view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                    <a href="{% url 'view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View Details</a>
                                 {% else %}
                                     <a href="{% url 'patron:patron_view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View Details</a>
                                 {% endif %}

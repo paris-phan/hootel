@@ -38,8 +38,7 @@
                                 <!-- Patron-only action - Book Now button -->
                                 <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-success">Book Now</a>
                                 {% endif %}
-                                <a href="{% url 'patron:list_hotel_rooms' hotel.id %}" class="btn btn-primary">View Rooms</a>
-                                <a href="{% url 'patron:librarian_search' %}" class="btn btn-secondary">Back to Search</a>
+                                <a href="{% url 'search_rooms' %}" class="btn btn-secondary">Back to Search</a>
                                 {% if user.is_staff %}
                                 <!-- Librarian-only action - Manage Hotels button -->
                                 <a href="{% url 'manage_hotels' %}" class="btn btn-outline-secondary">Manage Hotels</a>
