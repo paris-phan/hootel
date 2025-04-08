@@ -34,24 +34,67 @@ def book_hotel(request, hotel_id):
         messages.error(request, "Sorry, the requested hotel does not exist.")
         return redirect('patron:search')
     
+    # Get all approved bookings for this hotel
+    booked_dates = list(HotelBooking.objects.filter(
+        hotel=hotel,
+        status='APPROVED',
+        check_out_date__gte=timezone.now().date()
+    ).values('check_in_date', 'check_out_date'))
+    
+    # Convert dates to string format for JSON serialization
+    formatted_booked_dates = []
+    for booking in booked_dates:
+        formatted_booked_dates.append({
+            'check_in': booking['check_in_date'].strftime('%Y-%m-%d'),
+            'check_out': booking['check_out_date'].strftime('%Y-%m-%d')
+        })
+    
     if request.method == 'POST':
         check_in = request.POST.get('check_in')
         check_out = request.POST.get('check_out')
         
+        # Convert dates to datetime objects for comparison
+        check_in_date = datetime.strptime(check_in, '%Y-%m-%d').date()
+        check_out_date = datetime.strptime(check_out, '%Y-%m-%d').date()
+        
+        # Check if dates overlap with any approved bookings
+        overlapping_bookings = HotelBooking.objects.filter(
+            hotel=hotel,
+            status='APPROVED',
+            check_in_date__lt=check_out_date,
+            check_out_date__gt=check_in_date
+        ).exists()
+        
+        if overlapping_bookings:
+            messages.error(request, "Sorry, these dates are already booked. Please choose different dates.")
+            return render(request, 'patron/book_hotel.html', {
+                'hotel': hotel,
+                'booked_dates': formatted_booked_dates
+            })
+            
+        # Create the booking as pending
         booking = HotelBooking.objects.create(
             user=request.user,
             hotel=hotel,
-            check_in_date=check_in,
-            check_out_date=check_out
+            check_in_date=check_in_date,
+            check_out_date=check_out_date,
+            status='PENDING'  # Set initial status as pending
         )
-        messages.success(request, 'Booking request submitted successfully!')
+        messages.success(request, 'Booking request submitted successfully! Please wait for approval.')
         return redirect('patron:my_bookings')
         
-    return render(request, 'patron/book_hotel.html', {'hotel': hotel})
+    return render(request, 'patron/book_hotel.html', {
+        'hotel': hotel,
+        'booked_dates': formatted_booked_dates
+    })
 
 @login_required
 def my_bookings(request):
-    all_bookings = HotelBooking.objects.filter(user=request.user).order_by('-created_at')
+    # Only get bookings that have a status (exclude saved hotels)
+    all_bookings = HotelBooking.objects.filter(
+        user=request.user,
+        status__isnull=False
+    ).order_by('-created_at')
     
     # Add search functionality
     query = request.GET.get('query', '').strip()
@@ -196,8 +239,8 @@ def create_collection(request):
         name = request.POST.get('name')
         description = request.POST.get('description')
         
-        # Allow any user to set privacy
-        is_private = request.POST.get('is_private') == 'on'
+        # Only allow librarians to create private collections
+        is_private = request.POST.get('is_private') == 'on' and request.user.is_staff
         
         collection = Collection.objects.create(
             name=name,
@@ -242,6 +285,8 @@ def search(request):
     hotels = Hotel.objects.annotate(average_rating=Avg('review__rating'))
     for hotel in hotels:
         hotel.average_rating = hotel.review_set.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
+        # Add availability information
+        hotel.is_available, hotel.next_available_date = hotel.get_availability_info()
 
     if query:
         hotels = hotels.filter(
@@ -265,13 +310,19 @@ def search(request):
     if request.user.is_authenticated:
         user_collections = Collection.objects.filter(creator=request.user)
 
-    base_template = 'base/patron_base.html'
+    # Choose the correct base template based on user type
+    if request.user.is_authenticated and request.user.is_staff:
+        base_template = 'base/librarian_base.html'
+        is_librarian = True
+    else:
+        base_template = 'base/patron_base.html'
+        is_librarian = False
 
     return render(request, 'patron/search-page.html', {
         'hotels': hotels,
         'query': query,
-        'is_librarian': False,
         'base_template': base_template,
+        'is_librarian': is_librarian,  # Now correctly set based on user type
         'user_collections': user_collections
     })
 
@@ -366,14 +417,24 @@ def cancel_booking(request, booking_id):
     """
     booking = get_object_or_404(HotelBooking, id=booking_id, user=request.user)
     
-    # Only allow cancellation of pending bookings
-    if booking.status != 'PENDING':
-        messages.error(request, "You can only cancel pending bookings.")
+    # Allow cancellation of both pending and approved bookings
+    if booking.status not in ['PENDING', 'APPROVED']:
+        messages.error(request, "You can only cancel pending or approved bookings.")
         return redirect('patron:my_bookings')
     
-    booking.delete()
-    messages.success(request, "Your booking has been cancelled successfully.")
+    # Store hotel info for success message
+    hotel_name = booking.hotel.name
+    check_in = booking.check_in_date.strftime('%Y-%m-%d')
+    check_out = booking.check_out_date.strftime('%Y-%m-%d')
     
+    # Delete the booking
+    booking.delete()
+    
+    messages.success(
+        request, 
+        f'Your booking at {hotel_name} for {check_in} to {check_out} has been cancelled. '
+        'The hotel is now available for these dates.'
+    )
     return redirect('patron:my_bookings')
 
 @require_POST
@@ -683,8 +744,12 @@ def add_hotel_to_collection(request, hotel_id):
             return redirect(f"{reverse('patron:search')}?query={query}")
         return redirect('patron:search')
     
-    # If GET request, redirect to view hotel
-    return redirect('patron:patron_view_hotel', hotel_id=hotel_id)
+    # If GET request, show the form to select a collection
+    collections = Collection.objects.filter(creator=request.user)
+    return render(request, 'patron/add_hotel_to_collection.html', {
+        'hotel': hotel,
+        'collections': collections
+    })
 
 @login_required
 def edit_collection(request, collection_id):

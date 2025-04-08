@@ -55,8 +55,12 @@
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                {% if booking.status == 'PENDING' %}
-                                                    <a href="{% url 'patron:cancel_booking' booking.id %}" class="btn btn-sm btn-danger">Cancel</a>
+                                                {% if booking.status in 'PENDING,APPROVED' %}
+                                                    <a href="{% url 'patron:cancel_booking' booking.id %}" 
+                                                       class="btn btn-sm btn-danger"
+                                                       onclick="return confirm('Are you sure you want to cancel this booking? This action cannot be undone.')">
+                                                        Cancel
+                                                    </a>
                                                 {% endif %}
                                             </td>
                                         </tr>

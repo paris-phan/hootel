@@ -58,9 +58,6 @@
                     {% if booking.status == 'PENDING' %}
                     <div class="alert alert-info">
                         Your booking request is awaiting approval from a librarian.
-                        <div class="mt-2">
-                            <a href="{% url 'patron:cancel_booking' booking.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?')">Cancel Booking</a>
-                        </div>
                     </div>
                     {% elif booking.status == 'APPROVED' %}
                     <div class="alert alert-success">
@@ -69,6 +66,16 @@
                     {% elif booking.status == 'REJECTED' %}
                     <div class="alert alert-danger">
                         Your booking request was declined. Please contact a librarian for more information.
+                    </div>
+                    {% endif %}
+                    
+                    {% if booking.status in 'PENDING,APPROVED' %}
+                    <div class="mt-2">
+                        <a href="{% url 'patron:cancel_booking' booking.id %}" 
+                           class="btn btn-sm btn-danger" 
+                           onclick="return confirm('Are you sure you want to cancel this booking? This action cannot be undone.')">
+                            Cancel Booking
+                        </a>
                     </div>
                     {% endif %}
                     

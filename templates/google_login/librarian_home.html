@@ -30,12 +30,32 @@
                     <p><strong>Email:</strong> {{ email }}</p>
                     <p><strong>Account Type:</strong> {{ user_type }}</p>
                 </div>
+                
+                <!-- Quick Actions -->
+                <h4 class="mb-3">Quick Actions</h4>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'patron:search' %}" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search Rooms
+                    </a>
+                    <a href="{% url 'patron:my_bookings' %}" class="btn btn-info">
+                        <i class="bi bi-calendar-check"></i> My Bookings
+                    </a>
+                    <a href="{% url 'manage_hotels' %}" class="btn btn-success">
+                        <i class="bi bi-building"></i> Manage Rooms
+                    </a>
+                    <a href="{% url 'patron:manage_booking_requests' %}" class="btn btn-warning">
+                        <i class="bi bi-list-check"></i> Manage Bookings
+                    </a>
+                    <a href="{% url 'patron:view_collections' %}" class="btn btn-secondary">
+                        <i class="bi bi-collection"></i> Collections
+                    </a>
+                </div>
+
+                <!-- Logout Button -->
                 <div class="d-grid gap-2 mt-4">
-                    <a href="{% url 'create_hotel' %}" class="btn btn-primary">Create Rooms</a>
-                    <a href="{% url 'manage_hotels' %}" class="btn btn-primary">Manage Rooms</a>
-                    <a href="{% url 'search_rooms' %}" class="btn btn-primary">Search Rooms</a>
-                    <a href="{% url 'patron:view_collections' %}" class="btn btn-primary">Collections</a>
-                    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+                    <a href="{% url 'logout' %}" class="btn btn-danger">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
                 </div>
             </div>
         </div>
@@ -91,4 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<!-- Add Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 {% endblock %}

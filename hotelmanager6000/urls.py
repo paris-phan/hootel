@@ -19,11 +19,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
 
+def search_redirect(request):
+    if hasattr(request.user, 'librarian') and request.user.librarian:
+        return redirect('search_rooms')
+    return redirect('patron:search')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('google_login.urls')),
     path('patron/', include('patron.urls', namespace='patron')),
     path('', include('librarian.urls')),
-    path('search/', lambda request: redirect('patron:search'), name='search'),
+    path('search/', search_redirect, name='search'),
 ]
