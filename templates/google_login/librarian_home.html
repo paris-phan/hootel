@@ -31,8 +31,9 @@
                     <p><strong>Account Type:</strong> {{ user_type }}</p>
                 </div>
                 <div class="d-grid gap-2 mt-4">
-                    <a href="{% url 'search_rooms' %}" class="btn btn-primary">Search Rooms</a>
+                    <a href="{% url 'create_hotel' %}" class="btn btn-primary">Create Rooms</a>
                     <a href="{% url 'manage_hotels' %}" class="btn btn-primary">Manage Rooms</a>
+                    <a href="{% url 'search_rooms' %}" class="btn btn-primary">Search Rooms</a>
                     <a href="{% url 'patron:view_collections' %}" class="btn btn-primary">Collections</a>
                     <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
                 </div>
