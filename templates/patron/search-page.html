@@ -21,6 +21,16 @@
         background-color: #fff;
         transform: scale(1.1);
     }
+    .booked-dates {
+        font-size: 0.9rem;
+        color: #dc3545;
+        margin-top: 8px;
+    }
+    .available-dates {
+        font-size: 0.9rem;
+        color: #28a745;
+        margin-top: 8px;
+    }
 </style>
 {% endblock %}
 
@@ -49,18 +59,18 @@
                                 <option value="4+">4+</option>
                             </select>
                         </div>
-                        <div class="col-md-4" style="max-width: 15%">
+                        <div class="col-md-4" style="max-width: 15%;">
                             <select name="price_per_night" class="form-select" onchange="this.form.submit();">
                                 <option value="">💲Price per Night</option>
-                                <option value="<100"><100</option>
-                                <option value="100-200">100-200</option>
-                                <option value="200-300">200-300</option>
-                                <option value="300-400">300-400</option>
-                                <option value="400+">400+</option>
+                                <option value="50">$50</option>
+                                <option value="100">$100</option>
+                                <option value="150">$150</option>
+                                <option value="200">$200</option>
+                                <option value="250">$250</option>
+                                <option value="300">$300</option>
                             </select>
                         </div>
                     </div>
-
                 </div>
                 <div class="row g-2">
                     <div class="col-md-4">
@@ -79,13 +89,24 @@
             {% for hotel in hotels %}
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 position-relative">
-                        <!-- Hotel Image and Details -->
-                        <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
+                        <div class="position-relative">
+                            <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
+                            {% if request.user.is_authenticated %}
+                            <div class="bookmark-icon" onclick="addToCollection({{ hotel.id }})">
+                                <i class="bi bi-bookmark-plus"></i>
+                            </div>
+                            {% endif %}
+                        </div>
                         <div class="card-body">
                             <h5 class="card-title">{{ hotel.name }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ hotel.location }}</h6>
                             <p style="margin-bottom: 2px" class="card-text">Accommodates {{ hotel.num_people }}</p>
                             <p style="margin-bottom: 12px" class="card-text">Price Per Night: {{ hotel.price }}</p>
+                            {% if hotel.next_available_date %}
+                                <p class="booked-dates">⚠️ Next available date: {{ hotel.next_available_date|date:"M d, Y" }}</p>
+                            {% else %}
+                                <p class="available-dates">✓ Available for booking</p>
+                            {% endif %}
                             <h6 class="card-subtitle mb-2 text-muted">
                                 Average Rating: <span id="average-rating">{% if hotel.average_rating %}{{ hotel.average_rating|floatformat:1 }}{% else %}N/A{% endif %}</span>
                             </h6>
@@ -122,4 +143,18 @@
             {% endfor %}
         </div>
     </div>
+
+    {% block extra_js %}
+    <script>
+    function addToCollection(hotelId) {
+        // Get the current URL's query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('query') || '';
+        
+        // Redirect to the add to collection URL with the search query preserved
+        window.location.href = `{% url 'patron:add_hotel_to_collection' 0 %}`.replace('0', hotelId) + 
+            (query ? `?query=${encodeURIComponent(query)}` : '');
+    }
+    </script>
+    {% endblock %}
 {% endblock %} 

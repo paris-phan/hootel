@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.utils import timezone
 
 # Create your models here.
 
@@ -33,6 +34,34 @@ class Hotel(models.Model):
         else:
             # Return path to default hotel image in S3 bucket
             return f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/hotel_data/default/default_hotel.png"
+
+    def get_availability_info(self):
+        """Get availability information for the hotel"""
+        today = timezone.now().date()
+        
+        # Get all approved bookings that are current or future
+        approved_bookings = self.hotelbooking_set.filter(
+            status='APPROVED',
+            check_out_date__gte=today
+        ).order_by('check_in_date')
+        
+        # If there are no approved bookings, the room is available
+        if not approved_bookings.exists():
+            return True, None
+            
+        # Find the next available date by looking at gaps between bookings
+        current_date = today
+        for booking in approved_bookings:
+            # If there's a gap between current date and booking's check-in
+            if booking.check_in_date > current_date:
+                return True, current_date
+            # Update current date to after this booking's check-out
+            current_date = booking.check_out_date + timezone.timedelta(days=1)
+            
+        # If we've gone through all bookings and current_date is in the future
+        if current_date > today:
+            return True, current_date
+        return True, None
 
 class HotelBooking(models.Model):
     STATUS_CHOICES = (

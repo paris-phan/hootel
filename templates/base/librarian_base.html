@@ -13,10 +13,16 @@
                     <a class="nav-link" href="{% url 'home' %}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'search_rooms' %}">Search Rooms</a>
+                    <a class="nav-link" href="{% url 'patron:search' %}">Search Rooms</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'patron:my_bookings' %}">My Bookings</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'manage_hotels' %}">Manage Rooms</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'patron:manage_booking_requests' %}">Manage Bookings</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'patron:view_collections' %}">Collections</a>
