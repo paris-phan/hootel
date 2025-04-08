@@ -9,10 +9,10 @@ def hotel_image_path(instance, filename):
     # File will be uploaded to hotel_data/hotel_<id>/<filename>
     extension = filename.split('.')[-1]
     new_filename = f"hotel_image.{extension}"
-    return f'hotel_data/{instance.name}/{new_filename}'
+    return f'hotel_data/{instance.room}/{new_filename}'
 
 class Hotel(models.Model):
-    name = models.CharField(max_length=100)
+    room = models.IntegerField()
     street_address = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
@@ -24,7 +24,7 @@ class Hotel(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_hotels')
 
     def __str__(self):
-        return self.name
+        return self.room
 
     @property
     def image_url(self):
@@ -78,7 +78,7 @@ class HotelBooking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.hotel.name}"
+        return f"{self.user.username} - {self.hotel.room}"
     
     def get_status_display(self):
         """Return the human-readable status name."""
@@ -94,7 +94,7 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Review by {self.user.username} for {self.hotel.name} - Rating: {self.rating}"
+        return f"Review by {self.user.username} for {self.hotel.room} - Rating: {self.rating}"
 class Collection(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
@@ -115,7 +115,7 @@ class CollectionBooking(models.Model):
     notes = models.TextField(blank=True, null=True)
     
     def __str__(self):
-        return f"{self.booking.hotel.name} booking in {self.collection.name}"
+        return f"{self.booking.hotel.room} booking in {self.collection.name}"
     
     class Meta:
         unique_together = ('collection', 'booking')
