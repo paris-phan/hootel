@@ -23,7 +23,7 @@
     </div>
     
     <p class="text-muted mb-0">
-        <span class="badge bg-secondary">{{ collection_bookings|length }} hotel{% if collection_bookings|length != 1 %}s{% endif %}</span>
+        <span class="badge bg-secondary">{{ collection_bookings|length }} room{% if collection_bookings|length != 1 %}s{% endif %}</span>
         <span class="badge {% if collection.is_private %}bg-danger{% else %}bg-success{% endif %}">
             {{ collection.is_private|yesno:"Private,Public" }}
         </span>
@@ -80,7 +80,7 @@
                     <div class="card h-100">
                         <div class="card-header {% if not collection_booking.booking.status %}bg-info{% elif collection_booking.booking.status == 'PENDING' %}bg-warning{% elif collection_booking.booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %} text-white">
                             <a href="{% url 'patron:view_hotel' collection_booking.booking.hotel.id %}" class="text-white text-decoration-none">
-                                <h5 class="mb-0">{{ collection_booking.booking.hotel.name }}</h5>
+                                <h5 class="mb-0">{{ collection_booking.booking.hotel.room }}</h5>
                             </a>
                         </div>
                         <div class="card-body">
@@ -97,7 +97,7 @@
                                 </span>
                             </p>
                             {% else %}
-                            <!-- Just display saved hotel info -->
+                            <!-- Just display saved room info -->
                             <p class="card-text"><strong>Status:</strong> 
                                 <span class="badge bg-info">Saved</span>
                             </p>
@@ -127,10 +127,10 @@
                 </div>
                 {% empty %}
                 <div class="col-12">
-                    <p>No hotels in this collection yet.</p>
+                    <p>No rooms in this collection yet.</p>
                     {% if user.is_authenticated %}
-                    <p>You can add hotels to collections from the search page.</p>
-                    <a href="{% url 'patron:search' %}" class="btn btn-primary">Search Hotels</a>
+                    <p>You can add rooms to collections from the search page.</p>
+                    <a href="{% url 'patron:search' %}" class="btn btn-primary">Search Rooms</a>
                     {% endif %}
                 </div>
                 {% endfor %}
