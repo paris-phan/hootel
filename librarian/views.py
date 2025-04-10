@@ -15,47 +15,56 @@ from django.utils import timezone
 from django.db import models
 from django.urls import reverse
 
+hotel_data = {"room": 1, 
+              "floor": 1, 
+              "square_footage": 1, 
+              "max_num_of_occupants": 1, 
+              "num_of_beds": 1, 
+              "num_of_bathrooms": 1,
+              "price": 0.01,
+              "description": ""
+            }
+
 @login_required
 def create_hotel(request):
     """
     View for creating new hotels.
     """
     if request.method == 'POST':
-        room = request.POST.get('room_field')
-        street_address = request.POST.get('street_address_field')
-        city = request.POST.get('city_field')
-        state = request.POST.get('state_field')
-        country = request.POST.get('country_field')
-        price = request.POST.get('price_field')
-        description = request.POST.get('description')
-        
-        if room and street_address and city and state and country and price:
-            # Create the hotel instance without saving to DB yet
-            hotel = Hotel(
-                room=room,
-                street_address=street_address,
-                city=city,
-                state=state,
-                country=country,
-                price=price,
-                description=description,
-                created_by=request.user
-            )
-            
-            # Check if an image was uploaded
-            if 'hotel_image' in request.FILES:
-                hotel.image = request.FILES['hotel_image']
-                
-            # Save the hotel to the database
-            hotel.save()
-            
-            messages.success(request, 'Hotel created successfully!')
-            return redirect('manage_hotels')
-        else:
-            messages.error(request, 'Please provide the room, street address, city, state, country, and price for the hotel.')
+        for field in hotel_data.keys():
+            user_response = request.POST.get(field)
+            if user_response != null:
+                hotel_data[field] = user_response
+            else:
+                messages.error(request, 'Please provide the ' + field + ' of the hotel.')
+                return render(request, 'librarian/create_hotel.html')
+        save_hotel(request)
    
     return render(request, 'librarian/create_hotel.html')
 
+def save_hotel(request):
+    # Create the hotel instance without saving to DB yet
+    hotel = Hotel(
+        room=hotel_data["room"],
+        floor=hotel_data["floor"],
+        square_footage=hotel_data["square_footage"],
+        max_num_of_occupants=hotel_data["max_num_of_occupants"],
+        num_of_beds=hotel_data["num_of_beds"],
+        num_of_bathrooms=hotel_data["num_of_bathrooms"],
+        price=hotel_data["price"],
+        description=hotel_data["description"],
+        created_by=request.user
+    )
+
+    # Check if an image was uploaded
+    if 'hotel_image' in request.FILES:
+        hotel.image = request.FILES['hotel_image']
+                
+    # Save the hotel to the database
+    hotel.save()
+            
+    messages.success(request, 'Hotel created successfully!')
+    return redirect('manage_hotels')
 
 @login_required
 def manage_hotels(request):
