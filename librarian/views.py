@@ -15,7 +15,9 @@ from django.utils import timezone
 from django.db import models
 from django.urls import reverse
 
-hotel_data = {"room number": 1, 
+@login_required
+def create_hotel(request):
+    hotel_data = {"room number": 1, 
               "floor number": 1, 
               "square footage": 1, 
               "maximum number of occupants": 1, 
@@ -24,9 +26,6 @@ hotel_data = {"room number": 1,
               "price": 0.01,
               "description": ""
             }
-
-@login_required
-def create_hotel(request):
     """
     View for creating new hotels.
     """
@@ -128,43 +127,48 @@ def update_hotel(request, hotel_id):
     View for updating an existing hotel.
     """
     hotel = get_object_or_404(Hotel, id=hotel_id)
+
+    hotel_data = {"room number": hotel.room, 
+              "floor number": hotel.floor, 
+              "square footage": hotel.square_footage, 
+              "maximum number of occupants": hotel.max_num_of_occupants, 
+              "number of beds": hotel.num_of_beds, 
+              "number of bathrooms": hotel.num_of_bathrooms,
+              "price": hotel.price,
+              "description": hotel.description
+            }
     
     # Check permissions - must be staff or the hotel creator
     if not request.user.is_staff and hotel.created_by != request.user:
         messages.error(request, "You don't have permission to update this hotel.")
         return redirect('manage_hotels')
     if request.method == 'POST':
-        room = request.POST.get('room_field')
-        street_address = request.POST.get('street_address_field')
-        city = request.POST.get('city_field')
-        state = request.POST.get('state_field')
-        country = request.POST.get('country_field')
-        price = request.POST.get('price_field')
-        description = request.POST.get('description')
+        for field in hotel_data.keys():
+            user_response = request.POST.get(field)
+            if user_response != None:
+                hotel_data[field] = user_response
         
-        if room and street_address and city and state and country and price:
-            # Update the hotel instance without saving to DB yet
-            hotel.room=room
-            hotel.street_address=street_address
-            hotel.city=city
-            hotel.state=state
-            hotel.country=country
-            hotel.price=price
-            hotel.description=description
+        # Update the hotel instance without saving to DB yet
+        hotel.room=hotel_data["room number"]
+        hotel.floor=hotel_data["floor number"]
+        hotel.square_footage=hotel_data["square footage"]
+        hotel.max_num_of_occupants=hotel_data["maximum number of occupants"]
+        hotel.num_of_beds=hotel_data["number of beds"]
+        hotel.num_of_bathrooms=hotel_data["number of bathrooms"]
+        hotel.price=hotel_data["price"]
+        hotel.description=hotel_data["description"]
             
-            # Check if an image was uploaded
-            if 'hotel_image' in request.FILES:
-                # Delete old image if it exists
-                if hotel.image:
-                    hotel.image.delete(save=False)
-                hotel.image = request.FILES['hotel_image']
+        # Check if an image was uploaded
+        if 'hotel_image' in request.FILES:
+            # Delete old image if it exists
+            if hotel.image:
+                hotel.image.delete(save=False)
+            hotel.image = request.FILES['hotel_image']
 
-            # Save the hotel to the database
-            hotel.save()
-            messages.success(request, 'Hotel updated successfully!')
-            return redirect('view_hotel', hotel_id=hotel.id)
-        else:
-            messages.error(request, 'Please provide the room, street address, city, state, country, and price for the hotel.')     
+        # Save the hotel to the database
+        hotel.save()
+        messages.success(request, 'Hotel updated successfully!')
+        return redirect('view_hotel', hotel_id=hotel.id)    
     return render(request, 'librarian/update_hotel.html', {'hotel': hotel})
 
 @login_required
