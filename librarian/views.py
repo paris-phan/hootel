@@ -21,7 +21,7 @@ def create_hotel(request):
     View for creating new hotels.
     """
     if request.method == 'POST':
-        name = request.POST.get('name_field')
+        room = request.POST.get('room_field')
         street_address = request.POST.get('street_address_field')
         city = request.POST.get('city_field')
         state = request.POST.get('state_field')
@@ -29,10 +29,10 @@ def create_hotel(request):
         price = request.POST.get('price_field')
         description = request.POST.get('description')
         
-        if name and street_address and city and state and country and price:
+        if room and street_address and city and state and country and price:
             # Create the hotel instance without saving to DB yet
             hotel = Hotel(
-                name=name,
+                room=room,
                 street_address=street_address,
                 city=city,
                 state=state,
@@ -52,7 +52,7 @@ def create_hotel(request):
             messages.success(request, 'Hotel created successfully!')
             return redirect('manage_hotels')
         else:
-            messages.error(request, 'Please provide the name, street address, city, state, country, and price for the hotel.')
+            messages.error(request, 'Please provide the room, street address, city, state, country, and price for the hotel.')
    
     return render(request, 'librarian/create_hotel.html')
 
@@ -72,27 +72,6 @@ def manage_hotels(request):
     return render(request, 'librarian/manage_hotels.html', {
         'hotels': hotels
     })
-
-def edit(request, hotel_id):
-    hotel = Hotel.objects.get(pk = hotel_id)
-    if request.method == "POST":
-        if request.POST["name_field"] != "":
-            hotel.name = request.POST["name_field"]
-        if request.POST["location_field"] != "":
-            hotel.location = request.POST["location_field"]
-        hotel.save()
-        return update(request)
-    return render(request, 'librarian/edit_hotel.html', {'hotel': hotel})
-
-def delete(request, hotel_id):
-    hotel = Hotel.objects.get(pk = hotel_id)
-    hotel.delete()
-    return update(request)
-
-def update(request):
-    hotels = Hotel.objects.all()
-    hotels = hotels.filter(owner=request.user.id)
-    return render(request, 'librarian/manage_hotels.html', {'hotels': hotels})
     
 @require_POST
 @login_required
@@ -138,7 +117,7 @@ def update_hotel(request, hotel_id):
         messages.error(request, "You don't have permission to update this hotel.")
         return redirect('manage_hotels')
     if request.method == 'POST':
-        name = request.POST.get('name_field')
+        room = request.POST.get('room_field')
         street_address = request.POST.get('street_address_field')
         city = request.POST.get('city_field')
         state = request.POST.get('state_field')
@@ -146,9 +125,9 @@ def update_hotel(request, hotel_id):
         price = request.POST.get('price_field')
         description = request.POST.get('description')
         
-        if name and street_address and city and state and country and price:
+        if room and street_address and city and state and country and price:
             # Update the hotel instance without saving to DB yet
-            hotel.name=name
+            hotel.room=room
             hotel.street_address=street_address
             hotel.city=city
             hotel.state=state
@@ -168,7 +147,7 @@ def update_hotel(request, hotel_id):
             messages.success(request, 'Hotel updated successfully!')
             return redirect('view_hotel', hotel_id=hotel.id)
         else:
-            messages.error(request, 'Please provide the name, street address, city, state, country, and price for the hotel.')     
+            messages.error(request, 'Please provide the room, street address, city, state, country, and price for the hotel.')     
     return render(request, 'librarian/update_hotel.html', {'hotel': hotel})
 
 @login_required
@@ -192,9 +171,9 @@ def delete_hotel(request, hotel_id):
             return redirect('patron:view_hotel', hotel_id=hotel.id)
         
         # Delete the hotel
-        hotel_name = hotel.name
+        hotel_room = hotel.room
         hotel.delete()
-        messages.success(request, f'Hotel "{hotel_name}" has been deleted successfully.')
+        messages.success(request, f'Hotel "{hotel_room}" has been deleted successfully.')
         return redirect('manage_hotels')
     
     return render(request, 'librarian/delete_hotel.html', {'hotel': hotel})
@@ -321,15 +300,15 @@ def search_rooms(request):
     # Apply search filter if query exists
     if query:
         hotels = hotels.filter(
-            Q(name__icontains=query) | 
+            Q(room__icontains=query) | 
             Q(location__icontains=query) | 
             Q(description__icontains=query)
         )
 
     if sort_by == 'rating':
         hotels = hotels.order_by('-average_rating', '-created_at')  # Highest rating first
-    else:  # Default to alphabetical if 'alphabetical' is selected
-        hotels = hotels.order_by('name')
+    else:  # Default to numerically by room number if 'numerically by room number' is selected
+        hotels = hotels.order_by('room')
 
     if num_people != '👥 Travelers' and num_people != '':
         hotels = hotels.filter(num_people=num_people)
