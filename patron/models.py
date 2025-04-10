@@ -12,11 +12,20 @@ def hotel_image_path(instance, filename):
     return f'hotel_data/{instance.room}/{new_filename}'
 
 class Hotel(models.Model):
-    room = models.IntegerField()
+    # Old model attributes 
+    """
     street_address = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
+    """
+    # Updated model attributes
+    room = models.IntegerField()
+    floor = models.IntegerField()
+    square_footage = models.IntegerField()
+    max_num_of_occupants = models.IntegerField()
+    num_of_beds = models.IntegerField()
+    num_of_bathrooms = models.IntegerField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
