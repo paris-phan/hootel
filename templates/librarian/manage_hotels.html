@@ -25,14 +25,14 @@
                 <div class="image-container" style="position: relative; cursor: pointer;"
                      data-id="{{ hotel.id }}"
                      onclick="document.getElementById('hotelImageInput-{{ hotel.id }}').click();">
-                    <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.room }}" style="height: 200px; object-fit: cover;">
+                    <img src="{{ hotel.image_url }}" class="card-img-top" alt="Picture of Room #{{ hotel.room }} of Floor #{{ hotel.floor }}" style="height: 200px; object-fit: cover;">
                     <div style="position: absolute; bottom: 0; width: 100%; background-color: rgba(0,0,0,0.5); color: white; padding: 5px 0; font-size: 12px; text-align: center;">
                         Click to update image
                     </div>
                 </div>
                 {% else %}
                 <div class="image-container" style="position: relative;">
-                    <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.room }}" style="height: 200px; object-fit: cover;">
+                    <img src="{{ hotel.image_url }}" class="card-img-top" alt="Picture of Room #{{ hotel.room }} of Floor #{{ hotel.floor }}" style="height: 200px; object-fit: cover;">
                 </div>
                 {% endif %}
 

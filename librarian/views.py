@@ -39,17 +39,17 @@ def create_hotel(request):
                 return render(request, 'librarian/create_hotel.html')
         try:
             hotel = Hotel.objects.get(room = hotel_data["room number"], floor = hotel_data["floor number"])
-            messages.error(request, 'A room with this room number and floor number already exists!')
+            messages.error(request, f'Room #{hotel_data["room number"]} on Floor #{hotel_data["room number"]} already exists!')
             return render(request, 'librarian/create_hotel.html')
         except Hotel.DoesNotExist:
-            save_hotel(request)
+            save_hotel(request, hotel_data)
             # For staff, show all hotels
             hotels = Hotel.objects.all().order_by('-created_at')
             return manage_hotels(request)
     else:
         return render(request, 'librarian/create_hotel.html')
 
-def save_hotel(request):
+def save_hotel(request, hotel_data):
     # Create the hotel instance without saving to DB yet
     hotel = Hotel(
         room=hotel_data["room number"],
@@ -127,16 +127,7 @@ def update_hotel(request, hotel_id):
     View for updating an existing hotel.
     """
     hotel = get_object_or_404(Hotel, id=hotel_id)
-
-    hotel_data = {"room number": hotel.room, 
-              "floor number": hotel.floor, 
-              "square footage": hotel.square_footage, 
-              "maximum number of occupants": hotel.max_num_of_occupants, 
-              "number of beds": hotel.num_of_beds, 
-              "number of bathrooms": hotel.num_of_bathrooms,
-              "price": hotel.price,
-              "description": hotel.description
-            }
+    hotel_data = get_hotel_data(hotel)
     
     # Check permissions - must be staff or the hotel creator
     if not request.user.is_staff and hotel.created_by != request.user:
@@ -147,29 +138,44 @@ def update_hotel(request, hotel_id):
             user_response = request.POST.get(field)
             if user_response != None:
                 hotel_data[field] = user_response
-        
-        # Update the hotel instance without saving to DB yet
-        hotel.room=hotel_data["room number"]
-        hotel.floor=hotel_data["floor number"]
-        hotel.square_footage=hotel_data["square footage"]
-        hotel.max_num_of_occupants=hotel_data["maximum number of occupants"]
-        hotel.num_of_beds=hotel_data["number of beds"]
-        hotel.num_of_bathrooms=hotel_data["number of bathrooms"]
-        hotel.price=hotel_data["price"]
-        hotel.description=hotel_data["description"]
+        try:
+            existing_hotel = Hotel.objects.get(room = hotel_data["room number"], floor = hotel_data["floor number"])
+            messages.error(request, f'Room #{hotel_data["room number"]} on Floor #{hotel_data["floor number"]} already exists!')
+            return render(request, 'librarian/update_hotel.html', {'hotel': hotel})
+        except Hotel.DoesNotExist:
+            hotel.room=hotel_data["room number"]
+            hotel.floor=hotel_data["floor number"]
+            hotel.square_footage=hotel_data["square footage"]
+            hotel.max_num_of_occupants=hotel_data["maximum number of occupants"]
+            hotel.num_of_beds=hotel_data["number of beds"]
+            hotel.num_of_bathrooms=hotel_data["number of bathrooms"]
+            hotel.price=hotel_data["price"]
+            hotel.description=hotel_data["description"]
             
-        # Check if an image was uploaded
-        if 'hotel_image' in request.FILES:
-            # Delete old image if it exists
-            if hotel.image:
-                hotel.image.delete(save=False)
-            hotel.image = request.FILES['hotel_image']
+            # Check if an image was uploaded
+            if 'hotel_image' in request.FILES:
+                # Delete old image if it exists
+                if hotel.image:
+                    hotel.image.delete(save=False)
+                hotel.image = request.FILES['hotel_image']
 
-        # Save the hotel to the database
-        hotel.save()
-        messages.success(request, 'Hotel updated successfully!')
-        return redirect('view_hotel', hotel_id=hotel.id)    
+            # Save the hotel to the database
+            hotel.save()
+            messages.success(request, 'Hotel updated successfully!')
+            return redirect('view_hotel', hotel_id=hotel.id)    
     return render(request, 'librarian/update_hotel.html', {'hotel': hotel})
+
+def get_hotel_data(hotel):
+    hotel_data = {"room number": hotel.room, 
+              "floor number": hotel.floor, 
+              "square footage": hotel.square_footage, 
+              "maximum number of occupants": hotel.max_num_of_occupants, 
+              "number of beds": hotel.num_of_beds, 
+              "number of bathrooms": hotel.num_of_bathrooms,
+              "price": hotel.price,
+              "description": hotel.description
+            }
+    return hotel_data
 
 @login_required
 def delete_hotel(request, hotel_id):
