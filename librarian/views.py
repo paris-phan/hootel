@@ -189,8 +189,9 @@ def delete_hotel(request, hotel_id):
         
         # Delete the hotel
         hotel_room = hotel.room
+        hotel_floor = hotel.floor
         hotel.delete()
-        messages.success(request, f'Hotel "{hotel_room}" has been deleted successfully.')
+        messages.success(request, f'Room {hotel_room} on Floor {hotel_floor} has been deleted successfully.')
         return redirect('manage_hotels')
     
     return render(request, 'librarian/delete_hotel.html', {'hotel': hotel})
