@@ -36,11 +36,19 @@ def create_hotel(request):
             if user_response != None:
                 hotel_data[field] = user_response
             else:
-                messages.error(request, 'Please provide the ' + field + ' of the hotel.')
+                messages.error(request, 'Please provide the ' + field + ' of the room.')
                 return render(request, 'librarian/create_hotel.html')
-        save_hotel(request)
-   
-    return render(request, 'librarian/create_hotel.html')
+        try:
+            hotel = Hotel.objects.get(room = hotel_data["room number"], floor = hotel_data["floor number"])
+            messages.error(request, 'A room with this room number and floor number already exists!')
+            return render(request, 'librarian/create_hotel.html')
+        except Hotel.DoesNotExist:
+            save_hotel(request)
+            # For staff, show all hotels
+            hotels = Hotel.objects.all().order_by('-created_at')
+            return manage_hotels(request)
+    else:
+        return render(request, 'librarian/create_hotel.html')
 
 def save_hotel(request):
     # Create the hotel instance without saving to DB yet
@@ -64,7 +72,6 @@ def save_hotel(request):
     hotel.save()
             
     messages.success(request, 'Hotel created successfully!')
-    return render(request, 'librarian/manage_hotels.html')
 
 
 @login_required

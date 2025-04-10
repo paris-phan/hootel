@@ -6,18 +6,6 @@
 <div class="container">
     <h2 class="mb-4">Manage Rooms</h2>
 
-    {% if messages %}
-    <div class="row">
-        <div class="col-12">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
     <div class="d-flex justify-content-end mb-4">
         <a href="{% url 'create_hotel' %}" class="btn btn-primary">Add Room</a>
     </div>
