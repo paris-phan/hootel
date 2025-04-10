@@ -15,12 +15,12 @@ from django.utils import timezone
 from django.db import models
 from django.urls import reverse
 
-hotel_data = {"room": 1, 
-              "floor": 1, 
-              "square_footage": 1, 
-              "max_num_of_occupants": 1, 
-              "num_of_beds": 1, 
-              "num_of_bathrooms": 1,
+hotel_data = {"room number": 1, 
+              "floor number": 1, 
+              "square footage": 1, 
+              "maximum number of occupants": 1, 
+              "number of beds": 1, 
+              "number of bathrooms": 1,
               "price": 0.01,
               "description": ""
             }
@@ -33,7 +33,7 @@ def create_hotel(request):
     if request.method == 'POST':
         for field in hotel_data.keys():
             user_response = request.POST.get(field)
-            if user_response != null:
+            if user_response != None:
                 hotel_data[field] = user_response
             else:
                 messages.error(request, 'Please provide the ' + field + ' of the hotel.')
@@ -45,12 +45,12 @@ def create_hotel(request):
 def save_hotel(request):
     # Create the hotel instance without saving to DB yet
     hotel = Hotel(
-        room=hotel_data["room"],
-        floor=hotel_data["floor"],
-        square_footage=hotel_data["square_footage"],
-        max_num_of_occupants=hotel_data["max_num_of_occupants"],
-        num_of_beds=hotel_data["num_of_beds"],
-        num_of_bathrooms=hotel_data["num_of_bathrooms"],
+        room=hotel_data["room number"],
+        floor=hotel_data["floor number"],
+        square_footage=hotel_data["square footage"],
+        max_num_of_occupants=hotel_data["maximum number of occupants"],
+        num_of_beds=hotel_data["number of beds"],
+        num_of_bathrooms=hotel_data["number of bathrooms"],
         price=hotel_data["price"],
         description=hotel_data["description"],
         created_by=request.user
@@ -64,7 +64,8 @@ def save_hotel(request):
     hotel.save()
             
     messages.success(request, 'Hotel created successfully!')
-    return redirect('manage_hotels')
+    return render(request, 'librarian/manage_hotels.html')
+
 
 @login_required
 def manage_hotels(request):
