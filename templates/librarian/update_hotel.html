@@ -1,6 +1,6 @@
 {% extends base_template %}
 
-{% block title %}Update Hotel - HotelManager6000{% endblock %}
+{% block title %}Update Room - HotelManager6000{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -8,40 +8,46 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h2>Update Hotel</h2>
+                    <h2>Update Room</h2>
                 </div>
                 <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
 
                         <div class="mb-3">
-                            <label for="name" class="form-label">Hotel Name</label>
-                            <input type="text" class="form-control" id="name" name="name_field" value="{{ hotel.name }}" required>
+                            <label for="room_number" class="form-label">Room Number</label>
+                            <input type="number" class="form-control" id="room_number" min = 1 name="room number" value="{{ hotel.room }}" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="street_address" class="form-label">Street Address</label>
-                            <input type="text" class="form-control" id="street_address" name="street_address_field" value="{{ hotel.street_address }}" required>
+                            <label for="floor_number" class="form-label">Floor Number</label>
+                            <input type="number" class="form-control" id="floor_number" min = "1" name="floor number" value="{{ hotel.floor }}" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="city" class="form-label">City</label>
-                            <input type="text" class="form-control" id="city" name="city_field" value="{{ hotel.city }}" required>
+                            <label for="square_footage" class="form-label">Square Footage</label>
+                            <input type="number" class="form-control" id="square_footage" min = "1" name="square footage" value="{{ hotel.square_footage }}" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="state" class="form-label">State</label>
-                            <input type="text" class="form-control" id="state" name="state_field" value="{{ hotel.state }}" required>
+                            <label for="max_num_of_occupants" class="form-label">Maximum Number of Occupants</label>
+                            <input type="number" class="form-control" id="max_num_of_occupants" min = "1" name="maximum number of occupants" value="{{ hotel.max_num_of_occupants }}" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="country" class="form-label">Country</label>
-                            <input type="text" class="form-control" id="country" name="country_field" value="{{ hotel.country }}" required>
+                            <label for="number_of_beds" class="form-label">Number of Beds</label>
+                            <input type="number" class="form-control" id="number_of_beds" min = "1" name="number of beds" value="{{ hotel.num_of_beds }}"required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="price" class="form-label">Price</label>
-                            <input type="number" class="form-control" id="price" name="price_field" value="{{ hotel.price }}" required>
+                            <label for="number_of_bathrooms" class="form-label">Number of Bathrooms</label>
+                            <input type="number" class="form-control" id="number_of_bathrooms" min = "1" name="number of bathrooms" value="{{ hotel.num_of_bathrooms }}" required>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price Per Night ($)</label>
+                            <input type="number" class="form-control" id="price" name="price" value="{{ hotel.price }}" required>
                         </div>
 
                         <div class="mb-3">

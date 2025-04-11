@@ -1,25 +1,13 @@
 {% extends base_template %}
 
-{% block title %}Manage Hotels - HotelManager6000{% endblock %}
+{% block title %}Manage Rooms - HotelManager6000{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2 class="mb-4">Manage Hotels</h2>
-
-    {% if messages %}
-    <div class="row">
-        <div class="col-12">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
+    <h2 class="mb-4">Manage Rooms</h2>
 
     <div class="d-flex justify-content-end mb-4">
-        <a href="{% url 'create_hotel' %}" class="btn btn-primary">Add New Hotel</a>
+        <a href="{% url 'create_hotel' %}" class="btn btn-primary">Add Room</a>
     </div>
 
     <div class="row">
@@ -37,29 +25,27 @@
                 <div class="image-container" style="position: relative; cursor: pointer;"
                      data-id="{{ hotel.id }}"
                      onclick="document.getElementById('hotelImageInput-{{ hotel.id }}').click();">
-                    <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
+                    <img src="{{ hotel.image_url }}" class="card-img-top" alt="Picture of Room #{{ hotel.room }} of Floor #{{ hotel.floor }}" style="height: 200px; object-fit: cover;">
                     <div style="position: absolute; bottom: 0; width: 100%; background-color: rgba(0,0,0,0.5); color: white; padding: 5px 0; font-size: 12px; text-align: center;">
                         Click to update image
                     </div>
                 </div>
                 {% else %}
                 <div class="image-container" style="position: relative;">
-                    <img src="{{ hotel.image_url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
+                    <img src="{{ hotel.image_url }}" class="card-img-top" alt="Picture of Room #{{ hotel.room }} of Floor #{{ hotel.floor }}" style="height: 200px; object-fit: cover;">
                 </div>
                 {% endif %}
 
                 <div class="card-body">
-                    <h3 class="card-title">{{ hotel.name }}</h3>
-                    <h5 class="card-subtitle mb-2">${{ hotel.price }}</h5><br />
-                    <h6 class="card-subtitle mb-2">{{ hotel.street_address }}</h6>
-                    <h6 class="card-subtitle mb-2">{{ hotel.city }}, {{hotel.state}}, {{ hotel.country }}</h6>
-                    <p class="card-text">{{ hotel.description|truncatechars:100 }}</p>
+                    <h3 class="card-title">Price: ${{ hotel.price }}</h3>
+                    <h5 class="card-subtitle mb-2">Room #: {{ hotel.room }}</h5>
+                    <h5 class="card-subtitle mb-2">Floor #: {{ hotel.floor }}</h5>
+                    <p class="card-text">Description: {{ hotel.description|truncatechars:100 }}</p>
                     {% if hotel.created_by %}
                     <p class="card-text"><small class="text-muted">Created by: {{ hotel.created_by.username }}</small></p>
                     {% endif %}
                     <div class="d-flex justify-content-between mt-3">
                         <a href="{% url 'view_hotel' hotel.id %}" class="btn btn-sm btn-primary">View</a>
-                        <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-sm btn-success">Book</a>
                     </div>
                 </div>
             </div>

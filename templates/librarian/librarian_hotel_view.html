@@ -1,6 +1,6 @@
 {% extends base_template %}
 
-{% block title %}{{ hotel.name }} - HotelManager6000{% endblock %}
+{% block title %}Room #: {{ hotel.room }} Floor #:  {{ hotel.floor }} - HotelManager6000{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -8,7 +8,7 @@
         <div class="col-md-10">
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">{{ hotel.name }}</h2>
+                    <h2 class="mb-0">Room #: {{ hotel.room }} Floor #:  {{ hotel.floor }}</h2>
                     {% if user.is_staff %}
                     <!-- Librarian-only actions - Edit/Delete buttons -->
                     <div>
@@ -20,12 +20,16 @@
                 
                 <div class="row g-0">
                     <div class="col-md-6">
-                        <img src="{{ hotel.image_url }}" class="img-fluid" alt="{{ hotel.name }}" style="width: 100%; height: 350px; object-fit: cover;">
+                        <img src="{{ hotel.image_url }}" class="img-fluid" alt="Picture of Room #{{ hotel.room }} of Floor #{{ hotel.floor }}" style="width: 100%; height: 350px; object-fit: cover;">
                     </div>
                     <div class="col-md-6">
                         <div class="card-body">
-                            <h5 class="card-title"><i class="bi bi-geo-alt-fill"></i> {{ hotel.location }}</h5>
-                            <p class="card-text">{{ hotel.description|linebreaks }}</p>
+                            <h5 class="card-title"><i class="bi bi-geo-alt-fill"></i>Price: ${{ hotel.price }}</h5>
+                            <p class="card-text"><strong>Square Footage: </strong>{{ hotel.square_footage }}</p>
+                            <p class="card-text"><strong>Maximum Number of Occupants: </strong>{{ hotel.max_num_of_occupants }}</p>
+                            <p class="card-text"><strong>Number of Beds: </strong>{{ hotel.num_of_beds }}</p>
+                            <p class="card-text"><strong>Number of Bathrooms: </strong>{{ hotel.num_of_bathrooms }}</p>
+                            <p class="card-text"><strong>Description: </strong>{{ hotel.description|linebreaks }}</p>
                             <p class="card-text"><small class="text-muted">Added on {{ hotel.created_at|date:"F j, Y" }}</small></p>
                             
                             {% if user.is_staff and hotel.created_by %}
@@ -38,8 +42,7 @@
                                 <!-- Patron-only action - Book Now button -->
                                 <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-success">Book Now</a>
                                 {% endif %}
-                                <a href="{% url 'patron:list_hotel_rooms' hotel.id %}" class="btn btn-primary">View Rooms</a>
-                                <a href="{% url 'patron:librarian_search' %}" class="btn btn-secondary">Back to Search</a>
+                                <a href="{% url 'search_rooms' %}" class="btn btn-secondary">Back to Search</a>
                                 {% if user.is_staff %}
                                 <!-- Librarian-only action - Manage Hotels button -->
                                 <a href="{% url 'manage_hotels' %}" class="btn btn-outline-secondary">Manage Hotels</a>

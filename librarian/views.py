@@ -17,44 +17,60 @@ from django.urls import reverse
 
 @login_required
 def create_hotel(request):
+    hotel_data = {"room number": 1, 
+              "floor number": 1, 
+              "square footage": 1, 
+              "maximum number of occupants": 1, 
+              "number of beds": 1, 
+              "number of bathrooms": 1,
+              "price": 0.01,
+              "description": ""
+            }
     """
     View for creating new hotels.
     """
     if request.method == 'POST':
-        name = request.POST.get('name_field')
-        street_address = request.POST.get('street_address_field')
-        city = request.POST.get('city_field')
-        state = request.POST.get('state_field')
-        country = request.POST.get('country_field')
-        price = request.POST.get('price_field')
-        description = request.POST.get('description')
-        
-        if name and street_address and city and state and country and price:
-            # Create the hotel instance without saving to DB yet
-            hotel = Hotel(
-                name=name,
-                street_address=street_address,
-                city=city,
-                state=state,
-                country=country,
-                price=price,
-                description=description,
-                created_by=request.user
-            )
-            
-            # Check if an image was uploaded
-            if 'hotel_image' in request.FILES:
-                hotel.image = request.FILES['hotel_image']
+        for field in hotel_data.keys():
+            user_response = request.POST.get(field)
+            if user_response != None:
+                hotel_data[field] = user_response
+            else:
+                messages.error(request, 'Please provide the ' + field + ' of the room.')
+                return render(request, 'librarian/create_hotel.html')
+        try:
+            hotel = Hotel.objects.get(room = hotel_data["room number"], floor = hotel_data["floor number"])
+            messages.error(request, f'Room #{hotel_data["room number"]} on Floor #{hotel_data["room number"]} already exists!')
+            return render(request, 'librarian/create_hotel.html')
+        except Hotel.DoesNotExist:
+            save_hotel(request, hotel_data)
+            # For staff, show all hotels
+            hotels = Hotel.objects.all().order_by('-created_at')
+            return manage_hotels(request)
+    else:
+        return render(request, 'librarian/create_hotel.html')
+
+def save_hotel(request, hotel_data):
+    # Create the hotel instance without saving to DB yet
+    hotel = Hotel(
+        room=hotel_data["room number"],
+        floor=hotel_data["floor number"],
+        square_footage=hotel_data["square footage"],
+        max_num_of_occupants=hotel_data["maximum number of occupants"],
+        num_of_beds=hotel_data["number of beds"],
+        num_of_bathrooms=hotel_data["number of bathrooms"],
+        price=hotel_data["price"],
+        description=hotel_data["description"],
+        created_by=request.user
+    )
+
+    # Check if an image was uploaded
+    if 'hotel_image' in request.FILES:
+        hotel.image = request.FILES['hotel_image']
                 
-            # Save the hotel to the database
-            hotel.save()
+    # Save the hotel to the database
+    hotel.save()
             
-            messages.success(request, 'Hotel created successfully!')
-            return redirect('manage_hotels')
-        else:
-            messages.error(request, 'Please provide the name, street address, city, state, country, and price for the hotel.')
-   
-    return render(request, 'librarian/create_hotel.html')
+    messages.success(request, 'Hotel created successfully!')
 
 
 @login_required
@@ -72,27 +88,6 @@ def manage_hotels(request):
     return render(request, 'librarian/manage_hotels.html', {
         'hotels': hotels
     })
-
-def edit(request, hotel_id):
-    hotel = Hotel.objects.get(pk = hotel_id)
-    if request.method == "POST":
-        if request.POST["name_field"] != "":
-            hotel.name = request.POST["name_field"]
-        if request.POST["location_field"] != "":
-            hotel.location = request.POST["location_field"]
-        hotel.save()
-        return update(request)
-    return render(request, 'librarian/edit_hotel.html', {'hotel': hotel})
-
-def delete(request, hotel_id):
-    hotel = Hotel.objects.get(pk = hotel_id)
-    hotel.delete()
-    return update(request)
-
-def update(request):
-    hotels = Hotel.objects.all()
-    hotels = hotels.filter(owner=request.user.id)
-    return render(request, 'librarian/manage_hotels.html', {'hotels': hotels})
     
 @require_POST
 @login_required
@@ -132,29 +127,30 @@ def update_hotel(request, hotel_id):
     View for updating an existing hotel.
     """
     hotel = get_object_or_404(Hotel, id=hotel_id)
+    hotel_data = get_hotel_data(hotel)
     
     # Check permissions - must be staff or the hotel creator
     if not request.user.is_staff and hotel.created_by != request.user:
         messages.error(request, "You don't have permission to update this hotel.")
         return redirect('manage_hotels')
     if request.method == 'POST':
-        name = request.POST.get('name_field')
-        street_address = request.POST.get('street_address_field')
-        city = request.POST.get('city_field')
-        state = request.POST.get('state_field')
-        country = request.POST.get('country_field')
-        price = request.POST.get('price_field')
-        description = request.POST.get('description')
-        
-        if name and street_address and city and state and country and price:
-            # Update the hotel instance without saving to DB yet
-            hotel.name=name
-            hotel.street_address=street_address
-            hotel.city=city
-            hotel.state=state
-            hotel.country=country
-            hotel.price=price
-            hotel.description=description
+        for field in hotel_data.keys():
+            user_response = request.POST.get(field)
+            if user_response != None:
+                hotel_data[field] = user_response
+        try:
+            existing_hotel = Hotel.objects.get(room = hotel_data["room number"], floor = hotel_data["floor number"])
+            messages.error(request, f'Room #{hotel_data["room number"]} on Floor #{hotel_data["floor number"]} already exists!')
+            return render(request, 'librarian/update_hotel.html', {'hotel': hotel})
+        except Hotel.DoesNotExist:
+            hotel.room=hotel_data["room number"]
+            hotel.floor=hotel_data["floor number"]
+            hotel.square_footage=hotel_data["square footage"]
+            hotel.max_num_of_occupants=hotel_data["maximum number of occupants"]
+            hotel.num_of_beds=hotel_data["number of beds"]
+            hotel.num_of_bathrooms=hotel_data["number of bathrooms"]
+            hotel.price=hotel_data["price"]
+            hotel.description=hotel_data["description"]
             
             # Check if an image was uploaded
             if 'hotel_image' in request.FILES:
@@ -166,10 +162,20 @@ def update_hotel(request, hotel_id):
             # Save the hotel to the database
             hotel.save()
             messages.success(request, 'Hotel updated successfully!')
-            return redirect('view_hotel', hotel_id=hotel.id)
-        else:
-            messages.error(request, 'Please provide the name, street address, city, state, country, and price for the hotel.')     
+            return redirect('view_hotel', hotel_id=hotel.id)    
     return render(request, 'librarian/update_hotel.html', {'hotel': hotel})
+
+def get_hotel_data(hotel):
+    hotel_data = {"room number": hotel.room, 
+              "floor number": hotel.floor, 
+              "square footage": hotel.square_footage, 
+              "maximum number of occupants": hotel.max_num_of_occupants, 
+              "number of beds": hotel.num_of_beds, 
+              "number of bathrooms": hotel.num_of_bathrooms,
+              "price": hotel.price,
+              "description": hotel.description
+            }
+    return hotel_data
 
 @login_required
 def delete_hotel(request, hotel_id):
@@ -192,9 +198,10 @@ def delete_hotel(request, hotel_id):
             return redirect('patron:view_hotel', hotel_id=hotel.id)
         
         # Delete the hotel
-        hotel_name = hotel.name
+        hotel_room = hotel.room
+        hotel_floor = hotel.floor
         hotel.delete()
-        messages.success(request, f'Hotel "{hotel_name}" has been deleted successfully.')
+        messages.success(request, f'Room {hotel_room} on Floor {hotel_floor} has been deleted successfully.')
         return redirect('manage_hotels')
     
     return render(request, 'librarian/delete_hotel.html', {'hotel': hotel})
@@ -321,15 +328,15 @@ def search_rooms(request):
     # Apply search filter if query exists
     if query:
         hotels = hotels.filter(
-            Q(name__icontains=query) | 
+            Q(room__icontains=query) | 
             Q(location__icontains=query) | 
             Q(description__icontains=query)
         )
 
     if sort_by == 'rating':
         hotels = hotels.order_by('-average_rating', '-created_at')  # Highest rating first
-    else:  # Default to alphabetical if 'alphabetical' is selected
-        hotels = hotels.order_by('name')
+    else:  # Default to numerically by room number if 'numerically by room number' is selected
+        hotels = hotels.order_by('room')
 
     if num_people != '👥 Travelers' and num_people != '':
         hotels = hotels.filter(num_people=num_people)

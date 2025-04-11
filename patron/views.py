@@ -100,7 +100,7 @@ def my_bookings(request):
     query = request.GET.get('query', '').strip()
     if query:
         all_bookings = all_bookings.filter(
-            Q(hotel__name__icontains=query) | 
+            Q(hotel__room__icontains=query) | 
             Q(hotel__location__icontains=query) |
             Q(check_in_date__icontains=query) |
             Q(check_out_date__icontains=query)
@@ -298,7 +298,7 @@ def search(request):
     if sort_by == 'rating':
         hotels = hotels.order_by('-average_rating', '-created_at')  # Highest rating first
     else:  # Default to alphabetical if 'alphabetical' is selected
-        hotels = hotels.order_by('name')
+        hotels = hotels.order_by('room')
 
     if num_people != '👥 Travelers' and num_people != '':
         hotels = hotels.filter(num_people=num_people)
@@ -423,7 +423,7 @@ def cancel_booking(request, booking_id):
         return redirect('patron:my_bookings')
     
     # Store hotel info for success message
-    hotel_name = booking.hotel.name
+    hotel_room = booking.hotel.room
     check_in = booking.check_in_date.strftime('%Y-%m-%d')
     check_out = booking.check_out_date.strftime('%Y-%m-%d')
     
@@ -432,7 +432,7 @@ def cancel_booking(request, booking_id):
     
     messages.success(
         request, 
-        f'Your booking at {hotel_name} for {check_in} to {check_out} has been cancelled. '
+        f'Your booking at {hotel_room} for {check_in} to {check_out} has been cancelled. '
         'The hotel is now available for these dates.'
     )
     return redirect('patron:my_bookings')
@@ -492,6 +492,8 @@ def view_hotel(request, hotel_id):
     # Get recent bookings
     recent_bookings = HotelBooking.objects.filter(hotel=hotel).order_by('-created_at')[:10]
     
+    base_template = 'base/librarian_base.html'
+
     return render(request, 'librarian/librarian_hotel_view.html', {
         'hotel': hotel,
         "reviews": reviews,
@@ -583,14 +585,14 @@ def update_hotel(request, hotel_id):
         return redirect('patron:manage_hotels')
     
     if request.method == 'POST':
-        name = request.POST.get('name_field')
+        room = request.POST.get('room_field')
         location = request.POST.get('location_field')
         description = request.POST.get('description')
         num_people = request.POST.get('num_people')
         price = request.POST.get('price_per_night')
         
-        if name and location:
-            hotel.name = name
+        if room and location:
+            hotel.room = room
             hotel.location = location
             hotel.description = description
             hotel.price = price
@@ -607,7 +609,7 @@ def update_hotel(request, hotel_id):
             messages.success(request, 'Hotel updated successfully!')
             return redirect('patron:view_hotel', hotel_id=hotel.id)
         else:
-            messages.error(request, 'Please provide both name and location for the hotel.')
+            messages.error(request, 'Please provide both room and location for the hotel.')
     
     return render(request, 'patron/update_hotel.html', {
         'hotel': hotel,
@@ -635,9 +637,9 @@ def delete_hotel(request, hotel_id):
             return redirect('patron:view_hotel', hotel_id=hotel.id)
         
         # Delete the hotel
-        hotel_name = hotel.name
+        hotel_room = hotel.room
         hotel.delete()
-        messages.success(request, f'Hotel "{hotel_name}" has been deleted successfully.')
+        messages.success(request, f'Hotel "{hotel_room}" has been deleted successfully.')
         return redirect('patron:manage_hotels')
     
     return render(request, 'patron/delete_hotel.html', {
@@ -670,7 +672,7 @@ def add_booking_to_collection(request, booking_id):
                 booking=booking,
                 notes=notes
             )
-            messages.success(request, f"Booking for {booking.hotel.name} added to your collection.")
+            messages.success(request, f"Booking for {booking.hotel.room} added to your collection.")
         
         return redirect('patron:view_collection_items', collection_id=collection.id)
     
@@ -726,7 +728,7 @@ def add_hotel_to_collection(request, hotel_id):
         
         # Check if booking is already in the collection
         if CollectionBooking.objects.filter(collection=collection, booking=booking).exists():
-            messages.info(request, f"{hotel.name} is already in your collection.")
+            messages.info(request, f"{hotel.room} is already in your collection.")
         else:
             # Add booking to collection
             CollectionBooking.objects.create(
@@ -734,7 +736,7 @@ def add_hotel_to_collection(request, hotel_id):
                 booking=booking,
                 notes=notes
             )
-            messages.success(request, f"{hotel.name} added to your collection.")
+            messages.success(request, f"{hotel.room} added to your collection.")
         
         # Return to the search page with the same query
         query = request.GET.get('query', '')
