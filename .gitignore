@@ -110,3 +110,7 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# mac
+*/.DS_Store
+.DS_Store

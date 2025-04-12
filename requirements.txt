@@ -1,5 +1,13 @@
 asgiref==3.8.1
+boto3==1.34.34
+botocore==1.34.162
 Django==5.2
-sqlparse==0.5.3
+django-storages==1.14.2
+jmespath==1.0.1
 psycopg2-binary==2.9.9
+python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
+s3transfer==0.10.4
+six==1.17.0
+sqlparse==0.5.3
+urllib3==2.4.0
