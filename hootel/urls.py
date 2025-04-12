@@ -21,6 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('core.urls')),
+    path('catalog/', include('catalog.urls')),
+    path('collection/', include('collection.urls')),
 ]
 
 handler404 = 'core.views.handler404'

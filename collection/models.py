@@ -35,4 +35,4 @@ class CollectionAuthorizedUser(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'collection_authorized_user'  # <--- Custom table name
+        db_table = 'collection_authorized_users'  # <--- Custom table name

@@ -1,0 +1,23 @@
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+        <div class="card-body">
+            <h5 class="card-title">{{ collection.title }}</h5>
+            <p class="card-text">{{ collection.description|truncatewords:30 }}</p>
+            <p class="card-text">
+                <small class="text-muted">
+                    Visibility: {{ collection.get_visibility_display }}
+                </small>
+            </p>
+            {% if collection.collectionitems_set.all %}
+                <h6>Items in this collection:</h6>
+                <ul class="list-unstyled">
+                    {% for item in collection.collectionitems_set.all %}
+                        <li>{{ item.item.title }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No items in this collection.</p>
+            {% endif %}
+        </div>
+    </div>
+</div> 
