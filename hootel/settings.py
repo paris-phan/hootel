@@ -227,17 +227,16 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 #requires email but no verification from inbox
-ACCOUNT_EMAIL_REQUIRED = True
+#ACCOUNT_SIGNUP_FIELDS = ['username', 'email']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 #disable standard sign-up
-ACCOUNT_LOGIN_METHODS = ['email']
-ACCOUNT_USERNAME_REQUIRED = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 
 ACCOUNT_ADAPTER = 'accounts.adapters.NoUsernamePasswordAdapter'
 SOCIALACCOUNT_ADAPTER = 'accounts.adapters.CustomSocialAccountAdapter'
+
 
 #/**----------------------------------------------------------------------**/#
 
