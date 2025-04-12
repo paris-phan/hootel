@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Catalog</h1>
+    
+    {% if items %}
+        <div class="row">
+            {% for item in items %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    {% include "catalog/item.html" %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No items found in the catalog.
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

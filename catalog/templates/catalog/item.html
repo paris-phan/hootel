@@ -1,0 +1,15 @@
+<div class="catalog-item card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">{{ item.title }}</h5>
+        <p class="card-text">{{ item.description }}</p>
+        <div class="item-details">
+            <p class="mb-1"><strong>Location:</strong> {{ item.location }}</p>
+            <p class="mb-0">
+                <strong>Status:</strong> 
+                <span class="badge {% if item.status == 0 %}bg-success{% elif item.status == 1 %}bg-warning{% else %}bg-danger{% endif %}">
+                    {{ item.get_status_display }}
+                </span>
+            </p>
+        </div>
+    </div>
+</div> 
