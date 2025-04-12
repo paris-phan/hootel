@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-    # Add any custom fields you need for your users
     google_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     role = models.IntegerField(
         default=0,
