@@ -475,7 +475,7 @@
                   <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="button button--slim button--dark" href="{% url 'account_logout' %}">Logout</a>
+                            <a class="button button--slim button--dark" href="{% url 'accounts:profile' %}">Profile</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
