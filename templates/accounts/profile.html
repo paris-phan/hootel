@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - Hootel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h2 class="h4 mb-0">@{{ user.username }}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center">
+                            <div class="profile-avatar mb-3">
+                                {% if user.profile_photo %}
+                                    <img src="{{ user.profile_photo.url }}" alt="Profile Photo" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                {% else %}
+                                    <img src="{% static 'images/default-avatar.png' %}" alt="Default Avatar" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h3 class="h3">{{ user.get_full_name|default:user.username }}</h3>
+                            <p class="h5">{{ user.email }}</p>
+                            <span class="subtitle">{{ role_display }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="h6 text-muted">Account Details</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Username:</strong>
+                                    <span class="float-end">{{ user.username }}</span>
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Date Joined:</strong>
+                                    <span class="float-end">{{ user.date_joined|date:"F j, Y" }}</span>
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Last Login:</strong>
+                                    <span class="float-end">{{ user.last_login|date:"F j, Y" }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="h6 text-muted">Contact Information</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Email:</strong>
+                                    <span class="float-end">{{ user.email }}</span>
+                                </li>
+                                {% if user.first_name %}
+                                <li class="mb-2">
+                                    <strong>First Name:</strong>
+                                    <span class="float-end">{{ user.first_name }}</span>
+                                </li>
+                                {% endif %}
+                                {% if user.last_name %}
+                                <li class="mb-2">
+                                    <strong>Last Name:</strong>
+                                    <span class="float-end">{{ user.last_name }}</span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from catalog.models import Item
+from catalog.models import Item 
+from collection.models import Collection, CollectionItems
 
 # Create your views here.
 
@@ -21,29 +22,29 @@ def home(request):
             {
                 'name': 'Telzoe, Greece',
                 'description': 'Telzoe welcomes a new season on the beach-fringed Peloponnese.',
-                'image': 'images/Telzoe.jpg',
+                'image': 'core/images/destination-feature.jpg',
             },
             {
                 'name': 'Tel Nai Lert Bangkok',
-                'description': 'Introducing 52-suites, a 1,500-square-metre Tel Spa & Wellness centre and seven venues for dining and socialising to the city.',
-                'image': 'images/Tel_nai_lert.jpg',
+                'description': '"Introducing 52-suites, a 1,500-square-metre Tel Spa & Wellness centre and seven venues for dining and socialising to the city. Tel Nai Lert blends timeless Thai elegance with modern sophistication. Each suite is thoughtfully designed to reflect the rich cultural heritage of the Nai Lert Park area while offering state-of-the-art comfort. The Tel Spa & Wellness centre provides a sanctuary for holistic rejuvenation, featuring bespoke treatments and serene spaces. With seven distinct dining and social venues, guests can explore a vibrant tapestry of flavors and experiences that celebrate both local and international culinary artistry.',
+                'image': 'core/images/destination-feature.jpg',
             },
         ],
         'experiences': [
             {
                 'name': 'Wellness Journeys',
                 'description': 'Embark on a path to wellbeing with Tel\'s immersive wellness programs.',
-                'image': 'images/experiences-1.jpg',
+                'image': 'core/images/destination-feature.jpg',
             },
             {
                 'name': 'Cultural Discoveries',
                 'description': 'Immerse yourself in local traditions and authentic cultural experiences.',
-                'image': 'images/experiences-2.jpg',
+                'image': 'core/images/destination-feature.jpg',
             },
             {
                 'name': 'Active Adventures',
                 'description': 'Explore dramatic landscapes and natural wonders with expert guides.',
-                'image': 'images/experiences-3.jpg',
+                'image': 'core/images/destination-feature.jpg',
             },
         ]
     }
@@ -56,9 +57,16 @@ def destinations(request):
     # Get all items from the catalog
     items = Item.objects.all()
     
+    # Get all collections
+    collections = Collection.objects.all()
+    
     # Map items to destination format
     destinations = []
     for item in items:
+        # Get collections this item belongs to
+        item_collections = CollectionItems.objects.filter(item=item).select_related('collection')
+        collection_ids = [ci.collection.id for ci in item_collections]
+        
         # Map location to region
         region = 'asia'  # default
         if item.location and 'europe' in item.location.lower():
@@ -80,12 +88,14 @@ def destinations(request):
             'name': item.title,
             'description': item.description or '',
             'representative_image': image_path,
-            'region': region
+            'region': region,
+            'collection_ids': collection_ids
         })
     
     context = {
         'page_title': 'Destinations | Tel Resorts',
-        'destinations': destinations
+        'destinations': destinations,
+        'collections': collections
     }
     return render(request, 'core/destinations.html', context)
 
@@ -93,8 +103,12 @@ def experiences(request):
     #"""
     #Experiences page view.
     #"""
+    # Get all collections
+    collections = Collection.objects.all()
+    
     context = {
         'page_title': 'Experiences | Tel Resorts',
+        'collections': collections,
         'experiences': [
             {
                 'name': 'Wellness Journeys',

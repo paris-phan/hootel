@@ -6,9 +6,14 @@
 {% block extra_css %}
 <style>
   /* Additional styles specific to the experiences page */
+  
+  
+  
+  
+  
   .experience-hero {
     position: relative;
-    height: 500px;
+    height: 600px;
     overflow: hidden;
     margin-bottom: 3rem;
   }
@@ -63,128 +68,184 @@
       min-height: 300px;
     }
   }
+
+
+
+  .destinations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #dad9d7;
+  }
+  
+  .filter-bar button {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    color: #313131;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  
+  .filter-bar button.active {
+    opacity: 1;
+    border-bottom: 1px solid #313131;
+  }
+  
+  /* Search Bar Styles */
+  .search-bar {
+    max-width: 500px;
+    margin: 0;
+  }
+  
+  .search-bar input {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-bottom: 1px solid #dad9d7;
+    border-radius: 0;
+    font-size: 1rem;
+    width: 100%;
+    background: transparent;
+  }
+  
+  .search-bar input:focus {
+    outline: none;
+    border-color: #313131;
+  }
+  
+  /* Ensure consistent image dimensions in destination cards */
+  .slider-card .media--responsive {
+    height: 250px;
+    overflow: hidden;
+  }
+  
+  .slider-card .media--responsive img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .slider-card .media--responsive img:hover {
+    transform: scale(1.05);
+  }
+  
+  @media (max-width: 768px) {
+    .destination-hero {
+      height: 300px;
+    }
+  }
+  
+  /* Banner Section Styles */
+  .banner-section {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .banner-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    min-height: 400px;
+  }
+  
+  .banner-section .col-md-6 {
+    padding: 0;
+  }
+  
+  .banner-section .col-md-6:first-child {
+    position: relative;
+  }
+  
+  .banner-section .col-md-6:last-child {
+    padding: 2rem;
+  }
+
+
+
+
+
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- Hero Banner -->
-<section class="experience-hero">
-  <img src="{% static 'images/experiences-hero.jpg' %}" alt="Hootel Experiences" class="img-fluid">
-  <div class="experience-hero-content">
-    <div class="container">
-      <h1>Experiences</h1>
-      <p>Journey to extraordinary places with Hootel</p>
-    </div>
-  </div>
+<section class="destination-hero">
+  <video autoplay muted loop class="w-100">
+    <source src="{% static 'videos/experiences-hero.mp4' %}" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
 </section>
 
 <!-- Intro Section -->
 <section class="container container--spacer gutter">
   <header class="hgroup hgroup--limited text--centered">
     <p class="subtitle">Experiences at Hootel</p>
-    <h2 class="heading-h">Journey to extraordinary places</h2>
+    <h2 class="heading-h">Extraordinary Journeys for the Eextraordinary</h2>
     <div class="hgroup__intro">
       <p>From spiritual pilgrimages to cultural discoveries, Hootel curates transformative experiences that immerse guests in the spirit of each destination. Each Hootel property offers its own selection of activities that celebrate the surrounding landscape and culture.</p>
     </div>
   </header>
-</section>
 
-<!-- Experience Details - Wellness -->
-<section class="experience-detail">
-  <div class="container gutter">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="experience-image">
-          <img src="{% static 'images/experiences-1.jpg' %}" alt="Wellness Journey" class="img-fluid">
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="experience-content">
-          <p class="subtitle">Transformative Journeys</p>
-          <h2 class="heading-h">Wellness Journeys</h2>
-          <p>Hootel has always delivered a transforming and holistic spa experience, taking you on a journey of discovery. Wellness at Hootel is a 360 degree integration of wellbeing experiences, taking a personalized approach with a focus on individuals.</p>
-          <p>Harnessing the power of nature, our unique wellness paths incorporate Traditional Chinese Medicine and other global healing traditions. Backed by the latest research, our innovative spa services, fitness and mindfulness programs realign body, mind and spirit.</p>
-          <a href="#" class="button button--dark mt-4">Discover Wellness</a>
-        </div>
-      </div>
-    </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar mb-4">
+    <input type="text" id="destinationSearch" class="form-control" placeholder="Search destinations..." aria-label="Search destinations">
   </div>
-</section>
-
-<!-- Experience Details - Cultural -->
-<section class="experience-detail">
-  <div class="container gutter">
-    <div class="row flex-column-reverse flex-md-row">
-      <div class="col-md-6">
-        <div class="experience-content">
-          <p class="subtitle">Cultural Immersion</p>
-          <h2 class="heading-h">Cultural Discoveries</h2>
-          <p>Immerse yourself in the cultural heritage of each destination, with experiences shaped by local experts and designed to provide authentic insights into traditions and ways of life.</p>
-          <p>From private tea ceremonies in Japan to exploring ancient temples in Cambodia, Hootel's cultural experiences offer privileged access to local traditions, festivals, art, and cuisine, creating memories that will stay with you long after you leave.</p>
-          <a href="#" class="button button--dark mt-4">Discover Culture</a>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="experience-image">
-          <img src="{% static 'images/experiences-2.jpg' %}" alt="Cultural Discovery" class="img-fluid">
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Experience Details - Adventure -->
-<section class="experience-detail">
-  <div class="container gutter">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="experience-image">
-          <img src="{% static 'images/experiences-3.jpg' %}" alt="Active Adventure" class="img-fluid">
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="experience-content">
-          <p class="subtitle">Explorations</p>
-          <h2 class="heading-h">Active Adventures</h2>
-          <p>For those seeking adventure and connection with nature, Hootel offers bespoke experiences in some of the world's most remote and spectacular settings.</p>
-          <p>From trekking in the Himalayas to sailing the turquoise waters of the Aegean Sea, our adventures are crafted to showcase the natural beauty of each destination while providing expert guidance and unparalleled comfort.</p>
-          <a href="#" class="button button--dark mt-4">Discover Adventures</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Grid Section -->
-<section class="container container--spacer gutter">
-  <header class="hgroup hgroup--limited text--centered">
-    <h2 class="heading-h">Featured Experiences</h2>
-    <div class="hgroup__intro">
-      <p>Discover our most unique and sought-after experiences</p>
-    </div>
-  </header>
   
-  <div class="scards mt-5">
-    {% for experience in experiences %}
-    <div class="slider-card">
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <button class="active" data-filter="all">All Destinations</button>
+    {% for collection in collections %}
+      {% if not collection.is_region %}
+        <button data-filter="collection-{{ collection.id }}">{{ collection.title }}</button>
+      {% endif %}
+    {% endfor %}
+  </div>
+  
+  <!-- Destinations Grid -->
+  <div class="destinations-grid">
+    {% for destination in destinations %}
+    <div class="slider-card" data-region="{{ destination.region }}" data-collections="{{ destination.collection_ids|join:',' }}">
       <article class="card card--centered">
         <div class="media media--responsive">
-          <picture>
-            <img src="{% static experience.image %}" alt="{{ experience.name }}" class="img-fluid">
-          </picture>
+          {% if destination.representative_image %}
+            <img src="{{ destination.representative_image }}" alt="{{ destination.name }}" class="img-fluid">
+          {% else %}
+            <img src="{% static 'images/placeholder.jpg' %}" alt="{{ destination.name }}" class="img-fluid">
+          {% endif %}
         </div>
         <figcaption>
-          <h3>{{ experience.name }}</h3>
-          <p>{{ experience.description }}</p>
+          <h3>{{ destination.name }}</h3>
+          <p>{{ destination.description }}</p>
         </figcaption>
         <div class="card__post-link-content">
-          <a href="#" class="cta__link card__link__cta underline">Discover more</a>
+          <a href="{% url 'item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline">Discover more</a>
         </div>
       </article>
     </div>
     {% endfor %}
   </div>
+
+
+
 </section>
+
+
+
 
 <!-- Call to Action Section -->
 <section class="container--spacer container gutter text--centered">
@@ -195,26 +256,60 @@
 </section>
 {% endblock %}
 
+
+
+
+
+
+
+
 {% block extra_js %}
 <script>
-  // Experiences page specific JavaScript
+  // Destinations page specific JavaScript
   document.addEventListener('DOMContentLoaded', function() {
-    // Animation on scroll for experience sections
-    const experienceSections = document.querySelectorAll('.experience-detail');
+    // Search functionality
+    const searchInput = document.getElementById('destinationSearch');
+    const filterButtons = document.querySelectorAll('.filter-bar button');
+    const destinations = document.querySelectorAll('.destinations-grid .slider-card');
     
-    const revealOnScroll = function() {
-      experienceSections.forEach(section => {
-        const sectionTop = section.getBoundingClientRect().top;
-        const windowHeight = window.innerHeight;
+    function filterDestinations() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const activeFilter = document.querySelector('.filter-bar button.active').getAttribute('data-filter');
+      
+      destinations.forEach(dest => {
+        const title = dest.querySelector('h3').textContent.toLowerCase();
+        const description = dest.querySelector('p').textContent.toLowerCase();
+        const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
         
-        if (sectionTop < windowHeight * 0.8) {
-          section.classList.add('revealed');
+        let matchesFilter = true;
+        if (activeFilter !== 'all') {
+          if (activeFilter.startsWith('collection-')) {
+            const collectionId = activeFilter.split('-')[1];
+            const collections = dest.getAttribute('data-collections').split(',');
+            matchesFilter = collections.includes(collectionId);
+          } else {
+            matchesFilter = dest.getAttribute('data-region') === activeFilter;
+          }
         }
+        
+        dest.style.display = matchesSearch && matchesFilter ? 'block' : 'none';
       });
-    };
+    }
     
-    window.addEventListener('scroll', revealOnScroll);
-    window.addEventListener('load', revealOnScroll);
+    // Add search input event listener
+    searchInput.addEventListener('input', filterDestinations);
+    
+    // Filter functionality
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Update active button
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Filter destinations
+        filterDestinations();
+      });
+    });
   });
 </script>
 {% endblock %} 

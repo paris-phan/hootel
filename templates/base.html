@@ -360,15 +360,20 @@
               <!-- Column 1: Main menu -->
               <div class="global-navigation__column">
                 <ul class="global-navigation__list root">
-                  <li class="global-navigation__list-item">
+                  <!-- <li class="global-navigation__list-item">
                     <a href="javascript:void(0)" class="global-navigation__link toggle-link" data-toggle="destinations">Destinations</a>
-                  </li>
+                  </li> -->
+
+                  <!-- Destinations no toggle list-->
                   <li class="global-navigation__list-item">
-                    <a href="#" class="global-navigation__link">Hotels & Resorts</a>
+                    <a href="{% url 'core:destinations' %}" class="global-navigation__link">All Destinations</a>
                   </li>
+                  <!-- Destinations no toggle list-->
                   <li class="global-navigation__list-item">
-                    <a href="{% url 'core:experiences' %}" class="global-navigation__link toggle-link">Experiences</a>
+                    <a href="{% url 'core:experiences' %}" class="global-navigation__link">Experiences</a>
                   </li>
+
+                  
                   <li class="global-navigation__list-item">
                     <a href="#" class="global-navigation__link">Exclusive Offers</a>
                   </li>
@@ -385,55 +390,21 @@
                     <a href="{% url 'core:destinations' %}" class="global-navigation__link">All Destinations</a>
                   </li>
                   <li class="global-navigation__list-item">
-                    <a href="javascript:void(0)" class="global-navigation__link toggle-link" data-toggle="americas">Americas</a>
-                  </li>
-                  <li class="global-navigation__list-item">
-                    <a href="javascript:void(0)" class="global-navigation__link toggle-link" data-toggle="asia">Asia</a>
-                  </li>
-                  <li class="global-navigation__list-item">
-                    <a href="javascript:void(0)" class="global-navigation__link toggle-link" data-toggle="europe">Europe</a>
-                  </li>
-                </ul>
-              </div>
-
-              <!-- Column 3: Region-specific destinations -->
-              <div class="global-navigation__column" id="americas-submenu">
-                <ul class="global-navigation__list">
-                  <li class="global-navigation__list-item">
-                    <a href="#" class="global-navigation__link">See All Americas</a>
-                  </li>
-                  <li class="global-navigation__list-item">
-                    <a href="#" class="global-navigation__link">
-                      <span class="global-navigation__link-head">New York, USA</span>
-                      <span class="global-navigation__link-sub">City of Dreams</span>
+                    <a href="{% url 'core:destinations' %}?region=americas" class="global-navigation__link">
+                      <span class="global-navigation__link-head">Americas</span>
+                      <span class="global-navigation__link-sub">Explore our destinations in the Americas</span>
                     </a>
                   </li>
-                </ul>
-              </div>
-
-              <div class="global-navigation__column" id="asia-submenu">
-                <ul class="global-navigation__list">
                   <li class="global-navigation__list-item">
-                    <a href="#" class="global-navigation__link">See All Asia</a>
-                  </li>
-                  <li class="global-navigation__list-item">
-                    <a href="#" class="global-navigation__link">
-                      <span class="global-navigation__link-head">Tokyo, Japan</span>
-                      <span class="global-navigation__link-sub">City of Asian Dreams</span>
+                    <a href="{% url 'core:destinations' %}?region=asia" class="global-navigation__link">
+                      <span class="global-navigation__link-head">Asia</span>
+                      <span class="global-navigation__link-sub">Discover our Asian destinations</span>
                     </a>
                   </li>
-                </ul>
-              </div>
-
-              <div class="global-navigation__column" id="europe-submenu">
-                <ul class="global-navigation__list">
                   <li class="global-navigation__list-item">
-                    <a href="#" class="global-navigation__link">See All Europe</a>
-                  </li>
-                  <li class="global-navigation__list-item">
-                    <a href="#" class="global-navigation__link">
-                      <span class="global-navigation__link-head">Porto Heli, Greece</span>
-                      <span class="global-navigation__link-sub">Adventure in the Aegean</span>
+                    <a href="{% url 'core:destinations' %}?region=europe" class="global-navigation__link">
+                      <span class="global-navigation__link-head">Europe</span>
+                      <span class="global-navigation__link-sub">Experience our European destinations</span>
                     </a>
                   </li>
                 </ul>
@@ -441,14 +412,14 @@
             </div>
 
             <!-- Featured section -->
-            <!-- <div class="global-featured">
+            <div class="global-featured">
               <p class="global-featured__title">Discover Hootel in...</p>
               <div class="global-featured__buttons">
                 <a href="#" class="button">USA & the Caribbean</a>
                 <a href="#" class="button">Europe & North Africa</a>
                 <a href="#" class="button">Asia</a>
               </div>
-            </div> -->
+            </div>
           </div>
         </div>
       </div>
