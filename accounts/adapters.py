@@ -15,4 +15,11 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     
     def save_user(self, request, sociallogin, form):
         user = super().save_user(request, sociallogin, form)
+
+        # Set the user's role to 0 (Patron)
+        user.role = 0
+        user.save()
+
+        return user
+        
         
