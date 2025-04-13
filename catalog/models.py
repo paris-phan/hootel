@@ -7,7 +7,7 @@ class Item(models.Model):
         (1, 'Reserved'),
         (2, 'Maintenance'),
     )
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, unique=True)
     identifier = models.CharField(max_length=50, unique=True)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     location = models.CharField(max_length=255, blank=True)

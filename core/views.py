@@ -16,23 +16,23 @@ def home(request):
     Homepage view.
     """
     context = {
-        'page_title': 'Aman Resorts, Hotels & Residences – Explore Luxury Destinations',
+        'page_title': 'Tel Resorts, Hotels & Residences – Explore Luxury Destinations',
         'featured_destinations': [
             {
-                'name': 'Amanzoe, Greece',
-                'description': 'Amanzoe welcomes a new season on the beach-fringed Peloponnese.',
-                'image': 'images/amanzoe.jpg',
+                'name': 'Telzoe, Greece',
+                'description': 'Telzoe welcomes a new season on the beach-fringed Peloponnese.',
+                'image': 'images/Telzoe.jpg',
             },
             {
-                'name': 'Aman Nai Lert Bangkok',
-                'description': 'Introducing 52-suites, a 1,500-square-metre Aman Spa & Wellness centre and seven venues for dining and socialising to the city.',
-                'image': 'images/aman_nai_lert.jpg',
+                'name': 'Tel Nai Lert Bangkok',
+                'description': 'Introducing 52-suites, a 1,500-square-metre Tel Spa & Wellness centre and seven venues for dining and socialising to the city.',
+                'image': 'images/Tel_nai_lert.jpg',
             },
         ],
         'experiences': [
             {
                 'name': 'Wellness Journeys',
-                'description': 'Embark on a path to wellbeing with Aman\'s immersive wellness programs.',
+                'description': 'Embark on a path to wellbeing with Tel\'s immersive wellness programs.',
                 'image': 'images/experiences-1.jpg',
             },
             {
@@ -74,7 +74,7 @@ def destinations(request):
         })
     
     context = {
-        'page_title': 'Destinations | Aman Resorts',
+        'page_title': 'Destinations | Tel Resorts',
         'destinations': destinations
     }
     return render(request, 'core/destinations.html', context)
@@ -84,11 +84,11 @@ def experiences(request):
     #Experiences page view.
     #"""
     context = {
-        'page_title': 'Experiences | Aman Resorts',
+        'page_title': 'Experiences | Tel Resorts',
         'experiences': [
             {
                 'name': 'Wellness Journeys',
-                'description': 'Embark on a path to wellbeing with Aman\'s immersive wellness programs.',
+                'description': 'Embark on a path to wellbeing with Tel\'s immersive wellness programs.',
                 'image': 'images/experiences-1.jpg',
             },
             {
@@ -111,6 +111,6 @@ def about(request):
     #About page view.
     #"""
     context = {
-        'page_title': 'About Us | Aman Resorts',
+        'page_title': 'About Us | Tel Resorts',
     }
     return render(request, 'about.html', context) 
