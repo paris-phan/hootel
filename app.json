@@ -13,7 +13,7 @@
         "value": "False"
       },
       "ALLOWED_HOSTS": {
-        "value": [".herokuapp.com", "hoo-tels.com"]
+        "value": ".herokuapp.com"
       },
       "AWS_ACCESS_KEY_ID": {
         "required": true
