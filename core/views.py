@@ -61,15 +61,25 @@ def destinations(request):
     for item in items:
         # Map location to region
         region = 'asia'  # default
-        if 'europe' in item.location.lower():
+        if item.location and 'europe' in item.location.lower():
             region = 'europe'
-        elif 'america' in item.location.lower() or 'caribbean' in item.location.lower():
+        elif item.location and ('america' in item.location.lower() or 'caribbean' in item.location.lower()):
             region = 'americas'
+            
+        # Handle image - use a safe default
+        try:
+            if item.representative_image and hasattr(item.representative_image, 'url'):
+                image_path = item.representative_image.url
+            else:
+                image_path = 'images/default-destination.jpg'
+        except Exception:
+            # In case of any errors with the image, use default
+            image_path = 'images/default-destination.jpg'
             
         destinations.append({
             'name': item.title,
-            'description': item.description,
-            'image': item.representative_image.url if item.representative_image else 'images/default-destination.jpg',
+            'description': item.description or '',
+            'image': image_path,
             'region': region
         })
     
