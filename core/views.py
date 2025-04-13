@@ -131,10 +131,10 @@ def experiences(request):
     return render(request, 'core/experiences.html', context)
 
 def about(request):
-    #"""
-    #About page view.
-    #"""
+    """
+    About page view.
+    """
     context = {
         'page_title': 'About Us | Tel Resorts',
     }
-    return render(request, 'about.html', context) 
+    return render(request, 'core/about.html', context) 
