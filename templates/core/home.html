@@ -30,25 +30,85 @@
     margin-top: 4rem;
   }
   
-  .scards {
+  /* Featured Destinations Grid */
+  .scards--featured {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: 2fr 1fr;
     gap: 2rem;
+    height: 100%;
+  }
+  
+  /* Experiences Grid */
+  .scards--experiences {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    height: 100%;
   }
   
   .slider-card {
     background-color: #F3EEE7;
     border-radius: 0;
     overflow: hidden;
+    height: 100%;
   }
   
-  .card__heading {
-    margin-top: 1rem;
+  .slider-card-medium, .slider-card-small {
+    height: 100%;
   }
   
-  @media (min-width: 768px) {
-    .scards--first-2-3 .slider-card:first-child {
-      grid-column: span 2;
+  .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .card__link {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .media--responsive {
+    height: 100%;
+    min-height: 500px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .media--responsive picture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .media--responsive img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  .hgroup {
+    padding: 2rem;
+    flex: 1;
+  }
+  
+  .card__multiple_links {
+    padding: 1rem 2rem;
+    border-top: 1px solid #dad9d7;
+  }
+  
+  @media (max-width: 768px) {
+    .scards--featured,
+    .scards--experiences {
+      grid-template-columns: 1fr;
+    }
+    
+    .media--responsive {
+      min-height: 300px;
     }
   }
 </style>
@@ -83,20 +143,20 @@
 <!-- Featured Destinations Section -->
 <section class="paragraph--type--slider-cards container--spacer container--text-alignment-left portrait-video slider-cards">
   <div class="container gutter">
-    <div class="scards scards--col-count-2 scards--first-2-3 scards--second-1-3 scards--others-1-2 scards--image-style-landscape">
-      <!-- First Card (Featured) -->
-      <div class="slider-card slider-card-medium">
+    <div class="scards scards--featured">
+      {% for destination in featured_destinations %}
+      <div class="slider-card">
         <article class="card venue-card--link">
           <div class="media media--responsive">
-            <picture class="Hootel-responsive-image--landscape">
-              <img src="{% static 'core/images/destination-feature.jpg' %}" alt="Swimming Pool - Teljiwo, Java, Indonesia" class="img-fluid">
+            <picture>
+              <img src="{% static destination.image %}" alt="{{ destination.name }}" class="img-fluid">
             </picture>
           </div>
           <a href="#" class="card__link">
             <header class="hgroup">
-              <h3 class="subtitle">hotels &amp; resorts</h3>
-              <h3 class="heading-h card__heading">Explore Destinations</h3>
-              <div class="hgroup__intro">Uncover new horizons with Hootel – from soul-soothing escapes by the coast to transformational journeys that awaken the spirit – across 36 hotels and resorts in 20 countries.</div>
+              <h3 class="subtitle">{% if forloop.first %}hotels &amp; resorts{% else %}featured destination{% endif %}</h3>
+              <h3 class="heading-h card__heading">{{ destination.name }}</h3>
+              <div class="hgroup__intro">{{ destination.description }}</div>
             </header>
           </a>
           <div class="card__multiple_links">
@@ -104,27 +164,7 @@
           </div>
         </article>
       </div>
-      
-      <!-- Second Card -->
-      <div class="slider-card slider-card-small">
-        <article class="card venue-card--link">
-          <div class="media media--responsive">
-            <picture class="Hootel-responsive-image--portrait">
-              <img src="{% static 'core/images/Telzoe.jpg' %}" alt="Telzoe, Greece - Resort views" class="img-fluid">
-            </picture>
-          </div>
-          <a href="#" class="card__link">
-            <header class="hgroup">
-              <h3 class="subtitle">featured destination</h3>
-              <h3 class="heading-h card__heading">Telzoe, Greece</h3>
-              <div class="hgroup__intro">Telzoe welcomes a new season on the beach-fringed Peloponnese.</div>
-            </header>
-          </a>
-          <div class="card__multiple_links">
-            <a href="#" class="cta__link card__link__cta underline single-link">Discover more</a>
-          </div>
-        </article>
-      </div>
+      {% endfor %}
     </div>
   </div>
 </section>
@@ -139,60 +179,25 @@
     </div>
   </header>
   
-  <div class="scards mt-5">
-    <!-- Experience Card 1 -->
+  <div class="scards scards--experiences mt-5">
+    {% for experience in experiences %}
     <div class="slider-card">
       <article class="card card--centered">
         <div class="media media--responsive">
           <picture>
-            <img src="{% static 'images/experiences-1.jpg' %}" alt="Hootel Experiences - Wellness" class="img-fluid">
+            <img src="{% static experience.image %}" alt="Hootel Experiences - {{ experience.name }}" class="img-fluid">
           </picture>
         </div>
-        <figcaption>
-          <h3>Wellness Journeys</h3>
-          <p>Embark on a path to wellbeing with Hootel's immersive wellness programs.</p>
+        <figcaption class="hgroup">
+          <h3>{{ experience.name }}</h3>
+          <p>{{ experience.description }}</p>
         </figcaption>
-        <div class="card__post-link-content">
+        <div class="card__multiple_links">
           <a href="#" class="cta__link card__link__cta underline">Discover more</a>
         </div>
       </article>
     </div>
-    
-    <!-- Experience Card 2 -->
-    <div class="slider-card">
-      <article class="card card--centered">
-        <div class="media media--responsive">
-          <picture>
-            <img src="{% static 'images/experiences-2.jpg' %}" alt="Hootel Experiences - Cultural" class="img-fluid">
-          </picture>
-        </div>
-        <figcaption>
-          <h3>Cultural Discoveries</h3>
-          <p>Immerse yourself in local traditions and authentic cultural experiences.</p>
-        </figcaption>
-        <div class="card__post-link-content">
-          <a href="#" class="cta__link card__link__cta underline">Discover more</a>
-        </div>
-      </article>
-    </div>
-    
-    <!-- Experience Card 3 -->
-    <div class="slider-card">
-      <article class="card card--centered">
-        <div class="media media--responsive">
-          <picture>
-            <img src="{% static 'images/experiences-3.jpg' %}" alt="Hootel Experiences - Adventure" class="img-fluid">
-          </picture>
-        </div>
-        <figcaption>
-          <h3>Active Adventures</h3>
-          <p>Explore dramatic landscapes and natural wonders with expert guides.</p>
-        </figcaption>
-        <div class="card__post-link-content">
-          <a href="#" class="cta__link card__link__cta underline">Discover more</a>
-        </div>
-      </article>
-    </div>
+    {% endfor %}
   </div>
 </section>
 

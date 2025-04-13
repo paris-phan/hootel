@@ -15,14 +15,18 @@ class Collection(models.Model):
         related_name='collections_created'
     )
     visibility = models.IntegerField(choices=VISIBILITY_CHOICES, default=0)
+    is_region = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
 
     class Meta:
         db_table = 'collection'  # <--- Custom table name
 
 class CollectionItems(models.Model):
-    # The many-to-many “through” table linking Collections to Items
+    # The many-to-many "through" table linking Collections to Items
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
 

@@ -24,6 +24,9 @@ class Item(models.Model):
         related_name='items_created'
     )
 
+    def __str__(self):
+        return f"{self.title} ({self.identifier})"
+
     class Meta:
         db_table = 'item'  # <--- Custom table name
 

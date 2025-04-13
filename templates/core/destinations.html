@@ -63,6 +63,27 @@
     border-bottom: 1px solid #313131;
   }
   
+  /* Search Bar Styles */
+  .search-bar {
+    max-width: 500px;
+    margin: 0;
+  }
+  
+  .search-bar input {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-bottom: 1px solid #dad9d7;
+    border-radius: 0;
+    font-size: 1rem;
+    width: 100%;
+    background: transparent;
+  }
+  
+  .search-bar input:focus {
+    outline: none;
+    border-color: #313131;
+  }
+  
   /* Ensure consistent image dimensions in destination cards */
   .slider-card .media--responsive {
     height: 250px;
@@ -84,6 +105,31 @@
     .destination-hero {
       height: 300px;
     }
+  }
+  
+  /* Banner Section Styles */
+  .banner-section {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .banner-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    min-height: 400px;
+  }
+  
+  .banner-section .col-md-6 {
+    padding: 0;
+  }
+  
+  .banner-section .col-md-6:first-child {
+    position: relative;
+  }
+  
+  .banner-section .col-md-6:last-child {
+    padding: 2rem;
   }
 </style>
 {% endblock %}
@@ -107,18 +153,25 @@
     </div>
   </header>
   
+  <!-- Search Bar -->
+  <div class="search-bar mb-4">
+    <input type="text" id="destinationSearch" class="form-control" placeholder="Search destinations..." aria-label="Search destinations">
+  </div>
+  
   <!-- Filter Bar -->
   <div class="filter-bar">
     <button class="active" data-filter="all">All Destinations</button>
-    <button data-filter="asia">Asia</button>
-    <button data-filter="americas">Americas & Caribbean</button>
-    <button data-filter="europe">Europe & Africa</button>
+    {% for collection in collections %}
+      {% if collection.is_region %}
+        <button data-filter="collection-{{ collection.id }}">{{ collection.title }}</button>
+      {% endif %}
+    {% endfor %}
   </div>
   
   <!-- Destinations Grid -->
   <div class="destinations-grid">
     {% for destination in destinations %}
-    <div class="slider-card" data-region="{{ destination.region }}">
+    <div class="slider-card" data-region="{{ destination.region }}" data-collections="{{ destination.collection_ids|join:',' }}">
       <article class="card card--centered">
         <div class="media media--responsive">
           {% if destination.representative_image %}
@@ -141,10 +194,10 @@
 </section>
 
 <!-- Banner Section -->
-<section class="container container--spacer gutter bg-white">
+<section class="container container--spacer gutter bg-white banner-section">
   <div class="row">
     <div class="col-md-6">
-      <img src="{% static 'images/destinations-feature.jpg' %}" alt="Hootel Experience" class="img-fluid">
+      <img src="{% static 'core/images/destination-feature.jpg' %}" alt="Hootel Experience" class="img-fluid">
     </div>
     <div class="col-md-6 d-flex align-items-center">
       <div class="px-4 py-5">
@@ -162,10 +215,39 @@
 <script>
   // Destinations page specific JavaScript
   document.addEventListener('DOMContentLoaded', function() {
-    // Filter functionality
+    // Search functionality
+    const searchInput = document.getElementById('destinationSearch');
     const filterButtons = document.querySelectorAll('.filter-bar button');
     const destinations = document.querySelectorAll('.destinations-grid .slider-card');
     
+    function filterDestinations() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const activeFilter = document.querySelector('.filter-bar button.active').getAttribute('data-filter');
+      
+      destinations.forEach(dest => {
+        const title = dest.querySelector('h3').textContent.toLowerCase();
+        const description = dest.querySelector('p').textContent.toLowerCase();
+        const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+        
+        let matchesFilter = true;
+        if (activeFilter !== 'all') {
+          if (activeFilter.startsWith('collection-')) {
+            const collectionId = activeFilter.split('-')[1];
+            const collections = dest.getAttribute('data-collections').split(',');
+            matchesFilter = collections.includes(collectionId);
+          } else {
+            matchesFilter = dest.getAttribute('data-region') === activeFilter;
+          }
+        }
+        
+        dest.style.display = matchesSearch && matchesFilter ? 'block' : 'none';
+      });
+    }
+    
+    // Add search input event listener
+    searchInput.addEventListener('input', filterDestinations);
+    
+    // Filter functionality
     filterButtons.forEach(button => {
       button.addEventListener('click', function() {
         // Update active button
@@ -173,19 +255,7 @@
         this.classList.add('active');
         
         // Filter destinations
-        const filter = this.getAttribute('data-filter');
-        
-        if (filter === 'all') {
-          destinations.forEach(dest => dest.style.display = 'block');
-        } else {
-          destinations.forEach(dest => {
-            if (dest.getAttribute('data-region') === filter) {
-              dest.style.display = 'block';
-            } else {
-              dest.style.display = 'none';
-            }
-          });
-        }
+        filterDestinations();
       });
     });
   });

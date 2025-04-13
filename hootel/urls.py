@@ -24,6 +24,7 @@ urlpatterns = [
     path('destinations/<str:item_title>/', item_detail, name='item_detail'),
 
     path('accounts/', include('allauth.urls')),
+    path('accounts/', include('accounts.urls')),
     path('catalog/', include('catalog.urls')),
     path('collection/', include('collection.urls')),
 ]
