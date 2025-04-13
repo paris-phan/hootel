@@ -1,0 +1,81 @@
+{% extends base_template %}
+
+{% block title %}Update Room - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2>Update Room</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="room_number" class="form-label">Room Number</label>
+                            <input type="number" class="form-control" id="room_number" min = 1 name="room number" value="{{ hotel.room }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="floor_number" class="form-label">Floor Number</label>
+                            <input type="number" class="form-control" id="floor_number" min = "1" name="floor number" value="{{ hotel.floor }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="square_footage" class="form-label">Square Footage</label>
+                            <input type="number" class="form-control" id="square_footage" min = "1" name="square footage" value="{{ hotel.square_footage }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="max_num_of_occupants" class="form-label">Maximum Number of Occupants</label>
+                            <input type="number" class="form-control" id="max_num_of_occupants" min = "1" name="maximum number of occupants" value="{{ hotel.max_num_of_occupants }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="number_of_beds" class="form-label">Number of Beds</label>
+                            <input type="number" class="form-control" id="number_of_beds" min = "1" name="number of beds" value="{{ hotel.num_of_beds }}"required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="number_of_bathrooms" class="form-label">Number of Bathrooms</label>
+                            <input type="number" class="form-control" id="number_of_bathrooms" min = "1" name="number of bathrooms" value="{{ hotel.num_of_bathrooms }}" required>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price Per Night ($)</label>
+                            <input type="number" class="form-control" id="price" name="price" value="{{ hotel.price }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4">{{ hotel.description }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Current Image</label>
+                            <div class="mb-2">
+                                <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="hotel_image" class="form-label">Update Image</label>
+                            <input type="file" class="form-control" id="hotel_image" name="hotel_image" accept="image/*">
+                            <small class="text-muted">Leave empty to keep the current image</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Update Hotel</button>
+                            <a href="{% url 'view_hotel' hotel.id %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

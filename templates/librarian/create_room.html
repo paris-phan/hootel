@@ -1,0 +1,102 @@
+{% extends "base/librarian_base.html" %}
+
+{% block title %}Create Room - HotelManager6000{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Create New Room</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Room Name</label>
+                            <input type="text" class="form-control" id="name" name="name_field" required>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="room_number" class="form-label">Room Number</label>
+                                <input type="text" class="form-control" id="room_number" name="room_number" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="floor" class="form-label">Floor</label>
+                                <input type="number" class="form-control" id="floor" name="floor" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="room_type" class="form-label">Room Type</label>
+                                <select class="form-select" id="room_type" name="room_type" required>
+                                    <option value="">Select a type...</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Double">Double</option>
+                                    <option value="Suite">Suite</option>
+                                    <option value="Family">Family</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="capacity" class="form-label">Capacity</label>
+                                <input type="number" class="form-control" id="capacity" name="capacity" min="1" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price per Night ($)</label>
+                            <input type="number" class="form-control" id="price" name="price_field" step="0.01" min="0" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                        </div>
+
+                        <!-- Amenities -->
+                        <div class="mb-3">
+                            <h5>Amenities</h5>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="has_wifi" name="has_wifi" checked>
+                                <label class="form-check-label" for="has_wifi">WiFi</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="has_tv" name="has_tv" checked>
+                                <label class="form-check-label" for="has_tv">TV</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="has_bathroom" name="has_bathroom" checked>
+                                <label class="form-check-label" for="has_bathroom">Private Bathroom</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="has_balcony" name="has_balcony">
+                                <label class="form-check-label" for="has_balcony">Balcony</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_accessible" name="is_accessible">
+                                <label class="form-check-label" for="is_accessible">Accessible Room</label>
+                            </div>
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div class="mb-3">
+                            <label for="room_image" class="form-label">Room Image</label>
+                            <input type="file" class="form-control" id="room_image" name="room_image" accept="image/*">
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Create Room</button>
+                            <a href="{% url 'manage_rooms' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

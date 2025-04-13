@@ -123,6 +123,7 @@
 {% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
 <div class="collection-page">
   <!-- Hero Section -->
   <div class="collection-hero animate__animated animate__fadeIn">
@@ -132,6 +133,25 @@
       <p>
         Created by <strong>{{ collection.creator.username }}</strong> on {{ collection.created_at|date:"F j, Y" }}
         <!-- Public/Private Badge -->
+=======
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="mb-0">{{ collection.name }}</h2>
+        {% if user == collection.creator %}
+        <div class="btn-group">
+            <a href="{% url 'patron:edit_collection' collection.id %}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-pencil"></i> Edit Collection
+            </a>
+            <a href="{% url 'patron:delete_collection' collection.id %}" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i> Delete Collection
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <p class="text-muted mb-0">
+        <span class="badge bg-secondary">{{ collection_bookings|length }} room{% if collection_bookings|length != 1 %}s{% endif %}</span>
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664
         <span class="badge {% if collection.is_private %}bg-danger{% else %}bg-success{% endif %}">
           {{ collection.is_private|yesno:"Private,Public" }}
         </span>
@@ -198,8 +218,9 @@
     </div>
     {% endif %}
 
-    <!-- Hotels in this Collection Section -->
+    <!-- Rooms in this Collection Section -->
     <div class="card mb-4">
+<<<<<<< HEAD
       <div class="card-header bg-primary">
         <h4>Hotels in this Collection</h4>
       </div>
@@ -258,6 +279,70 @@
                     <button type="submit" class="btn btn-sm btn-danger">Remove</button>
                   </form>
                   {% endif %}
+=======
+        <div class="card-header bg-primary text-white">
+            <h4>Rooms in this Collection</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for collection_booking in collection_bookings %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-header {% if not collection_booking.booking.status %}bg-info{% elif collection_booking.booking.status == 'PENDING' %}bg-warning{% elif collection_booking.booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %} text-white">
+                            <a href="{% url 'patron:view_hotel' collection_booking.booking.hotel.id %}" class="text-white text-decoration-none">
+                                <h5 class="mb-0">{{ collection_booking.booking.hotel.room }}</h5>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text"><strong>Location:</strong> {{ collection_booking.booking.hotel.location }}</p>
+                            
+                            {% if collection_booking.booking.status %}
+                            <!-- Display booking details when it's an actual booking -->
+                            <p class="card-text"><strong>Check-in:</strong> {{ collection_booking.booking.check_in_date }}</p>
+                            <p class="card-text"><strong>Check-out:</strong> {{ collection_booking.booking.check_out_date }}</p>
+                            <p class="card-text">
+                                <strong>Status:</strong> 
+                                <span class="badge {% if collection_booking.booking.status == 'PENDING' %}bg-warning{% elif collection_booking.booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ collection_booking.booking.get_status_display }}
+                                </span>
+                            </p>
+                            {% else %}
+                            <!-- Just display saved room info -->
+                            <p class="card-text"><strong>Status:</strong> 
+                                <span class="badge bg-info">Saved</span>
+                            </p>
+                            {% endif %}
+                            
+                            {% if collection_booking.notes %}
+                            <div class="alert alert-info">
+                                <small>Your notes: {{ collection_booking.notes }}</small>
+                            </div>
+                            {% endif %}
+                            
+                            {% if user.is_authenticated %}
+                            <div class="d-flex mt-3 gap-2">
+                                {% if not collection_booking.booking.status %}
+                                <a href="{% url 'patron:book_hotel' collection_booking.booking.hotel.id %}" class="btn btn-sm btn-success">Book Now</a>
+                                {% endif %}
+                                {% if is_owner %}
+                                <form action="{% url 'patron:remove_booking_from_collection' collection.id collection_booking.booking.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p>No rooms in this collection yet.</p>
+                    {% if user.is_authenticated %}
+                    <p>You can add rooms to collections from the search page.</p>
+                    <a href="{% url 'patron:search' %}" class="btn btn-primary">Search Rooms</a>
+                    {% endif %}
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664
                 </div>
                 {% endif %}
               </div>

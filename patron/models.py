@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.utils import timezone
 
 # Create your models here.
 
@@ -8,24 +9,31 @@ def hotel_image_path(instance, filename):
     # File will be uploaded to hotel_data/hotel_<id>/<filename>
     extension = filename.split('.')[-1]
     new_filename = f"hotel_image.{extension}"
-    return f'hotel_data/{instance.name}/{new_filename}'
-
-def room_image_path(instance, filename):
-    # File will be uploaded to hotel_data/hotel_<id>/rooms/room_<id>/<filename>
-    extension = filename.split('.')[-1]
-    new_filename = f"room_image.{extension}"
-    return f'hotel_data/{instance.hotel.name}/rooms/{instance.number}/{new_filename}'
+    return f'hotel_data/{instance.room}/{new_filename}'
 
 class Hotel(models.Model):
-    name = models.CharField(max_length=100)
-    location = models.CharField(max_length=100)
+    # Old model attributes 
+    """
+    street_address = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    """
+    # Updated model attributes
+    room = models.IntegerField()
+    floor = models.IntegerField()
+    square_footage = models.IntegerField()
+    max_num_of_occupants = models.IntegerField()
+    num_of_beds = models.IntegerField()
+    num_of_bathrooms = models.IntegerField()
+    price = models.DecimalField(max_digits=6, decimal_places=2)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to=hotel_image_path, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_hotels')
 
     def __str__(self):
-        return self.name
+        return self.room
 
     @property
     def image_url(self):
@@ -36,31 +44,33 @@ class Hotel(models.Model):
             # Return path to default hotel image in S3 bucket
             return f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/hotel_data/default/default_hotel.png"
 
-class Room(models.Model):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
-    number = models.CharField(max_length=20)
-    type = models.CharField(max_length=50)
-    description = models.TextField(blank=True, null=True)
-    price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
-    capacity = models.PositiveIntegerField(default=1)
-    is_available = models.BooleanField(default=True)
-    image = models.ImageField(upload_to=room_image_path, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.hotel.name} - Room {self.number}"
-    
-    @property
-    def image_url(self):
-        """Return the room image URL or the default if none exists"""
-        if self.image and hasattr(self.image, 'url'):
-            return self.image.url
-        else:
-            # Return path to default room image in S3 bucket
-            return f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/hotel_data/default/default_room.png"
-    
-    class Meta:
-        unique_together = ('hotel', 'number')
+    def get_availability_info(self):
+        """Get availability information for the hotel"""
+        today = timezone.now().date()
+        
+        # Get all approved bookings that are current or future
+        approved_bookings = self.hotelbooking_set.filter(
+            status='APPROVED',
+            check_out_date__gte=today
+        ).order_by('check_in_date')
+        
+        # If there are no approved bookings, the room is available
+        if not approved_bookings.exists():
+            return True, None
+            
+        # Find the next available date by looking at gaps between bookings
+        current_date = today
+        for booking in approved_bookings:
+            # If there's a gap between current date and booking's check-in
+            if booking.check_in_date > current_date:
+                return True, current_date
+            # Update current date to after this booking's check-out
+            current_date = booking.check_out_date + timezone.timedelta(days=1)
+            
+        # If we've gone through all bookings and current_date is in the future
+        if current_date > today:
+            return True, current_date
+        return True, None
 
 class HotelBooking(models.Model):
     STATUS_CHOICES = (
@@ -77,7 +87,7 @@ class HotelBooking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.hotel.name}"
+        return f"{self.user.username} - {self.hotel.room}"
     
     def get_status_display(self):
         """Return the human-readable status name."""
@@ -85,37 +95,24 @@ class HotelBooking(models.Model):
             return "Saved"
         return dict(self.STATUS_CHOICES).get(self.status, self.status)
 
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    rating = models.IntegerField()  # Ensure that this field only accepts valid ratings (1-5)
+    comment = models.TextField(blank=True, null=True)  # Allow comments to be optional
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review by {self.user.username} for {self.hotel.room} - Rating: {self.rating}"
 class Collection(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_private = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return self.name
-    
-    def can_be_private(self):
-        """Only librarians can create private collections."""
-        try:
-            return self.creator.userprofile.user_type == 'LIBRARIAN'
-        except:
-            return False
-
-class CollectionRoom(models.Model):
-    """
-    Model to represent a room in a collection (essentially a favorite or saved room)
-    """
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='rooms')
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='in_collections')
-    added_at = models.DateTimeField(auto_now_add=True)
-    notes = models.TextField(blank=True, null=True)
-    
-    def __str__(self):
-        return f"{self.room} in {self.collection.name}"
-    
-    class Meta:
-        unique_together = ('collection', 'room')
 
 class CollectionBooking(models.Model):
     """
@@ -127,45 +124,10 @@ class CollectionBooking(models.Model):
     notes = models.TextField(blank=True, null=True)
     
     def __str__(self):
-        return f"{self.booking.hotel.name} booking in {self.collection.name}"
+        return f"{self.booking.hotel.room} booking in {self.collection.name}"
     
     class Meta:
         unique_together = ('collection', 'booking')
-
-# Keeping Item model for backward compatibility but marking it as deprecated
-class Item(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    collection = models.ForeignKey(Collection, on_delete=models.SET_NULL, null=True, blank=True, related_name='items')
-    creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    # Add a room field to link to the new Room model
-    room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True, blank=True, related_name='legacy_items')
-    
-    def __str__(self):
-        return self.title
-
-class Borrowing(models.Model):
-    STATUS_CHOICES = (
-        ('PENDING', 'Pending'),
-        ('APPROVED', 'Approved'),
-        ('REJECTED', 'Rejected'),
-        ('RETURNED', 'Returned'),
-    )
-    
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='borrowings')
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='borrowings')
-    request_date = models.DateTimeField(auto_now_add=True)
-    due_date = models.DateField(null=True, blank=True)
-    return_date = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.item.title}"
-    
-    def get_status_display(self):
-        """Return the human-readable status name."""
-        return dict(self.STATUS_CHOICES).get(self.status, self.status)
 
 class CollectionAccessRequest(models.Model):
     STATUS_CHOICES = (
@@ -174,14 +136,25 @@ class CollectionAccessRequest(models.Model):
         ('REJECTED', 'Rejected'),
     )
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='collection_requests')
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='access_requests')
-    request_date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    request_date = models.DateTimeField(auto_now_add=True)
+    response_date = models.DateTimeField(null=True, blank=True)
     
     def __str__(self):
-        return f"{self.user.username} - {self.collection.name}"
+        return f"{self.user.username} requests access to {self.collection.name}"
     
-    def get_status_display(self):
-        """Return the human-readable status name."""
-        return dict(self.STATUS_CHOICES).get(self.status, self.status)
+    class Meta:
+        unique_together = ('collection', 'user')
+
+# Keeping Item model for backward compatibility but marking it as deprecated
+class Item(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    collection = models.ForeignKey(Collection, on_delete=models.SET_NULL, null=True, blank=True, related_name='items')
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.title

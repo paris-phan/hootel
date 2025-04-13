@@ -5,6 +5,7 @@
 {% block title %}Patron Home - HotelManager6000{% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
 <style>
   body {
     background: url("{% static 'images/hotel1.jpg' %}") no-repeat center center fixed;
@@ -100,6 +101,60 @@
           🔓 Logout
         </a>
       </div>
+=======
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Welcome Patron {{ name }}!</h2>
+                <div class="user-info mb-4">
+                    <!-- Hidden file input -->
+                    <form id="profilePictureForm" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*" style="display:none;">
+                    </form>
+                    
+                    <!-- Profile picture circle (clickable) -->
+                    <div class="text-center mb-3">
+                        <div id="profilePictureContainer" style="width: 150px; height: 150px; overflow: hidden; border-radius: 50%; margin: 0 auto; cursor: pointer; position: relative;">
+                            <img id="profileImage" src="{{ profile_picture_url }}" 
+                                 alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div style="position: absolute; bottom: 0; width: 100%; background-color: rgba(0,0,0,0.5); color: white; padding: 10px 0; font-size: 10px;">
+                                Click to change
+                            </div>
+                        </div>
+                    </div>
+                    <p><strong>Name:</strong> {{ name }}</p>
+                    <p><strong>Email:</strong> {{ email }}</p>
+                    <p><strong>Account Type:</strong> {{ user_type }}</p>
+                </div>
+
+                <!-- Quick Actions -->
+                <h4 class="mb-3">Quick Actions</h4>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'patron:search' %}" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search Hotels
+                    </a>
+                    <a href="{% url 'patron:my_bookings' %}" class="btn btn-info">
+                        <i class="bi bi-calendar-check"></i> My Bookings
+                    </a>
+                    <a href="{% url 'patron:view_collections' %}" class="btn btn-success">
+                        <i class="bi bi-collection"></i> Collections
+                    </a>
+                    <a href="{% url 'patron:my_reviews' %}" class="btn btn-warning">
+                        <i class="bi bi-star"></i> My Reviews
+                    </a>
+                </div>
+
+                <!-- Logout Button -->
+                <div class="d-grid gap-2 mt-4">
+                    <a href="{% url 'logout' %}" class="btn btn-danger">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664
     </div>
   </div>
 </div>
@@ -117,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     profilePictureInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
+<<<<<<< HEAD
             profileImage.style.opacity = '0.5';
             const formData = new FormData(profilePictureForm);
 
@@ -139,8 +195,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('An error occurred while uploading the image.');
                 profileImage.style.opacity = '1';
             });
+=======
+            profilePictureForm.submit();
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664
         }
     });
 });
 </script>
+<<<<<<< HEAD
 {% endblock %}
+=======
+
+<!-- Add Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+{% endblock %}
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664

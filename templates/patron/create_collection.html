@@ -4,6 +4,7 @@
 {% block title %}Create Collection - HotelManager6000{% endblock %}
 
 {% block extra_css %}
+<<<<<<< HEAD
 <!-- Optional: Animate.css for fade/slide/zoom animations -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
@@ -91,16 +92,95 @@
   .form-text.text-muted {
     font-size: 0.8rem;
   }
+=======
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<style>
+    .form-switch .form-check-input {
+        width: 3em;
+        height: 1.5em;
+        margin-right: 10px;
+    }
+    .form-switch .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .private-collection-toggle {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        border: 1px solid #dee2e6;
+        margin-bottom: 20px;
+    }
+    .private-collection-toggle:hover {
+        background-color: #e9ecef;
+    }
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664
 </style>
 {% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
 <div class="create-collection-page container-fluid">
   <!-- No Bootstrap row/col, so card can occupy the full width up to max-width -->
   <div class="create-collection-card animate__animated animate__fadeInUp">
     <!-- Card Header -->
     <div class="create-collection-header">
       <h2>Create a New Booking Collection</h2>
+=======
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2>Create a New Booking Collection</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Collections help you organize your hotel bookings. Create a collection like "Business Trips", "Family Vacations", or "Weekend Getaways".</p>
+                    
+                    {% if user.is_staff %}
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-shield-lock"></i>
+                        <strong>Librarian Feature:</strong> You can create private collections that are only accessible to approved patrons.
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Collection Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="e.g. Summer Trips, Business Stays, etc.">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Describe this collection of bookings..."></textarea>
+                        </div>
+
+                        {% if user.is_staff %}
+                        <div class="private-collection-toggle">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="is_private" name="is_private">
+                                <label class="form-check-label" for="is_private">
+                                    <strong><i class="bi bi-lock-fill"></i> Make this an exclusive private collection</strong>
+                                </label>
+                                <div class="form-text text-muted mt-2">
+                                    <i class="bi bi-info-circle"></i> Private collections are only visible to librarians and patrons who have been granted access.
+                                    Patrons will need to request access to view and book hotels within this collection.
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Create Collection</button>
+                            <a href="{% url 'patron:view_collections' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664
     </div>
     <!-- Card Body with increased padding -->
     <div class="card-body">
@@ -160,3 +240,25 @@
   </div><!-- /.create-collection-card -->
 </div>
 {% endblock %}
+<<<<<<< HEAD
+=======
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const privateToggle = document.getElementById('is_private');
+    if (privateToggle) {
+        privateToggle.addEventListener('change', function() {
+            const toggleContainer = this.closest('.private-collection-toggle');
+            if (this.checked) {
+                toggleContainer.style.backgroundColor = '#e2e3e5';
+            } else {
+                toggleContainer.style.backgroundColor = '#f8f9fa';
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664

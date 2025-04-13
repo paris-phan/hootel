@@ -1,53 +1,50 @@
 from django.urls import path
 from . import views
-
 app_name = 'patron'
 
 urlpatterns = [
-    path('search/', views.search, name='search'),
-    path('librarian-search/', views.librarian_search, name='librarian_search'),
-    path('book/<int:hotel_id>/', views.book_hotel, name='book_hotel'),
+    # Hotel views
+    path('hotels/', views.view_hotels, name='view_hotels'),
+    path('hotels/<int:hotel_id>/', views.patron_view_hotel, name='patron_view_hotel'),
+    path('hotels/<int:hotel_id>/book/', views.book_hotel, name='book_hotel'),
+    path('hotels/<int:hotel_id>/add-to-collection/', views.add_hotel_to_collection, name='add_hotel_to_collection'),
+
+    # Rating views
+    path('hotel/<int:hotel_id>/add_review/', views.add_review, name='add_review'),
+    path('my-reviews/', views.my_reviews, name='my_reviews'),
+    path('edit-review/<int:review_id>/', views.edit_review, name='edit_review'),
+    path('delete-review/<int:review_id>/', views.delete_review, name='delete_review'),
+
+    # Booking management
     path('my-bookings/', views.my_bookings, name='my_bookings'),
-    path('cancel-booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
+    path('bookings/<int:booking_id>/cancel/', views.cancel_booking, name='cancel_booking'),
+    path('bookings/<int:booking_id>/add-to-collection/', views.add_booking_to_collection, name='add_booking_to_collection'),
     
-    # Librarian booking management
-    path('manage-bookings/', views.manage_booking_requests, name='manage_booking_requests'),
-    path('update-booking/<int:booking_id>/<str:status>/', views.update_booking_status, name='update_booking_status'),
-    
-    # Room and hotel management (for librarians only)
-    path('manage-hotels/', views.manage_hotels, name='manage_hotels'),  
-    path('hotels/<int:hotel_id>/view/', views.view_hotel, name='view_hotel'),
-    # Patron-specific hotel view
-    path('hotels/<int:hotel_id>/patron-view/', views.patron_view_hotel, name='patron_view_hotel'),
-    path('hotels/<int:hotel_id>/rooms/', views.list_hotel_rooms, name='list_hotel_rooms'),
-    path('rooms/add/', views.add_room, name='add_room'),
-    path('rooms/<int:room_id>/', views.view_room, name='view_room'),
-    
-    # Collection related URLs
+    # Collection management
     path('collections/', views.view_collections, name='view_collections'),
-    path('collections/<int:collection_id>/', views.view_collection_items, name='view_collection_items'),
     path('collections/create/', views.create_collection, name='create_collection'),
+    path('collections/<int:collection_id>/', views.view_collection_items, name='view_collection_items'),
     path('collections/<int:collection_id>/edit/', views.edit_collection, name='edit_collection'),
     path('collections/<int:collection_id>/delete/', views.delete_collection, name='delete_collection'),
-    path('collections/request-access/<int:collection_id>/', views.request_collection_access, name='request_collection_access'),
-    # Collection access management
-    path('collections/access-requests/', views.manage_collection_requests, name='manage_collection_requests'),
-    path('collections/process-access-request/<int:request_id>/<str:action>/', views.process_access_request, name='process_access_request'),
-    path('collections/<int:collection_id>/revoke-access/<int:user_id>/', views.revoke_collection_access, name='revoke_collection_access'),
-    path('rooms/<int:room_id>/add-to-collection/', views.add_room_to_collection, name='add_room_to_collection'),
-    path('collections/<int:collection_id>/remove-room/<int:room_id>/', views.remove_room_from_collection, name='remove_room_from_collection'),
-    path('bookings/<int:booking_id>/add-to-collection/', views.add_booking_to_collection, name='add_booking_to_collection'),
+    path('collections/<int:collection_id>/request-access/', views.request_collection_access, name='request_collection_access'),
     path('collections/<int:collection_id>/remove-booking/<int:booking_id>/', views.remove_booking_from_collection, name='remove_booking_from_collection'),
     
-    # Backwards compatibility redirect
-    path('my-borrowed-items/', views.my_borrowed_items, name='my_borrowed_items'),
+    # Collection access management
+    path('collection-requests/', views.manage_collection_requests, name='manage_collection_requests'),
+    path('collection-requests/<int:request_id>/<str:action>/', views.process_access_request, name='process_access_request'),
+    path('collections/<int:collection_id>/revoke-access/<int:user_id>/', views.revoke_collection_access, name='revoke_collection_access'),
     
-    # For librarians only - redirects to proper librarian views
-    path('create-hotel/', views.create_hotel, name='create_hotel'),
-    path('update-hotel-image/<int:hotel_id>/', views.update_hotel_image, name='update_hotel_image'),
+    # Search and browse
+    path('search/', views.search, name='search'),
+    
+    # Hotel management (for librarians only)
+    path('manage-hotels/', views.manage_hotels, name='manage_hotels'),
     path('hotels/<int:hotel_id>/update/', views.update_hotel, name='update_hotel'),
     path('hotels/<int:hotel_id>/delete/', views.delete_hotel, name='delete_hotel'),
+    path('hotels/<int:hotel_id>/update-image/', views.update_hotel_image, name='update_hotel_image'),
+    path('hotels/<int:hotel_id>/view/', views.view_hotel, name='view_hotel'),
     
-    # Add hotel directly to collection (for bookmark feature)
-    path('hotels/<int:hotel_id>/add-to-collection/', views.add_hotel_to_collection, name='add_hotel_to_collection'),
+    # Booking management (for librarians only)
+    path('manage-bookings/', views.manage_booking_requests, name='manage_booking_requests'),
+    path('bookings/<int:booking_id>/<str:status>/', views.update_booking_status, name='update_booking_status'),
 ] 
