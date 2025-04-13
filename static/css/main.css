@@ -128,7 +128,7 @@ h2 {
 Buttons
 ===================================
 */
-a.button {
+a.button, button.button {
   display: inline-block;
   padding: 0.8em 4em;
   color: #000;
@@ -138,15 +138,16 @@ a.button {
   background: transparent;
   box-sizing: border-box;
   font-family: 'Whitney SSm A', 'Whitney SSm B', 'Lyon Display Web', 'Times New Roman', serif;
+  cursor: pointer;
 }
 
-a.button--dark {
+a.button--dark, button.button--dark {
   border-color: #313131;
   background-color: #313131;
   color: #f3eee7;
 }
 
-a.button--slim {
+a.button--slim, button.button--slim {
   font-size: 0.88rem;
   padding: 0.6em 2.7em;
 }

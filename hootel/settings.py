@@ -200,7 +200,7 @@ MEDIA_ROOT = ''
 
 # Static files configuration
 STATIC_URL = '/static/' if DEBUG else 'https://%s.s3.amazonaws.com/static/' % os.getenv('AWS_STORAGE_BUCKET_NAME')
-STATIC_ROOT = ''
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Add this line to tell Django where to find static files during development
 STATICFILES_DIRS = [
