@@ -172,14 +172,15 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage" if DEBUG else "storages.backends.s3.S3Storage",
         "OPTIONS": {
-            "location": "static",
-            "base_url": "/static/",
-            **({"bucket_name": os.getenv('AWS_STORAGE_BUCKET_NAME'),
+            **({"location": "static", "base_url": "/static/"} if DEBUG else {
+                "bucket_name": os.getenv('AWS_STORAGE_BUCKET_NAME'),
                 "access_key": os.getenv('AWS_ACCESS_KEY_ID'),
                 "secret_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
                 "region_name": os.getenv('AWS_S3_REGION_NAME'),
                 "default_acl": "public-read",
-                "file_overwrite": True} if not DEBUG else {})
+                "file_overwrite": True,
+                "location": "static"
+            })
         },
     },
 }

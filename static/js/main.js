@@ -1,5 +1,5 @@
 /**
- * Main JavaScript file for Aman website
+ * Main JavaScript file for Hootel website
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize video background autoplay
     initVideoAutoplay();
+
+    // Initialize destinations menu toggle
+    initDestinationsMenuToggle();
 });
 
 /**
@@ -107,7 +110,7 @@ window.addEventListener('scroll', function() {
 /**
  * Utility functions
  */
-const AmanUtils = {
+const HootelUtils = {
     /**
      * Get viewport width
      * @returns {Number} viewport width
@@ -133,4 +136,81 @@ const AmanUtils = {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return date.toLocaleDateString('en-US', options);
     }
-}; 
+};
+
+/**
+ * Initialize destinations menu toggle functionality
+ */
+function initDestinationsMenuToggle() {
+    // Main Destinations toggle
+    const destinationsToggle = document.querySelector('.toggle-link[data-toggle="destinations"]');
+    const destinationsSubmenu = document.getElementById('destinations-submenu');
+    
+    if (destinationsToggle && destinationsSubmenu) {
+        // Initially hide the destinations submenu
+        destinationsToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Toggle active class
+            destinationsToggle.classList.toggle('active');
+            
+            // Display or hide the destinations column
+            if (destinationsToggle.classList.contains('active')) {
+                destinationsSubmenu.style.display = 'block';
+                
+                // Hide any continent submenu that might be open
+                document.getElementById('americas-submenu').style.display = 'none';
+                document.getElementById('asia-submenu').style.display = 'none';
+                document.getElementById('europe-submenu').style.display = 'none';
+                
+                // Remove active class from continent toggles
+                document.querySelectorAll('.toggle-link[data-toggle="americas"], .toggle-link[data-toggle="asia"], .toggle-link[data-toggle="europe"]').forEach(toggle => {
+                    toggle.classList.remove('active');
+                });
+            } else {
+                destinationsSubmenu.style.display = 'none';
+            }
+        });
+    }
+    
+    // Initialize continent toggles
+    initContinentToggle('americas');
+    initContinentToggle('asia');
+    initContinentToggle('europe');
+}
+
+/**
+ * Initialize toggle functionality for continent submenus
+ * @param {string} continent - Continent identifier (americas, asia, europe)
+ */
+function initContinentToggle(continent) {
+    const continentToggle = document.querySelector(`.toggle-link[data-toggle="${continent}"]`);
+    const continentSubmenu = document.getElementById(`${continent}-submenu`);
+    
+    if (continentToggle && continentSubmenu) {
+        continentToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Toggle active class
+            const wasActive = continentToggle.classList.contains('active');
+            
+            // Remove active from all continent toggles
+            document.querySelectorAll('.toggle-link[data-toggle="americas"], .toggle-link[data-toggle="asia"], .toggle-link[data-toggle="europe"]').forEach(toggle => {
+                toggle.classList.remove('active');
+            });
+            
+            // Hide all continent submenus
+            document.getElementById('americas-submenu').style.display = 'none';
+            document.getElementById('asia-submenu').style.display = 'none';
+            document.getElementById('europe-submenu').style.display = 'none';
+            
+            if (!wasActive) {
+                // Add active class back to this toggle
+                continentToggle.classList.add('active');
+                
+                // Show this continent's submenu
+                continentSubmenu.style.display = 'block';
+            }
+        });
+    }
+} 

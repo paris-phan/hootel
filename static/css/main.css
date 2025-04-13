@@ -1,5 +1,5 @@
 /* 
-Main CSS file for Aman website
+Main CSS file for Hootel website
 */
 
 /* 
@@ -162,6 +162,10 @@ Header
   background-color: var(--primary-bg-color) !important;
 }
 
+.header__top {
+  padding: 1rem 0;
+}
+
 .header__top .container .grid {
   min-height: var(--header-menu-height-lg);
 }
@@ -174,6 +178,11 @@ Header
   display: flex;
   align-items: center;
   margin-bottom: 0;
+}
+
+.main-header .grid .hamburger {
+  display: flex;
+  align-items: center;
 }
 
 .main-header .grid .hamburger button {
@@ -198,10 +207,21 @@ Header
 .main-header .grid .logo {
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
 }
 
 .main-header .grid .logo a {
   display: inline-flex;
+}
+
+.main-header .grid .logo svg {
+  width: 220px;
+  height: 60px;
+}
+
+.global-navigation__logo svg {
+  width: 220px;
+  height: 60px;
 }
 
 .main-header__right {
@@ -216,7 +236,7 @@ Main Content
 main {
   position: relative;
   z-index: 1;
-  margin-top: 108px;
+  margin-top: 120px;
   background-color: var(--primary-bg-color) !important;
 }
 
@@ -368,6 +388,10 @@ Media Queries
   .hgroup h2 {
     margin-bottom: 0.6428571429rem;
   }
+  
+  main {
+    margin-top: 100px;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -385,16 +409,154 @@ Media Queries
   }
   
   .main-header .logo a {
-    width: 5.3571428571rem;
+    width: auto;
   }
   
-  .main-header .logo a img {
-    max-width: 100%;
-    height: auto;
+  .main-header .grid .logo svg, 
+  .global-navigation__logo svg {
+    width: 180px;
+    height: 50px;
   }
   
   .hero-image--container {
     margin-right: -1.75rem;
     margin-left: -1.75rem;
   }
+}
+
+/* Keep these rules */
+.global-navigation__list--children {
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+}
+
+/* Toggle links styles */
+.toggle-link {
+    position: relative;
+    cursor: pointer;
+}
+
+.toggle-link::after {
+    content: ' >';
+    display: inline-block;
+    position: static;
+    margin-left: 4px;
+    transform: none;
+    transition: transform 0.3s ease;
+}
+
+.toggle-link.active::after {
+    transform: rotate(90deg);
+    display: inline-block;
+}
+
+/* Nested menu styles */
+.global-navigation__list--children .global-navigation__list--children {
+    margin-left: 15px;
+}
+
+/* "See All" link styling */
+.global-navigation__list--children .global-navigation__list-item:first-child .global-navigation__link {
+    font-weight: 500;
+}
+
+/* 
+===================================
+Navigation Menu
+===================================
+*/
+.global-navigation {
+  position: relative;
+}
+
+.global-navigation__columns {
+  display: flex;
+  flex-direction: row;
+  min-height: 400px;
+  background-color: var(--primary-bg-color);
+}
+
+.global-navigation__column {
+  flex: 0 0 250px;
+  padding: 20px 40px 20px 0;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.global-navigation__column:first-child {
+  flex: 0 0 200px;
+}
+
+.global-navigation__column:not(:first-child) {
+  display: none;
+}
+
+.global-navigation__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.global-navigation__list-item {
+  margin-bottom: 15px;
+}
+
+.global-navigation__link {
+  text-decoration: none;
+  color: var(--text-color);
+  display: block;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.global-navigation__link-head {
+  display: block;
+  font-weight: 500;
+}
+
+.global-navigation__link-sub {
+  display: block;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.global-featured {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.global-featured__title {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.global-featured__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hamburger {
+  display: flex;
+  align-items: center;
+}
+
+.icon--burger {
+  width: 32px;
+  height: 32px;
+}
+
+.hamburger__label {
+  font-size: 1.2rem;
+  margin-left: 0.5rem;
+}
+
+.icon--search-thin {
+  width: 28px;
+  height: 28px;
+}
+
+.booking-bar-cta {
+  padding-left: 2rem;
 } 

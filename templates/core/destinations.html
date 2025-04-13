@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Destinations | Aman Resorts, Hotels &amp; Residences{% endblock %}
+{% block title %}Destinations | Hootel Resorts, Hotels &amp; Residences{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -74,7 +74,7 @@
 {% block content %}
 <!-- Hero Banner -->
 <section class="destination-hero">
-  <img src="{% static 'images/destinations-hero.jpg' %}" alt="Aman Destinations" class="img-fluid">
+  <img src="{% static 'images/destinations-hero.jpg' %}" alt="Hootel Destinations" class="img-fluid">
   <div class="destination-hero-content">
     <div class="container">
       <h1>Destinations</h1>
@@ -86,10 +86,10 @@
 <!-- Intro Section -->
 <section class="container container--spacer gutter">
   <header class="hgroup hgroup--limited text--centered">
-    <p class="subtitle">Aman Destinations</p>
+    <p class="subtitle">Hootel Destinations</p>
     <h2 class="heading-h">Extraordinary Places</h2>
     <div class="hgroup__intro">
-      <p>From the pristine paradise islands of Indonesia and the Philippines to the cultural and historic gems of Montenegro, Japan and Saudi Arabia, Aman's constellation of destinations is diverse and unique.</p>
+      <p>From the pristine paradise islands of Indonesia and the Philippines to the cultural and historic gems of Montenegro, Japan and Saudi Arabia, Hootel's constellation of destinations is diverse and unique.</p>
     </div>
   </header>
   
@@ -116,7 +116,7 @@
           <p>{{ destination.description }}</p>
         </figcaption>
         <div class="card__post-link-content">
-          <a href="#" class="cta__link card__link__cta underline">Discover more</a>
+          <a href="{% url 'item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline">Discover more</a>
         </div>
       </article>
     </div>
@@ -128,13 +128,13 @@
 <section class="container container--spacer gutter bg-white">
   <div class="row">
     <div class="col-md-6">
-      <img src="{% static 'images/destinations-feature.jpg' %}" alt="Aman Experience" class="img-fluid">
+      <img src="{% static 'images/destinations-feature.jpg' %}" alt="Hootel Experience" class="img-fluid">
     </div>
     <div class="col-md-6 d-flex align-items-center">
       <div class="px-4 py-5">
-        <p class="subtitle">Experience Aman</p>
+        <p class="subtitle">Experience Hootel</p>
         <h2 class="heading-h">Journey of a Lifetime</h2>
-        <p>Aman's constellation of destinations spans 20 countries, with each resort and setting offering a gateway to the most remarkable locations and experiences.</p>
+        <p>Hootel's constellation of destinations spans 20 countries, with each resort and setting offering a gateway to the most remarkable locations and experiences.</p>
         <a href="#" class="button button--dark mt-4">Explore Experiences</a>
       </div>
     </div>
