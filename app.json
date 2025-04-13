@@ -1,0 +1,55 @@
+{
+    "name": "hoo-tel",
+    "description": "Hotel management application",
+    "repository": "https://github.com/uva-cs3240-s25/project-b-10",
+    "env": {
+      "DJANGO_SETTINGS_MODULE": {
+        "value": "hootel.settings"
+      },
+      "SECRET_KEY": {
+        "generator": "secret"
+      },
+      "DEBUG": {
+        "value": "False"
+      },
+      "ALLOWED_HOSTS": {
+        "value": [".herokuapp.com", "hoo-tels.com"]
+      },
+      "AWS_ACCESS_KEY_ID": {
+        "required": true
+      },
+      "AWS_SECRET_ACCESS_KEY": {
+        "required": true
+      },
+      "AWS_STORAGE_BUCKET_NAME": {
+        "required": true
+      },
+      "AWS_S3_REGION_NAME": {
+        "required": true
+      }
+    },
+    "environments": {
+      "review": {
+        "addons": [
+          "heroku-postgresql:essential-0"
+        ],
+        "scripts": {
+          "predeploy": "heroku pg:copy $HEROKU_PARENT_APP_NAME::DATABASE DATABASE_URL --app $HEROKU_APP_NAME --confirm $HEROKU_APP_NAME"
+        }
+      }
+    },
+    "buildpacks": [
+      {
+        "url": "heroku/python"
+      }
+    ],
+    "formation": {
+      "web": {
+        "quantity": 1,
+        "size": "basic"
+      }
+    },
+    "scripts": {
+      "postdeploy": "python manage.py collectstatic --noinput"
+    }
+  }
