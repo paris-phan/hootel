@@ -79,7 +79,7 @@ def destinations(request):
         destinations.append({
             'name': item.title,
             'description': item.description or '',
-            'image': image_path,
+            'representative_image': image_path,
             'region': region
         })
     
