@@ -2,7 +2,139 @@
 
 {% block title %}Create Room - HotelManager6000{% endblock %}
 
+{% block extra_css %}
+<!-- Animate.css for smooth entrance animations (optional) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+  body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  /* Hero Banner */
+  .create-hotel-hero {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    padding: 2rem 1rem;
+    border-radius: 0 0 25px 25px;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .create-hotel-hero h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* Card & Form Styles */
+  .card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+  }
+  .card-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 1rem 1.5rem;
+  }
+  .card-header h3 {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .form-label {
+    font-weight: 600;
+  }
+
+  /* Pill-Shaped Buttons */
+  .btn {
+    border-radius: 30px; /* Pill-shaped */
+    transition: all 0.3s ease;
+    box-shadow: none;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #00408f);
+  }
+  .btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #545b62);
+    border: none;
+    color: #fff;
+  }
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #545b62, #3e4549);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
+<<<<<<< HEAD
+<!-- Hero Section -->
+<div class="create-hotel-hero animate__animated animate__fadeInDown">
+  <h2>Create a Hotel</h2>
+</div>
+
+<div class="container animate__animated animate__fadeInUp">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="mb-0">New Hotel Details</h3>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="name" class="form-label">Hotel Name</label>
+              <input type="text" class="form-control" id="name" name="name_field" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="location" class="form-label">Location</label>
+              <input type="text" class="form-control" id="location" name="location_field" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="hotel_image" class="form-label">Hotel Image</label>
+              <input type="file" class="form-control" id="hotel_image" name="hotel_image" accept="image/*">
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <button type="submit" class="btn btn-primary">Create Hotel</button>
+              <a href="{% url 'patron:manage_hotels' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div><!-- /.card-body -->
+      </div><!-- /.card -->
+    </div><!-- /.col-md-8 -->
+  </div><!-- /.row -->
+</div><!-- /.container -->
+{% endblock %}
+=======
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -124,3 +256,4 @@
     </div>
 </div>
 {% endblock %}
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664

@@ -2,6 +2,210 @@
 
 {% block title %}Search Rooms - HotelManager6000{% endblock %}
 
+<<<<<<< HEAD
+{% block content %}
+<div class="container my-5">
+  <!-- Page Heading -->
+  <div class="text-center mb-4">
+    <h1 class="display-5">Search Hotels</h1>
+    <p class="text-muted">Find your perfect stay</p>
+  </div>
+
+  <div class="row">
+    <!-- FILTER SIDEBAR -->
+    <div class="col-md-3 mb-4">
+      <h5 class="mb-3">Filters</h5>
+      <form method="GET" action="{% url 'search' %}">
+        <!-- Hotel Name/Location Search -->
+        <div class="mb-3">
+          <label for="query" class="form-label">Hotel Name or Location</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="query" 
+            name="query"
+            value="{{ request.GET.query|default:'' }}" 
+            placeholder="e.g. 'New York' or 'Beach Resort'"
+          >
+        </div>
+
+        <!-- Price Range Filter -->
+        <div class="mb-3">
+          <label for="price-min" class="form-label">Min Price ($)</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="price-min" 
+            name="price_min"
+            value="{{ request.GET.price_min|default:'' }}" 
+          >
+        </div>
+        <div class="mb-3">
+          <label for="price-max" class="form-label">Max Price ($)</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="price-max" 
+            name="price_max"
+            value="{{ request.GET.price_max|default:'' }}" 
+          >
+        </div>
+
+        <!-- Star Rating Filter -->
+        <div class="mb-3">
+          <label for="rating" class="form-label">Minimum Rating</label>
+          <select class="form-select" id="rating" name="rating">
+            <option value="">Any</option>
+            <option value="1" {% if request.GET.rating == '1' %}selected{% endif %}>1★+</option>
+            <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2★+</option>
+            <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3★+</option>
+            <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4★+</option>
+            <option value="5" {% if request.GET.rating == '5' %}selected{% endif %}>5★</option>
+          </select>
+        </div>
+
+        <!-- Apply Filters -->
+        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+      </form>
+    </div>
+
+    <!-- SEARCH RESULTS COLUMN -->
+    <div class="col-md-9">
+      <!-- Sorting Controls (optional) -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        {% if hotels %}
+          <span class="text-muted small">{{ hotels|length }} hotel(s) found</span>
+        {% endif %}
+        <form method="GET" action="{% url 'search' %}" class="d-flex">
+          <!-- Keep any existing query/filter in hidden inputs if you want to preserve them
+               or omit this for simplicity -->
+          <input type="hidden" name="query" value="{{ request.GET.query|default:'' }}">
+          <input type="hidden" name="price_min" value="{{ request.GET.price_min|default:'' }}">
+          <input type="hidden" name="price_max" value="{{ request.GET.price_max|default:'' }}">
+          <input type="hidden" name="rating" value="{{ request.GET.rating|default:'' }}">
+
+          <!-- Sort By Dropdown -->
+          <div class="input-group">
+            <label class="input-group-text" for="sort-by">Sort by</label>
+            <select class="form-select" id="sort-by" name="sort">
+              <option value="">None</option>
+              <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price (Low to High)</option>
+              <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price (High to Low)</option>
+              <option value="rating_desc" {% if request.GET.sort == 'rating_desc' %}selected{% endif %}>Rating (High to Low)</option>
+            </select>
+            <button class="btn btn-outline-secondary" type="submit">Sort</button>
+          </div>
+        </form>
+      </div>
+
+      {% if hotels %}
+        <!-- Grid of Hotel Cards -->
+        <div class="row">
+          {% for hotel in hotels %}
+          <div class="col-sm-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+              <div class="position-relative">
+                {% if is_librarian %}
+                <!-- Librarian: Clickable image & hidden form for uploading -->
+                <form 
+                  id="hotelImageForm-{{ hotel.id }}" 
+                  method="post" 
+                  enctype="multipart/form-data" 
+                  style="display: none;"
+                >
+                  {% csrf_token %}
+                  <input 
+                    type="file" 
+                    id="hotelImageInput-{{ hotel.id }}" 
+                    name="hotel_image" 
+                    accept="image/*"
+                  >
+                </form>
+                <div 
+                  class="hotel-image-container" 
+                  style="cursor: pointer;" 
+                  data-id="{{ hotel.id }}"
+                  onclick="document.getElementById('hotelImageInput-{{ hotel.id }}').click();"
+                >
+                  <img 
+                    src="{{ hotel.image_url }}" 
+                    alt="{{ hotel.name }}" 
+                    class="card-img-top" 
+                    style="object-fit: cover; height: 200px;"
+                  >
+                  <div 
+                    class="bg-dark bg-opacity-50 text-white small text-center p-1" 
+                    style="position: absolute; bottom: 0; width: 100%;"
+                  >
+                    Update image
+                  </div>
+                </div>
+                {% else %}
+                <!-- Patron: Non-clickable image -->
+                <img 
+                  src="{{ hotel.image_url }}" 
+                  alt="{{ hotel.name }}" 
+                  class="card-img-top" 
+                  style="object-fit: cover; height: 200px;"
+                >
+                {% endif %}
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ hotel.name }}</h5>
+                <p class="card-text text-muted mb-1">
+                  <i class="bi bi-geo-alt-fill"></i> {{ hotel.location }}
+                </p>
+                <!-- Example star rating display; adapt to your data model -->
+                {% if hotel.rating %}
+                  <p class="mb-1">
+                    <!-- Quick logic to print star icons, e.g. 4 out of 5 as ★★★★☆ -->
+                    {% for i in "12345"|slice:":hotel.rating"|default_if_none:"" %}★{% endfor %}
+                    {% for i in "12345"|slice:"hotel.rating:" %}☆{% endfor %}
+                    <small class="text-muted">({{ hotel.rating }}/5)</small>
+                  </p>
+                {% endif %}
+                {% if hotel.price %}
+                  <p class="fw-bold mb-2">From ${{ hotel.price }} / night</p>
+                {% endif %}
+                
+                <!-- Booking Button (hidden for librarians) -->
+                {% if not is_librarian %}
+                <div class="mt-auto">
+                  <a 
+                    href="{% url 'patron:book_hotel' hotel.id %}" 
+                    class="btn btn-primary w-100"
+                  >
+                    Book Now
+                  </a>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% elif request.GET.query or request.GET.price_min or request.GET.price_max or request.GET.rating %}
+        <!-- If filters/search were used, but no matches found -->
+        <div class="alert alert-info text-center mt-4" role="alert">
+          No hotels found matching your criteria. Try adjusting your filters.
+        </div>
+      {% else %}
+        <!-- If no filters were used and no hotels in DB -->
+        <div class="alert alert-info text-center mt-4" role="alert">
+          No hotels available at the moment.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Back to Home -->
+  <div class="d-grid gap-2 mt-5 col-6 col-md-3 mx-auto">
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary">Back to Home</a>
+  </div>
+</div>
+{% endblock %}
+=======
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 <style>
@@ -158,3 +362,4 @@
     </script>
     {% endblock %}
 {% endblock %} 
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664

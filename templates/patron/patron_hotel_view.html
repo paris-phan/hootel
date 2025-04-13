@@ -2,7 +2,127 @@
 
 {% block title %}{{ hotel.name }} - HotelManager6000{% endblock %}
 
+{% block extra_css %}
+<!-- Animate.css for entrance animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+<style>
+  /* Page Background & Typography */
+  body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .content-container {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Main Hotel Card Styles */
+  .hotel-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+    background: #fff;
+  }
+  .hotel-card-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    padding: 1rem 1.5rem;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  .hotel-card-header h2,
+  .hotel-card-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  .hotel-card-body {
+    padding: 1.5rem;
+  }
+
+  /* Image Styling with Hover Zoom */
+  .hotel-img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .hotel-img:hover {
+    transform: scale(1.05);
+  }
+
+  /* Custom Button Spacing & Rounded Edges */
+  .btn-custom {
+    margin-top: 0.5rem;
+    margin-right: 0.5rem;
+    border-radius: 30px;
+  }
+  .btn-success {
+    background-color: #28a745;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+  .btn-success:hover {
+    background-color: #218838;
+  }
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+  }
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+  .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+  }
+  .btn-secondary:hover {
+    background-color: #5a6268;
+  }
+  .btn-danger {
+    background-color: #dc3545;
+    border: none;
+  }
+  .btn-danger:hover {
+    background-color: #c82333;
+  }
+
+  /* Table & Badge Styling */
+  .table-striped tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+  .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529;
+  }
+
+  /* Fade-in Animation */
+  .animate-fadeInUp {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s forwards;
+  }
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
+<<<<<<< HEAD
+<div class="container content-container">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <!-- Main Hotel Card -->
+      <div class="hotel-card mb-4 animate-fadeInUp" style="animation-delay: 0.1s;">
+        <div class="hotel-card-header text-white d-flex justify-content-between align-items-center animate__animated animate__fadeIn">
+          <h2 class="mb-0">{{ hotel.name }}</h2>
+          <!-- No Edit/Delete buttons for patrons -->
+=======
     <div class="container">
         <div class="row">
             <div class="col-md-8">
@@ -125,6 +245,88 @@
                     </div>
                 </div>
             </div>
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664
         </div>
+        <div class="row g-0">
+          <div class="col-md-6">
+            <img src="{{ hotel.image_url }}" class="hotel-img" alt="{{ hotel.name }}">
+          </div>
+          <div class="col-md-6">
+            <div class="hotel-card-body">
+              <h5 class="card-title">
+                <i class="bi bi-geo-alt-fill"></i> {{ hotel.location }}
+              </h5>
+              <p class="card-text">{{ hotel.description|linebreaks }}</p>
+              <p class="card-text">
+                <small class="text-muted">Added on {{ hotel.created_at|date:"F j, Y" }}</small>
+              </p>
+              <!-- No "Added by" information for patrons -->
+              <div class="mt-4">
+                {% if user.is_authenticated %}
+                <a href="{% url 'patron:book_hotel' hotel.id %}" class="btn btn-success btn-custom">Book Now</a>
+                {% endif %}
+                <a href="{% url 'patron:list_hotel_rooms' hotel.id %}" class="btn btn-primary btn-custom">View Rooms</a>
+                <a href="{% url 'patron:search' %}" class="btn btn-secondary btn-custom">Back to Search</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User's Own Bookings for this Hotel -->
+      {% if user.is_authenticated %}
+      <div class="hotel-card mb-4 animate-fadeInUp" style="animation-delay: 0.2s;">
+        <!-- Updated gradient for consistency -->
+        <div class="hotel-card-header text-white">
+          <h3>Your Bookings at This Hotel</h3>
+        </div>
+        <div class="hotel-card-body">
+          <div class="table-responsive">
+            <table class="table table-striped align-middle">
+              <thead>
+                <tr>
+                  <th>Check-in</th>
+                  <th>Check-out</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for booking in user_bookings %}
+                <tr>
+                  <td>{{ booking.check_in_date|date:"M d, Y" }}</td>
+                  <td>{{ booking.check_out_date|date:"M d, Y" }}</td>
+                  <td>
+                    <span class="badge {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %}">
+                      {{ booking.get_status_display }}
+                    </span>
+                  </td>
+                  <td>
+                    {% if booking.status == 'PENDING' %}
+                    <a href="{% url 'patron:cancel_booking' booking.id %}" class="btn btn-danger btn-sm btn-custom"
+                       onclick="return confirm('Are you sure you want to cancel this booking?')">
+                      Cancel
+                    </a>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center">
+                    You don't have any bookings at this hotel yet.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endif %}
     </div>
+<<<<<<< HEAD
+  </div>
+</div>
+=======
+>>>>>>> b052fccc03f8618feec97d157851d356bff05664
 {% endblock %}

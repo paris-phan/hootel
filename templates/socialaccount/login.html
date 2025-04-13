@@ -1,21 +1,41 @@
 {% extends base_template %}
-{% load i18n %}
+{% load static %}
 
-{% block head_title %}{% trans "Sign In" %}{% endblock %}
+{% block title %}
+Sign In Via Google
+{% endblock %}
 
 {% block content %}
-{% if process == "connect" %}
-<h1>{% blocktrans with provider.name as provider %}Connect {{ provider }}{% endblocktrans %}</h1>
-
-<p>{% blocktrans with provider.name as provider %}You are about to connect a new third party account from {{ provider }}.{% endblocktrans %}</p>
-{% else %}
-<h1>{% blocktrans with provider.name as provider %}Sign In Via {{ provider }}{% endblocktrans %}</h1>
-
-<p>{% blocktrans with provider.name as provider %}You are about to sign in using a third party account from {{ provider }}.{% endblocktrans %}</p>
-{% endif %}
-
-<form method="post">
-  {% csrf_token %}
-  <button type="submit">{% trans "Continue" %}</button>
-</form>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-5">
+      
+      <div class="card shadow-sm">
+        <div class="card-body text-center p-5">
+          
+          <h1 class="card-title display-6 mb-3">Sign In Via Google</h1>
+          
+          <p class="card-text text-muted mb-4">
+            You are about to sign in using a third-party account from Google.
+          </p>
+      
+          <form method="POST" action="{{ google_login_url }}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-lg d-inline-flex align-items-center justify-content-center gap-2">
+              Continue with Google
+            </button>
+          </form>
+          
+        </div>
+      </div>
+      
+      <div class="text-center mt-3">
+        <p class="small text-muted">
+          By continuing, you agree to our Terms of Service and Privacy Policy.
+        </p>
+      </div>      
+      
+    </div>
+  </div>
+</div>
 {% endblock %}
