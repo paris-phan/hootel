@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Destinations | Aman Resorts, Hotels &amp; Residences{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Additional styles specific to the destinations page */
+  .destinations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  
+  .destination-hero {
+    position: relative;
+    height: 400px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+  
+  .destination-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .destination-hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: #F3EEE7;
+  }
+  
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #dad9d7;
+  }
+  
+  .filter-bar button {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    color: #313131;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  
+  .filter-bar button.active {
+    opacity: 1;
+    border-bottom: 1px solid #313131;
+  }
+  
+  @media (max-width: 768px) {
+    .destination-hero {
+      height: 300px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<section class="destination-hero">
+  <img src="{% static 'images/destinations-hero.jpg' %}" alt="Aman Destinations" class="img-fluid">
+  <div class="destination-hero-content">
+    <div class="container">
+      <h1>Destinations</h1>
+      <p>Discover extraordinary places across the globe</p>
+    </div>
+  </div>
+</section>
+
+<!-- Intro Section -->
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <p class="subtitle">Aman Destinations</p>
+    <h2 class="heading-h">Extraordinary Places</h2>
+    <div class="hgroup__intro">
+      <p>From the pristine paradise islands of Indonesia and the Philippines to the cultural and historic gems of Montenegro, Japan and Saudi Arabia, Aman's constellation of destinations is diverse and unique.</p>
+    </div>
+  </header>
+  
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <button class="active" data-filter="all">All Destinations</button>
+    <button data-filter="asia">Asia</button>
+    <button data-filter="americas">Americas & Caribbean</button>
+    <button data-filter="europe">Europe & Africa</button>
+  </div>
+  
+  <!-- Destinations Grid -->
+  <div class="destinations-grid">
+    {% for destination in destinations %}
+    <div class="slider-card" data-region="{{ destination.region }}">
+      <article class="card card--centered">
+        <div class="media media--responsive">
+          <picture>
+            <img src="{% static destination.image %}" alt="{{ destination.name }}" class="img-fluid">
+          </picture>
+        </div>
+        <figcaption>
+          <h3>{{ destination.name }}</h3>
+          <p>{{ destination.description }}</p>
+        </figcaption>
+        <div class="card__post-link-content">
+          <a href="#" class="cta__link card__link__cta underline">Discover more</a>
+        </div>
+      </article>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Banner Section -->
+<section class="container container--spacer gutter bg-white">
+  <div class="row">
+    <div class="col-md-6">
+      <img src="{% static 'images/destinations-feature.jpg' %}" alt="Aman Experience" class="img-fluid">
+    </div>
+    <div class="col-md-6 d-flex align-items-center">
+      <div class="px-4 py-5">
+        <p class="subtitle">Experience Aman</p>
+        <h2 class="heading-h">Journey of a Lifetime</h2>
+        <p>Aman's constellation of destinations spans 20 countries, with each resort and setting offering a gateway to the most remarkable locations and experiences.</p>
+        <a href="#" class="button button--dark mt-4">Explore Experiences</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Destinations page specific JavaScript
+  document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const filterButtons = document.querySelectorAll('.filter-bar button');
+    const destinations = document.querySelectorAll('.destinations-grid .slider-card');
+    
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Update active button
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Filter destinations
+        const filter = this.getAttribute('data-filter');
+        
+        if (filter === 'all') {
+          destinations.forEach(dest => dest.style.display = 'block');
+        } else {
+          destinations.forEach(dest => {
+            if (dest.getAttribute('data-region') === filter) {
+              dest.style.display = 'block';
+            } else {
+              dest.style.display = 'none';
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
+{% endblock %} 

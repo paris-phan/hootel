@@ -1,45 +1,146 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Project B-10{% endblock %}</title>
+<html lang="en" dir="ltr" prefix="og: https://ogp.me/ns#">
+  <head>
+    <meta charset="utf-8" />
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'analytics_storage': 'denied',
+      'personalization_storage': 'denied',
+      'wait_for_update' : 500
+    });
+    </script>
+    <meta name="description" content="Explore the world of Aman. 35 luxury resorts, hotels &amp; private residences in 20 countries. Book accommodation, experiences &amp; journeys of discovery with Aman" />
+    <meta http-equiv="content-language" content="en" />
+    <link rel="canonical" href="{% url 'core:home' %}" />
+    <meta property="og:title" content="Aman Resorts, Hotels &amp; Residences – Explore Luxury Destinations" />
+    <meta property="og:description" content="Explore the world of Aman. 35 luxury resorts, hotels &amp; private residences in 20 countries. Book accommodation, experiences &amp; journeys of discovery with Aman" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/vnd.microsoft.icon" />
+
+    <title>{% block title %}Aman Resorts, Hotels &amp; Residences – Explore Luxury Destinations{% endblock %}</title>
+    
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        html, body {
-            height: 100%;
-        }
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-        main {
-            flex: 1 0 auto;
-        }
-        footer {
-            flex-shrink: 0;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    
+    <!-- Critical CSS -->
+    <style id="critical-css">
+    @font-face{font-family:Lyon Display Web;src:url("{% static 'font/LyonDisplay-Light-Web.woff2' %}") format("woff2"),url("{% static 'font/LyonText-Regular-Web.woff2' %}") format("woff2"),url("{% static 'font/LyonDisplay-Light-Web.woff' %}") format("woff"),url("{% static 'font/LyonText-Regular-Web.woff' %}") format("woff");font-weight:300;font-style:normal;font-stretch:normal;font-display:swap}@font-face{font-family:Lyon Text Web;src:url("{% static 'font/LyonText-Regular-Web.woff2' %}") format("woff2"),url("{% static 'font/LyonText-Regular-Web.woff' %}") format("woff");font-weight:400;font-style:normal;font-stretch:normal;font-display:swap}.hidden{display:none}.visually-hidden{position:absolute!important;overflow:hidden;clip:rect(1px,1px,1px,1px);width:1px;height:1px;word-wrap:normal}.blazy,.blazy *,.blazy :after,.blazy :before{box-sizing:border-box}.b-lazy,.b-responsive{display:block;height:auto;min-height:1px}@media screen and (prefers-reduced-motion:no-preference){.b-lazy,.b-responsive{opacity:0}}.blazy .media{display:block;position:relative}.media.media--ratio{position:relative;display:block;overflow:hidden;width:100%;max-width:100%;height:0;min-height:1px}.media--ratio--11{padding-bottom:100%}.dropbutton-wrapper,.dropbutton-wrapper div{box-sizing:border-box}.layout--onecol .layout__region{width:100%}:root{--header-menu-content-offset:20px;--header-menu-height-lg:88px;--booking-bar-height-lg:70px;--header-menu-scrolled:60px;--bn-col-gap:49px}.bg-primary{background-color:#f3eee7}.bg-white{background-color:#fff}html{scroll-padding-top:100px}body{margin:0;overflow-x:hidden}.container{position:relative;max-width:1440px;margin-right:auto;margin-left:auto;background-color:#f3eee7}.container--large{max-width:1600px}.container--spacer{margin-top:4.6428571429rem;margin-bottom:4.6428571429rem}.gutter{padding-right:1.75rem;padding-left:1.75rem}picture,picture img{max-width:100%}picture img{height:auto}.grid{display:flex;flex-wrap:wrap;margin-left:-1.75rem;margin-right:-1.75rem}.grid--space-between{justify-content:space-between}.grid__item{display:flex;flex:1 1 100%;margin:0 1.75rem 1.4285714286rem}@-webkit-keyframes slide-in-left{0%{transform:translateX(-100%)}to{transform:translateX(0)}}@keyframes slide-in-left{0%{transform:translateX(-100%)}to{transform:translateX(0)}}@-webkit-keyframes slide-fade-in-left{0%{opacity:0;transform:translateX(-2rem)}to{opacity:1;transform:translateX(0)}}@keyframes slide-fade-in-left{0%{opacity:0;transform:translateX(-2rem)}to{opacity:1;transform:translateX(0)}}@-webkit-keyframes slide-in-right{0%{transform:translateX(100%)}to{transform:translateX(0)}}@keyframes slide-in-right{0%{transform:translateX(100%)}to{transform:translateX(0)}}@-webkit-keyframes fade-in{0%{opacity:0}to{opacity:1}}@keyframes fade-in{0%{opacity:0}to{opacity:1}}article,figure,header,main,nav,picture,section{display:block}[data-bind-visible]{display:none}[data-bind-hidden]{display:block}:root{font-size:14px;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}body{font-size:1rem;line-height:1.45;color:#313131;letter-spacing:.0571428571rem;overflow-wrap:break-word}.text--centered{text-align:center}.text--right{text-align:right}.h3,h1,h2,h3,h4{letter-spacing:.0357142857rem;font-weight:400}h1{margin-bottom:1.6rem;font-size:2.22rem}@media screen and (max-width:480px){.grid__item{flex-basis:calc(100% - 3.5rem);max-width:100%}h1{font-size:1.722rem}}h2{font-size:2.22rem}@media screen and (max-width:480px){h2{font-size:1.722rem}}.h3,h3,h4{font-size:1.4rem;letter-spacing:0}.hgroup--limited{max-width:680px;margin-right:auto;margin-bottom:4.6428571429rem;margin-left:auto}.hgroup h2,.hgroup h3,.hgroup p{margin-top:0}.hgroup .subtitle{margin-top:0;margin-bottom:1rem;font-size:.722rem;text-transform:uppercase;letter-spacing:.1428571429rem}.hgroup--plain{max-width:inherit}.hgroup--plain h2{margin-bottom:.5714285714rem}.hgroup--plain .subtitle{margin-bottom:1.4285714286rem}@media screen and (max-width:768px){.hgroup{margin-bottom:4.2857142857rem}.hgroup h2{margin-bottom:.6428571429rem}}a{color:inherit;text-decoration:underline}a.underline{position:relative;text-decoration:none}a.underline:after{content:"";position:absolute;top:100%;right:0;width:100%;margin-top:4px;border-bottom:1px solid}ul{line-height:inherit;position:relative}a.button{display:inline-block;padding:.8em 4em;color:#000;letter-spacing:.05rem;text-decoration:none;border:1px solid #000;background:0 0;box-sizing:border-box}a.button--dark{border-color:#313131;background-color:#313131;color:#f3eee7}a.button--slim{font-size:.88rem;padding:.6em 2.7em}@media screen and (max-width:480px){a.button--slim{padding:.5em 1.3em}}input.button{display:inline-block;padding:.8em 4em;color:#000;letter-spacing:.05rem;text-decoration:none;border:1px solid #000;background:0 0;box-sizing:border-box}input.button--black{display:inline-block;padding:.8em 4em;color:#f3eee7;letter-spacing:.05rem;text-decoration:none;border:1px solid #000;background:#000;box-sizing:border-box}.button--slim{font-size:.88rem;padding:.6em 2.7em}@media screen and (max-width:480px){.button--slim{padding:.5em 1.3em}}[type=button],[type=submit]{-webkit-appearance:none;border-radius:0}.slider-card,.card,.venue-card--link{background-color:#f3eee7;border-radius:0;overflow:hidden}.paragraph--type--slider-cards{background-color:#f3eee7}.site-footer{background-color:#fff!important}
+    </style>
+    
     {% block extra_css %}{% endblock %}
-</head>
-<body>
-    <!-- Navbar -->
-    {% include 'includes/navbar.html' %}
+  </head>
 
-    <!-- Main Content -->
-    <main class="container mt-4">
+  <body class="exclude-node-title bg-primary path-frontpage page-node-type-landing-page" style="background-color: #f3eee7 !important;">
+    <a href="#main-content" class="visually-hidden focusable">
+      Skip to main content
+    </a>
+    
+    <div class="dialog-off-canvas-main-canvas bg-primary" data-off-canvas-main-canvas>
+      <!-- Header section -->
+      <header class="main-header bg-primary">
+        <div class="header__top gutter bg-primary">
+          <div class="container container--large">
+            <div class="grid grid--space-between">
+              <div class="hamburger grid__item">
+                <button id="hamburger" aria-label="Open main menu">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 24" class="icon icon--burger">
+                    <title>Menu</title>
+                    <path d="M4 4h20v1H4zM4 11h20v1H4zM4 18h20v1H4z" />
+                  </svg>
+                  <span class="hamburger__label">Menu</span>
+                </button>
+                <div class="search-sidebar-wrap">
+                  <button class="search-sidebar__toggle-btn" type="button" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="icon icon--search-thin">
+                      <circle cx="10.6" cy="10.6" r="8" fill="none" stroke="#000" stroke-width=".9"/>
+                      <path fill="none" stroke="#000" d="m16.3 16.3 5.8 5.8"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="logo grid__item">
+                <a tabindex="-1" href="{% url 'core:home' %}" title="Aman resorts">
+                  <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 775.8 207.1" width="150" height="40">
+                    <title>Aman resorts</title>
+                    <path d="M355.7 44.7h-1.5c-57.4 119.2-58.4 126.7-63.8 139h-.4c-5.5-12.3-6.5-19.8-63.8-139h-1.6S210.2 204 204.6 204v.8h17.2v-.8c-4.2 0 8.4-112.5 9-125.5h.4a776 776 0 0 0 25.7 57.6c7.7 16 18.2 40.8 31.5 68.7h3.6c13.3-27.9 23.8-52.7 31.5-68.7a730.6 730.6 0 0 0 25.6-57.6h.4c.7 13 13.3 125.5 9.1 125.5v.8h17.1v-.8c-5.6 0-20-159.4-20-159.4M67.8 71.2h-.2c-2.6 7.6-31.9 80.6-31.9 80.6-17.4 43-20.5 51.2-18.4 52.3v.8H0v-.8c4.3 0 67.1-159.4 67.1-159.4h2s60 159.4 64.3 159.4v.8h-17.8v-.8c2-1-.5-9.3-17.5-52.3 0 0-27.8-73-30.3-80.7m446.9.1h-.2c-2.6 7.6-32 80.6-32 80.6-17.3 43-20.5 51.2-18.3 52.3v.8h-17.3v-.8c4.3 0 67-159.4 67-159.4h2.1S576 204 580.3 204v.8h-17.8v-.8c2-1-.5-9.3-17.5-52.3 0 0-27.9-73-30.3-80.7m251.9-23.7h-8v.8c1.5 0 2.7 9.5 2.7 67.7V178h-.4c-8.9-12.7-61.4-80-104-133.3h-1.6v91.7c0 58.2-2.5 67.7-3.9 67.7v.8h17.2v-.8c-1.3 0-2.6-9.5-2.6-67.7V73.7h.4c8.8 12.8 61.4 80 104 133.4h1.5v-91.3c0-58.2 2.6-67.7 4-67.7v-.8ZM43.1 0h48.3v10.5H43.1z"/>
+                  </svg>
+                </a>
+              </div>
+              
+              <div class="main-header__right grid__item">
+                <div class="booking-bar-cta">
+                  <a href="#" class="button button--slim button--dark">Reserve</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main content area -->
+      <main role="main" class="grid-container bg-primary">
+        <a id="main-content" tabindex="-1"></a>
+        
         {% block content %}
+        <!-- Content will be inserted here -->
         {% endblock %}
-    </main>
+      </main>
+      
+      <!-- Footer section -->
+      <footer class="site-footer bg-white">
+        <div class="container gutter mb-5">
+          <div class="row py-5">
+            <div class="col-md-4">
+              <h3>Aman Resorts</h3>
+              <p>Explore the world of Aman. 35 luxury resorts, hotels & private residences in 20 countries.</p>
+            </div>
+            <div class="col-md-4">
+              <h3>Contact</h3>
+              <ul class="list-unstyled">
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">Reservations</a></li>
+                <li><a href="#">Careers</a></li>
+              </ul>
+            </div>
+            <div class="col-md-4">
+              <h3>Legal</h3>
+              <ul class="list-unstyled">
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Use</a></li>
+                <li><a href="#">Cookie Policy</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="row border-top pt-4">
+            <div class="col-md-6">
+                <p class="mb-0">&copy; {% now "Y" %} Project B-10. All rights reserved.</p>
+                <p class="mb-0">This is a class project. The system is not monitored.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="mb-0">No real information should be submitted to this domain.</p>
+                <p class="mb-0">For actual hotel bookings, please visit <a href="https://www.hotels.com" target="_blank">hotels.com</a></p>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
 
-    <!-- Footer -->
-    {% include 'includes/footer.html' %}
-
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
+    <!-- Bootstrap JS with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    
     {% block extra_js %}{% endblock %}
-</body>
+  </body>
 </html> 

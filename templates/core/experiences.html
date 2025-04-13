@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Experiences | Aman Resorts, Hotels &amp; Residences{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Additional styles specific to the experiences page */
+  .experience-hero {
+    position: relative;
+    height: 500px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+  
+  .experience-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .experience-hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 4rem 2rem 2rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: #F3EEE7;
+  }
+  
+  .experience-detail {
+    padding: 4rem 0;
+  }
+  
+  .experience-detail:nth-child(even) {
+    background-color: #F3EEE7;
+  }
+  
+  .experience-image {
+    position: relative;
+    height: 100%;
+    min-height: 400px;
+  }
+  
+  .experience-image img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .experience-content {
+    padding: 2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .experience-hero {
+      height: 300px;
+    }
+    
+    .experience-image {
+      min-height: 300px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<section class="experience-hero">
+  <img src="{% static 'images/experiences-hero.jpg' %}" alt="Aman Experiences" class="img-fluid">
+  <div class="experience-hero-content">
+    <div class="container">
+      <h1>Experiences</h1>
+      <p>Journey to extraordinary places with Aman</p>
+    </div>
+  </div>
+</section>
+
+<!-- Intro Section -->
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <p class="subtitle">Experiences at Aman</p>
+    <h2 class="heading-h">Journey to extraordinary places</h2>
+    <div class="hgroup__intro">
+      <p>From spiritual pilgrimages to cultural discoveries, Aman curates transformative experiences that immerse guests in the spirit of each destination. Each Aman property offers its own selection of activities that celebrate the surrounding landscape and culture.</p>
+    </div>
+  </header>
+</section>
+
+<!-- Experience Details - Wellness -->
+<section class="experience-detail">
+  <div class="container gutter">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="experience-image">
+          <img src="{% static 'images/experiences-1.jpg' %}" alt="Wellness Journey" class="img-fluid">
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="experience-content">
+          <p class="subtitle">Transformative Journeys</p>
+          <h2 class="heading-h">Wellness Journeys</h2>
+          <p>Aman has always delivered a transforming and holistic spa experience, taking you on a journey of discovery. Wellness at Aman is a 360 degree integration of wellbeing experiences, taking a personalized approach with a focus on individuals.</p>
+          <p>Harnessing the power of nature, our unique wellness paths incorporate Traditional Chinese Medicine and other global healing traditions. Backed by the latest research, our innovative spa services, fitness and mindfulness programs realign body, mind and spirit.</p>
+          <a href="#" class="button button--dark mt-4">Discover Wellness</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Experience Details - Cultural -->
+<section class="experience-detail">
+  <div class="container gutter">
+    <div class="row flex-column-reverse flex-md-row">
+      <div class="col-md-6">
+        <div class="experience-content">
+          <p class="subtitle">Cultural Immersion</p>
+          <h2 class="heading-h">Cultural Discoveries</h2>
+          <p>Immerse yourself in the cultural heritage of each destination, with experiences shaped by local experts and designed to provide authentic insights into traditions and ways of life.</p>
+          <p>From private tea ceremonies in Japan to exploring ancient temples in Cambodia, Aman's cultural experiences offer privileged access to local traditions, festivals, art, and cuisine, creating memories that will stay with you long after you leave.</p>
+          <a href="#" class="button button--dark mt-4">Discover Culture</a>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="experience-image">
+          <img src="{% static 'images/experiences-2.jpg' %}" alt="Cultural Discovery" class="img-fluid">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Experience Details - Adventure -->
+<section class="experience-detail">
+  <div class="container gutter">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="experience-image">
+          <img src="{% static 'images/experiences-3.jpg' %}" alt="Active Adventure" class="img-fluid">
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="experience-content">
+          <p class="subtitle">Explorations</p>
+          <h2 class="heading-h">Active Adventures</h2>
+          <p>For those seeking adventure and connection with nature, Aman offers bespoke experiences in some of the world's most remote and spectacular settings.</p>
+          <p>From trekking in the Himalayas to sailing the turquoise waters of the Aegean Sea, our adventures are crafted to showcase the natural beauty of each destination while providing expert guidance and unparalleled comfort.</p>
+          <a href="#" class="button button--dark mt-4">Discover Adventures</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Grid Section -->
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <h2 class="heading-h">Featured Experiences</h2>
+    <div class="hgroup__intro">
+      <p>Discover our most unique and sought-after experiences</p>
+    </div>
+  </header>
+  
+  <div class="scards mt-5">
+    {% for experience in experiences %}
+    <div class="slider-card">
+      <article class="card card--centered">
+        <div class="media media--responsive">
+          <picture>
+            <img src="{% static experience.image %}" alt="{{ experience.name }}" class="img-fluid">
+          </picture>
+        </div>
+        <figcaption>
+          <h3>{{ experience.name }}</h3>
+          <p>{{ experience.description }}</p>
+        </figcaption>
+        <div class="card__post-link-content">
+          <a href="#" class="cta__link card__link__cta underline">Discover more</a>
+        </div>
+      </article>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="container--spacer container gutter text--centered">
+  <div class="py-5">
+    <h2 class="heading-h mb-4">Plan Your Aman Journey</h2>
+    <a href="#" class="button button--dark">Contact Us</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Experiences page specific JavaScript
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animation on scroll for experience sections
+    const experienceSections = document.querySelectorAll('.experience-detail');
+    
+    const revealOnScroll = function() {
+      experienceSections.forEach(section => {
+        const sectionTop = section.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (sectionTop < windowHeight * 0.8) {
+          section.classList.add('revealed');
+        }
+      });
+    };
+    
+    window.addEventListener('scroll', revealOnScroll);
+    window.addEventListener('load', revealOnScroll);
+  });
+</script>
+{% endblock %} 

@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Us | Aman Resorts, Hotels &amp; Residences{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Additional styles specific to the about page */
+  .about-hero {
+    position: relative;
+    height: 500px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+  
+  .about-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .about-hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 4rem 2rem 2rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: #F3EEE7;
+  }
+  
+  .timeline {
+    position: relative;
+    padding: 4rem 0;
+  }
+  
+  .timeline:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 100%;
+    background: #dad9d7;
+  }
+  
+  .timeline-item {
+    position: relative;
+    margin-bottom: 3rem;
+  }
+  
+  .timeline-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .timeline-item .timeline-dot {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #f3eee7;
+    border: 1px solid #313131;
+    transform: translateX(-50%);
+  }
+  
+  .timeline-content {
+    width: 45%;
+    padding: 1.5rem;
+    background: #F3EEE7;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+  
+  .timeline-item:nth-child(odd) .timeline-content {
+    margin-left: auto;
+  }
+  
+  .timeline-year {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    background: #313131;
+    color: #f3eee7;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+  
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  
+  .team-member {
+    text-align: center;
+  }
+  
+  .team-member img {
+    width: 100%;
+    height: auto;
+    max-width: 200px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+  }
+  
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+  }
+  
+  .stat-item {
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+    color: #313131;
+  }
+  
+  .stat-label {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+  }
+  
+  @media (max-width: 768px) {
+    .about-hero {
+      height: 300px;
+    }
+    
+    .timeline:before {
+      left: 1rem;
+    }
+    
+    .timeline-item .timeline-dot {
+      left: 1rem;
+    }
+    
+    .timeline-content {
+      width: 85%;
+      margin-left: 2.5rem !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<section class="about-hero">
+  <img src="{% static 'images/about-hero.jpg' %}" alt="About Aman" class="img-fluid">
+  <div class="about-hero-content">
+    <div class="container">
+      <h1>About Aman</h1>
+      <p>A legacy of exceptional destinations</p>
+    </div>
+  </div>
+</section>
+
+<!-- Intro Section -->
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <p class="subtitle">The Aman Story</p>
+    <h2 class="heading-h">A Story of Exceptional Destinations</h2>
+    <div class="hgroup__intro">
+      <p>Founded in 1988, Aman has since evolved into a collection of 35 hotels and resorts in 20 countries. Each Aman welcomes guests as if to the home of a close friend, instilling a sense of peace and belonging amid some of the world's most diverse natural and historical landscapes.</p>
+    </div>
+  </header>
+  
+  <!-- Stats -->
+  <div class="stats-container">
+    <div class="stat-item">
+      <div class="stat-number">35</div>
+      <div class="stat-label">Destinations</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">20</div>
+      <div class="stat-label">Countries</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">1988</div>
+      <div class="stat-label">Year Founded</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">32+</div>
+      <div class="stat-label">Years of Excellence</div>
+    </div>
+  </div>
+</section>
+
+<!-- Philosophy Section -->
+<section class="container container--spacer gutter bg-white">
+  <div class="row align-items-center">
+    <div class="col-md-6">
+      <img src="{% static 'images/about-philosophy.jpg' %}" alt="Aman Philosophy" class="img-fluid">
+    </div>
+    <div class="col-md-6">
+      <div class="px-4 py-5">
+        <p class="subtitle">Our Philosophy</p>
+        <h2 class="heading-h">A Sanctuary for the Soul</h2>
+        <p>The Sanskrit-derived word for 'peace', Aman has built a legacy on providing guests with a sense of place and peace since its first retreat was founded over 30 years ago.</p>
+        <p>Designed in harmony with its natural surroundings, every Aman property was designed to frame, not claim, its setting, with architecture inspired by the destination and sensitive to local culture. Aman creates intimate sanctuaries offering privacy and exclusivity in some of the world's most inspiring landscapes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Timeline Section -->
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <h2 class="heading-h">Our Journey</h2>
+    <div class="hgroup__intro">
+      <p>From our first retreat in Phuket to today's global collection</p>
+    </div>
+  </header>
+  
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-year">1988</div>
+        <h3>Amanpuri</h3>
+        <p>Aman's first resort, Amanpuri, opens in Phuket, Thailand, setting a new standard for luxury hospitality.</p>
+      </div>
+    </div>
+    
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-year">1990s</div>
+        <h3>Asian Expansion</h3>
+        <p>Aman expands throughout Asia with Amankila in Bali, Amandari, and other exceptional destinations.</p>
+      </div>
+    </div>
+    
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-year">2000s</div>
+        <h3>Global Reach</h3>
+        <p>Aman ventures beyond Asia to North Africa, Europe, and North America with resorts like Amanjena in Morocco.</p>
+      </div>
+    </div>
+    
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-year">2014</div>
+        <h3>New Leadership</h3>
+        <p>Under the leadership of Vladislav Doronin, Aman enters a new era of growth and development.</p>
+      </div>
+    </div>
+    
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-year">Today</div>
+        <h3>Continued Innovation</h3>
+        <p>With 35 properties in 20 countries and more in development, Aman continues to set the standard for ultra-luxury hospitality.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Leadership Section -->
+<section class="container container--spacer gutter bg-white">
+  <header class="hgroup hgroup--limited text--centered">
+    <h2 class="heading-h">Leadership</h2>
+    <div class="hgroup__intro">
+      <p>The visionaries behind Aman</p>
+    </div>
+  </header>
+  
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center mb-5">
+      <img src="{% static 'images/vladislav-doronin.jpg' %}" alt="Vladislav Doronin" class="img-fluid rounded-circle" style="max-width: 200px;">
+      <h3 class="mt-4">Vladislav Doronin</h3>
+      <p class="subtitle">Chairman and CEO</p>
+      <p>Vladislav Doronin is an international businessman, investor and real estate developer with over 28 years' experience in global property markets. As Chairman and CEO of Aman, he has led the company through a period of transformation and expansion.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Values Section -->
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <h2 class="heading-h">Our Values</h2>
+    <div class="hgroup__intro">
+      <p>The principles that guide everything we do</p>
+    </div>
+  </header>
+  
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="p-4 h-100 bg-white">
+        <h3>Exceptional Service</h3>
+        <p>We believe in intimate, personalized service that anticipates guests' needs and creates unforgettable moments.</p>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="p-4 h-100 bg-white">
+        <h3>Harmony with Nature</h3>
+        <p>Respecting and celebrating the natural environment is fundamental to the Aman philosophy.</p>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="p-4 h-100 bg-white">
+        <h3>Cultural Immersion</h3>
+        <p>Each Aman is deeply rooted in the cultural heritage of its location, offering authentic experiences.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="container--spacer container gutter text--centered">
+  <div class="py-5">
+    <h2 class="heading-h mb-4">Experience the World of Aman</h2>
+    <a href="#" class="button button--dark">Plan Your Stay</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // About page specific JavaScript
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animation for timeline
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    
+    const revealOnScroll = function() {
+      timelineItems.forEach((item, index) => {
+        const itemTop = item.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (itemTop < windowHeight * 0.8) {
+          setTimeout(() => {
+            item.classList.add('fade-in');
+          }, index * 200);
+        }
+      });
+    };
+    
+    window.addEventListener('scroll', revealOnScroll);
+    window.addEventListener('load', revealOnScroll);
+  });
+</script>
+{% endblock %} 
