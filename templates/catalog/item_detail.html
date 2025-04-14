@@ -25,8 +25,9 @@
     left: 0;
     width: 100%;
     padding: 4rem 2rem 2rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    background: linear-gradient(to top, rgba(0,0,0,1), transparent);
     color: #F3EEE7;
+    
   }
   
   .item-detail {
@@ -98,10 +99,10 @@
     <img src="{% static 'images/placeholder.jpg' %}" alt="{{ item.title }}" class="img-fluid">
   {% endif %}
   <div class="item-hero-content">
-    <div class="container">
+    
       <h1>{{ item.title }}</h1>
       <p>{{ item.location }}</p>
-    </div>
+    
   </div>
 </section>
 
@@ -115,10 +116,7 @@
       {% if item.location %}
         <p><strong>Location:</strong> {{ item.location }}</p>
       {% endif %}
-      <div class="status-badge 
-        {% if item.status == 0 %}status-available{% elif item.status == 1 %}status-reserved{% else %}status-maintenance{% endif %}">
-        {{ item.get_status_display }}
-      </div>
+      <a href="{% url 'catalog:booking' item.title %}" class="button button--primary">Book Now</a>
     </div>
   </header>
 </section>
@@ -141,12 +139,10 @@
           <p class="subtitle">Destination Information</p>
           <h2 class="heading-h">About {{ item.title }}</h2>
           <p>{{ item.description }}</p>
-          <p><strong>Identifier:</strong> {{ item.identifier }}</p>
           <p><strong>Location:</strong> {{ item.location }}</p>
           <p><strong>Status:</strong> {{ item.get_status_display }}</p>
-          <p><strong>Added on:</strong> {{ item.created_at|date:"F j, Y" }}</p>
+          <p><strong>Established:</strong> {{ item.created_at|date:"F, Y" }}</p>
           {% if item.created_by %}
-            <p><strong>Added by:</strong> {{ item.created_by.username }}</p>
           {% endif %}
         </div>
       </div>
@@ -180,7 +176,7 @@
 <!-- Call to Action Section -->
 <section class="container--spacer container gutter text--centered">
   <div class="py-5">
-    <h2 class="heading-h mb-4">Explore More Destinations</h2>
+    <h2 class="heading-h mb-4">Explore More</h2>
     <a href="{% url 'core:destinations' %}" class="button button--dark">View All Destinations</a>
   </div>
 </section>

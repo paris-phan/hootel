@@ -12,7 +12,7 @@ class ItemAdmin(admin.ModelAdmin):
             'fields': ('title', 'identifier', 'status', 'location')
         }),
         ('Details', {
-            'fields': ('description', 'representative_image')
+            'fields': ('description', 'representative_image', 'hero_image')
         }),
         ('Metadata', {
             'fields': ('created_at', 'updated_at', 'created_by')
