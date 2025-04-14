@@ -84,7 +84,17 @@
     border-color: #313131;
   }
   
-  /* Ensure consistent image dimensions in destination cards */
+  /* Card Styles */
+  .slider-card {
+    height: 100%;
+  }
+  
+  .slider-card .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
   .slider-card .media--responsive {
     height: 250px;
     overflow: hidden;
@@ -99,6 +109,25 @@
   
   .slider-card .media--responsive img:hover {
     transform: scale(1.05);
+  }
+  
+  .slider-card figcaption {
+    flex: 1;
+    padding: 1rem;
+  }
+  
+  .slider-card figcaption p {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 1rem;
+  }
+  
+  .slider-card .card__post-link-content {
+    padding: 1rem;
+    border-top: 1px solid #dad9d7;
   }
   
   @media (max-width: 768px) {

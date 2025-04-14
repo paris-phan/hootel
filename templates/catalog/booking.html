@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Book {{ item.title }} | Hootel Destinations{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+  .item-detail {
+    padding: 4rem 0;
+  }
+  
+  .item-detail:nth-child(even) {
+    background-color: #F3EEE7;
+  }
+  
+  .item-image {
+    position: relative;
+    height: 100%;
+    min-height: 400px;
+  }
+  
+  .item-image img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .item-content {
+    padding: 2rem;
+  }
+
+  .booking-container {
+    display: flex;
+    gap: 3rem;
+    margin-top: 3rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    align-items: flex-start;
+  }
+
+  .calendar-container {
+    flex: 0 0 auto;
+    background: transparent;
+    padding: 2rem;
+    width: fit-content;
+  }
+
+  .details-panel {
+    flex: 1;
+    background: transparent;
+    padding: 2rem;
+  }
+
+  .details-panel h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .selected-dates {
+    margin-bottom: 2rem;
+  }
+
+  .selected-dates p {
+    margin-bottom: 0.5rem;
+    color: #666;
+  }
+
+  .selected-dates strong {
+    color: #333;
+    font-weight: 500;
+  }
+
+  .booking-summary {
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .booking-summary p {
+    margin-bottom: 0.75rem;
+    color: #666;
+  }
+
+  .booking-summary strong {
+    color: #333;
+    font-weight: 500;
+  }
+
+  /* Flatpickr custom styles */
+  .flatpickr-calendar {
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .flatpickr-innerContainer {
+    width: 100% !important;
+  }
+
+  .flatpickr-rContainer {
+    width: 100% !important;
+  }
+
+  .flatpickr-days {
+    width: 100% !important;
+  }
+
+  .dayContainer {
+    width: 100% !important;
+    min-width: 280px !important;
+  }
+
+  .flatpickr-months {
+    margin-bottom: 1rem !important;
+  }
+
+  .flatpickr-month {
+    height: 40px !important;
+    background: transparent !important;
+  }
+
+  .flatpickr-current-month {
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
+    color: #333 !important;
+  }
+
+  .flatpickr-weekday {
+    color: #666 !important;
+    font-weight: 500 !important;
+  }
+
+  .flatpickr-day {
+    color: #333 !important;
+    font-weight: 400 !important;
+    border-radius: 0 !important;
+    height: 40px !important;
+    line-height: 40px !important;
+  }
+
+  .flatpickr-day:hover {
+    background: #f5f5f5 !important;
+    border-color: #f5f5f5 !important;
+  }
+
+  .flatpickr-day.selected {
+    background: #333 !important;
+    border-color: #333 !important;
+    color: white !important;
+  }
+
+  .flatpickr-day.inRange {
+    background: #f5f5f5 !important;
+    border-color: #f5f5f5 !important;
+    box-shadow: none !important;
+  }
+
+  .flatpickr-day.today {
+    border-color: #333 !important;
+  }
+
+  .flatpickr-day.today:hover {
+    background: #f5f5f5 !important;
+    border-color: #333 !important;
+  }
+
+  .flatpickr-day.disabled {
+    color: #ccc !important;
+  }
+
+  .btn-primary {
+    background-color: #333;
+    border-color: #333;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #222;
+    border-color: #222;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+<!-- Item Details -->
+<section class="item-detail">
+  <div class="container gutter">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="item-image">
+          {% if item.representative_image %}
+            <img src="{{ item.representative_image.url }}" alt="{{ item.title }}" class="img-fluid">
+          {% else %}
+            <img src="{% static 'images/placeholder.jpg' %}" alt="{{ item.title }}" class="img-fluid">
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="item-content">
+          <p class="subtitle">Destination Information</p>
+          <h2 class="heading-h">About {{ item.title }}</h2>
+          <p>{{ item.description }}</p>
+          <p><strong>Location:</strong> {{ item.location }}</p>
+          <p><strong>Status:</strong> {{ item.get_status_display }}</p>
+          <p><strong>Established:</strong> {{ item.created_at|date:"F, Y" }}</p>
+          {% if item.created_by %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Booking Section -->
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <h1 class="heading-h">Book {{ item.title }}</h1>
+    <div class="hgroup__intro">
+      <p>Select the start and end dates for your stay at {{ item.title }}.</p>
+    </div>
+  </header>
+
+  <div class="booking-container">
+    <!-- Calendar Container -->
+    <div class="calendar-container">
+      <input type="text" id="date-range" placeholder="Select dates" style="display: none;">
+    </div>
+
+    <!-- Details Panel -->
+    <div class="details-panel">
+      <h3>Booking Details</h3>
+      <div class="selected-dates">
+        <p><strong>Check-in:</strong> <span id="check-in-date">Not selected</span></p>
+        <p><strong>Check-out:</strong> <span id="check-out-date">Not selected</span></p>
+      </div>
+      <div class="booking-summary">
+        <p><strong>Total Nights:</strong> <span id="total-nights">0</span></p>
+        <p><strong>Price per Night:</strong> $<span id="price-per-night">{{ item.price_per_night }}</span></p>
+        <p><strong>Total Price:</strong> $<span id="total-price">0.00</span></p>
+      </div>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Book Now</button>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const fp = flatpickr("#date-range", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      minDate: "today",
+      inline: true,
+      disableMobile: true,
+      showMonths: 1,
+      monthSelectorType: "static",
+      onChange: function(selectedDates, dateStr, instance) {
+        if (selectedDates.length === 2) {
+          const startDate = selectedDates[0];
+          const endDate = selectedDates[1];
+          
+          // Update the check-in and check-out dates
+          document.getElementById('check-in-date').textContent = startDate.toLocaleDateString();
+          document.getElementById('check-out-date').textContent = endDate.toLocaleDateString();
+          
+          // Calculate total nights
+          const diffTime = Math.abs(endDate - startDate);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          document.getElementById('total-nights').textContent = diffDays;
+          
+          // Calculate total price
+          const pricePerNight = parseFloat(document.getElementById('price-per-night').textContent);
+          const totalPrice = (diffDays * pricePerNight).toFixed(2);
+          document.getElementById('total-price').textContent = totalPrice;
+        }
+      }
+    });
+  });
+</script>
+{% endblock %} 
