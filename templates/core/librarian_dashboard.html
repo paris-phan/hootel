@@ -5,6 +5,7 @@
 
 {% block content %}
 <div class="container-fluid py-4">
+    {% csrf_token %}
     <div class="row">
         <div class="col-12">
             <h1 class="mb-4">Librarian Dashboard</h1>
@@ -227,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const denyButtons = document.querySelectorAll('.deny-btn');
     
     function handleRequest(action, requestId) {
-        fetch(`/librarian-dashboard/access-request/${action}/${requestId}/`, {
+        fetch(`/access-request/${action}/${requestId}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -275,12 +276,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const action = currentRole === 0 ? 'make librarian' : 'make patron';
             
             if (confirm(`Are you sure you want to ${action}?`)) {
-                fetch(`/librarian-dashboard/accounts/toggle-role/${userId}/`, {
+                fetch(`/accounts/toggle-role/${userId}/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    }
+                    },
+                    body: JSON.stringify({
+                        new_role: newRole
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {

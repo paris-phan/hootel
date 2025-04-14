@@ -7,6 +7,7 @@ from catalog.models import Item
 from collection.models import Collection, CollectionItems, CollectionAuthorizedUser
 from access_request.models import AccessRequest
 from django.contrib.auth import get_user_model
+import json
 
 # Create your views here.
 
@@ -209,7 +210,7 @@ def about(request):
     return render(request, 'core/about.html', context)
 
 def is_librarian(user):
-    return user.is_staff or user.is_superuser
+    return user.is_staff or user.is_superuser or user.role == 1
 
 @login_required
 @user_passes_test(is_librarian)
@@ -255,37 +256,14 @@ def handle_access_request(request, action, request_id):
             # Delete the access request
             access_request.delete()
             message = 'Access request approved successfully'
-        else:  # deny
-            access_request.deny(request.user)
+        elif action == 'deny':
+            # Just delete the access request
+            access_request.delete()
             message = 'Access request denied successfully'
             
         return JsonResponse({
             'success': True,
             'message': message
-        })
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'message': str(e)
-        }, status=500)
-
-@login_required
-@user_passes_test(is_librarian)
-@require_POST
-def toggle_user_role(request, user_id):
-    """Toggle a user's role between librarian and patron"""
-    try:
-        user = get_object_or_404(get_user_model(), id=user_id)
-        current_role = user.role
-        new_role = 1 if current_role == 0 else 0
-        
-        user.role = new_role
-        user.save()
-        
-        action = 'made librarian' if new_role == 1 else 'made patron'
-        return JsonResponse({
-            'success': True,
-            'message': f'User has been {action} successfully'
         })
     except Exception as e:
         return JsonResponse({

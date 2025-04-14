@@ -3,8 +3,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.http import JsonResponse
-from catalog.models import ItemReview
+from catalog.models import ItemReview, Item
 from loans.models import Loan
+from core.views import is_librarian
 
 # Create your views here.
 
@@ -18,12 +19,16 @@ def user_profile(request, username):
     reviews = ItemReview.objects.filter(creator=user).select_related('item').order_by('-created_at')
     loans = Loan.objects.filter(requester=user).select_related('item').order_by('-requested_at')
     
+    # Get all items for the collection creation modal if this is the user's own profile
+    all_items = Item.objects.all() if is_own_profile else None
+    
     context = {
         'user': user,
         'role_display': 'Patron' if user.role == 0 else 'Librarian',
         'is_own_profile': is_own_profile,
         'reviews': reviews,
-        'loans': loans
+        'loans': loans,
+        'all_items': all_items
     }
     return render(request, 'accounts/profile.html', context)
 
@@ -40,7 +45,7 @@ def update_profile_photo(request):
     return redirect('accounts:user_profile', username=request.user.username)
 
 @login_required
-@user_passes_test(lambda u: u.is_staff)
+@user_passes_test(is_librarian)
 def toggle_user_role(request, user_id):
     if request.method == 'POST':
         try:
