@@ -76,7 +76,10 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-white">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="h4 mb-0">{{ collection.title }}</h2>
+                        <div>
+                            <h2 class="h4 mb-0">{{ collection.title }}</h2>
+                            <small class="text-muted">Created by {{ collection.creator.username }}</small>
+                        </div>
                         <span class="badge {% if collection.visibility == 0 %}bg-success{% else %}bg-warning{% endif %}">
                             {{ collection.get_visibility_display }}
                         </span>
