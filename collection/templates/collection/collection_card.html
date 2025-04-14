@@ -1,7 +1,14 @@
 <div class="col-md-6 col-lg-4 mb-4">
     <div class="card h-100">
         <div class="card-body">
-            <h5 class="card-title">{{ collection.title }}</h5>
+            <h5 class="card-title">
+                <a href="{% url 'collection:detail' collection.id %}" class="text-decoration-none text-dark">{{ collection.title }}</a>
+            </h5>
+            <p class="card-text">
+                <small class="text-muted">
+                    Created by <a href="{% url 'accounts:user_profile' username=collection.creator.username %}" class="text-decoration-none">{{ collection.creator.username }}</a>
+                </small>
+            </p>
             <p class="card-text">{{ collection.description|truncatewords:30 }}</p>
             <p class="card-text">
                 <small class="text-muted">
