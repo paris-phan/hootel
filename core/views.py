@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from catalog.models import Item 
 from collection.models import Collection, CollectionItems
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 # Create your views here.
 
@@ -65,6 +66,14 @@ def destinations(request):
     for item in items:
         # Get collections this item belongs to
         item_collections = CollectionItems.objects.filter(item=item).select_related('collection')
+        
+        # Check if the item is in any private collections
+        is_in_private_collection = any(ci.collection.visibility == 1 for ci in item_collections)
+        
+        # Skip items that are in private collections
+        if is_in_private_collection:
+            continue
+            
         collection_ids = [ci.collection.id for ci in item_collections]
         
         # Map location to region
@@ -137,4 +146,26 @@ def about(request):
     context = {
         'page_title': 'About Us | Tel Resorts',
     }
-    return render(request, 'core/about.html', context) 
+    return render(request, 'core/about.html', context)
+
+def is_librarian(user):
+    return user.is_staff or user.is_superuser
+
+@login_required
+@user_passes_test(is_librarian)
+def librarian_dashboard(request):
+    """
+    Dashboard view for librarians to manage items and collections.
+    """
+    # Get all items with their details
+    items = Item.objects.all().select_related('created_by').prefetch_related('reviews')
+    
+    # Get all collections with their items
+    collections = Collection.objects.all().select_related('creator').prefetch_related('collectionitems_set__item')
+    
+    context = {
+        'page_title': 'Librarian Dashboard',
+        'items': items,
+        'collections': collections,
+    }
+    return render(request, 'core/librarian_dashboard.html', context) 

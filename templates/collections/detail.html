@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ collection.title }} - Collection{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0">{{ collection.title }}</h2>
+                        <span class="badge {% if collection.visibility == 0 %}bg-success{% else %}bg-warning{% endif %}">
+                            {{ collection.get_visibility_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <p class="lead">{{ collection.description }}</p>
+                        <div class="d-flex align-items-center text-muted">
+                            <small>
+                                Created by <a href="{% url 'accounts:user_profile' username=collection.creator.username %}" class="text-decoration-none">{{ collection.creator.username }}</a>
+                                on {{ collection.created_at|date:"F j, Y" }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="collection-items">
+                        <h3 class="h5 mb-3">Items in this Collection</h3>
+                        {% if collection.collectionitems_set.all %}
+                            <div class="row">
+                                {% for collection_item in collection.collectionitems_set.all %}
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title">
+                                                    <a href="{% url 'catalog:item_detail' item_title=collection_item.item.title %}" class="text-decoration-none">
+                                                        {{ collection_item.item.title }}
+                                                    </a>
+                                                </h5>
+                                                <p class="card-text">{{ collection_item.item.description|truncatewords:30 }}</p>
+                                                <p class="card-text">
+                                                    <small class="text-muted">
+                                                        Location: {{ collection_item.item.location }}
+                                                    </small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                No items have been added to this collection yet.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

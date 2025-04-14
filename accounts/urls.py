@@ -6,4 +6,5 @@ app_name = 'accounts'
 urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('profile/update-photo/', views.update_profile_photo, name='update_profile_photo'),
+    path('<str:username>/', views.user_profile, name='user_profile'),
 ] 

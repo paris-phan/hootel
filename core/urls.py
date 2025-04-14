@@ -9,4 +9,5 @@ urlpatterns = [
     path('experiences/', views.experiences, name='experiences'),
     path('about/', views.about, name='about'),
     path('accounts/', include('accounts.urls')),
+    path('librarian-dashboard/', views.librarian_dashboard, name='librarian_dashboard'),
 ] 
