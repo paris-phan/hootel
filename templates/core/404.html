@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center">
+        <h1 class="display-1">404</h1>
+        <h2>Page Not Found</h2>
+        <p class="lead">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+        <a href="{% url 'core:home' %}" class="btn btn-primary">Go to Homepage</a>
+    </div>
+</div>
+{% endblock %} 

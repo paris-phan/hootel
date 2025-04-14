@@ -1,0 +1,563 @@
+/* 
+Main CSS file for Hootel website
+*/
+
+/* 
+===================================
+General Styles
+===================================
+*/
+:root {
+  --primary-bg-color: #f3eee7;
+  --text-color: #313131;
+  --header-menu-content-offset: 20px;
+  --header-menu-height-lg: 88px;
+  --booking-bar-height-lg: 70px;
+  --header-menu-scrolled: 60px;
+  --bn-col-gap: 49px;
+}
+
+html, body {
+  background-color: var(--primary-bg-color) !important;
+}
+
+body {
+  font-family: 'Lyon Display Web', 'Times New Roman', serif;
+  color: var(--text-color);
+  background-color: var(--primary-bg-color) !important;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  letter-spacing: 0.0571428571rem;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.bg-primary {
+  background-color: var(--primary-bg-color) !important;
+}
+
+.bg-white {
+  background-color: #F3EEE7;
+}
+
+.container {
+  position: relative;
+  max-width: 1440px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.container--large {
+  max-width: 1600px;
+}
+
+.container--spacer {
+  margin-top: 4.6428571429rem;
+  margin-bottom: 4.6428571429rem;
+}
+
+.gutter {
+  padding-right: 1.75rem;
+  padding-left: 1.75rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.underline {
+  position: relative;
+}
+
+a.underline:after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 100%;
+  margin-top: 4px;
+  border-bottom: 1px solid;
+}
+
+/* 
+===================================
+Typography
+===================================
+*/
+h1, h2, h3, h4, .h3 {
+  font-family: 'Lyon Text Web', 'Lyon Display Web', 'Times New Roman', serif;
+  letter-spacing: 0.0357142857rem;
+  font-weight: 400;
+}
+
+h1 {
+  margin-bottom: 1.6rem;
+  font-size: 2.22rem;
+}
+
+h2 {
+  font-size: 2.22rem;
+}
+
+.h3, h3, h4 {
+  font-size: 1.4rem;
+  letter-spacing: 0;
+}
+
+.subtitle {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 0.722rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1428571429rem;
+  font-family: 'Whitney SSm A', 'Whitney SSm B', 'Lyon Display Web', 'Times New Roman', serif;
+}
+
+.text--centered {
+  text-align: center;
+}
+
+.text--right {
+  text-align: right;
+}
+
+/* 
+===================================
+Buttons
+===================================
+*/
+a.button, button.button {
+  display: inline-block;
+  padding: 0.8em 4em;
+  color: #000;
+  letter-spacing: 0.05rem;
+  text-decoration: none;
+  border: 1px solid #000;
+  background: transparent;
+  box-sizing: border-box;
+  font-family: 'Whitney SSm A', 'Whitney SSm B', 'Lyon Display Web', 'Times New Roman', serif;
+  cursor: pointer;
+}
+
+a.button--dark, button.button--dark {
+  border-color: #313131;
+  background-color: #313131;
+  color: #f3eee7;
+}
+
+a.button--slim, button.button--slim {
+  font-size: 0.88rem;
+  padding: 0.6em 2.7em;
+}
+
+/* 
+===================================
+Header
+===================================
+*/
+.main-header {
+  position: relative;
+  z-index: 2;
+  background-color: var(--primary-bg-color) !important;
+}
+
+.header__top {
+  padding: 1rem 0;
+}
+
+.header__top .container .grid {
+  min-height: var(--header-menu-height-lg);
+}
+
+.main-header .grid {
+  flex-wrap: nowrap;
+}
+
+.main-header .grid__item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.main-header .grid .hamburger {
+  display: flex;
+  align-items: center;
+}
+
+.main-header .grid .hamburger button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  outline: 0;
+  color: #313131;
+  display: flex;
+  align-items: center;
+}
+
+.main-header .grid .hamburger button .icon {
+  width: 2rem;
+}
+
+.main-header .grid .hamburger__label {
+  margin-left: 2rem;
+  letter-spacing: 0.05rem;
+}
+
+.main-header .grid .logo {
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.main-header .grid .logo a {
+  display: inline-flex;
+}
+
+.main-header .grid .logo svg {
+  width: 220px;
+  height: 60px;
+}
+
+.global-navigation__logo svg {
+  width: 220px;
+  height: 60px;
+}
+
+.main-header__right {
+  justify-content: flex-end;
+}
+
+/* 
+===================================
+Main Content
+===================================
+*/
+main {
+  position: relative;
+  z-index: 1;
+  margin-top: 120px;
+  background-color: var(--primary-bg-color) !important;
+}
+
+.hgroup--limited {
+  max-width: 680px;
+  margin-right: auto;
+  margin-bottom: 4.6428571429rem;
+  margin-left: auto;
+}
+
+.hgroup h2, 
+.hgroup h3, 
+.hgroup p {
+  margin-top: 0;
+}
+
+.hgroup--plain {
+  max-width: inherit;
+}
+
+.hgroup--plain h2 {
+  margin-bottom: 0.5714285714rem;
+}
+
+.hgroup--plain .subtitle {
+  margin-bottom: 1.4285714286rem;
+}
+
+/* 
+===================================
+Cards
+===================================
+*/
+.card {
+  display: inline-block;
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+.card .hgroup {
+  margin-left: 0;
+}
+
+.card__link {
+  display: block;
+  text-decoration: none;
+  outline: 0;
+}
+
+.card figure {
+  margin: 0;
+}
+
+.card img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: top;
+  width: 100%;
+}
+
+.card figcaption, 
+.card header {
+  margin-top: 1.1428571429rem;
+  margin-bottom: 0;
+  padding-bottom: 1rem;
+}
+
+.card figcaption h3, 
+.card header h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.card figcaption p, 
+.card header p {
+  margin-top: 0;
+}
+
+.card--centered {
+  text-align: center;
+}
+
+.card--centered .card__multiple_links, 
+.card--centered .card__post-link-content, 
+.card--centered figcaption {
+  padding-right: 1.75rem;
+  padding-left: 1.75rem;
+}
+
+.card__multiple_links {
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.card__multiple_links .cta__link {
+  margin: 0 0 1rem;
+}
+
+.cta__link {
+  padding: 1rem;
+  font-family: 'Whitney SSm A', 'Whitney SSm B', 'Lyon Display Web', 'Times New Roman', serif;
+}
+
+.cta__link.underline:after {
+  bottom: 0.6rem;
+  right: 1rem;
+  left: 1rem;
+  width: auto;
+  top: auto;
+}
+
+/* Override any Bootstrap or other framework backgrounds */
+.site-footer {
+  background-color: var(--primary-bg-color) !important;
+}
+
+/* 
+===================================
+Media Queries
+===================================
+*/
+@media screen and (max-width: 1100px) {
+  .header__top {
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--primary-bg-color) !important;
+    z-index: 9;
+    margin-top: 0;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .main-header .grid .hamburger__label {
+    display: none;
+  }
+  
+  .hgroup {
+    margin-bottom: 4.2857142857rem;
+  }
+  
+  .hgroup h2 {
+    margin-bottom: 0.6428571429rem;
+  }
+  
+  main {
+    margin-top: 100px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .grid__item {
+    flex-basis: calc(100% - 3.5rem);
+    max-width: 100%;
+  }
+  
+  h1, h2 {
+    font-size: 1.722rem;
+  }
+  
+  a.button--slim {
+    padding: 0.5em 1.3em;
+  }
+  
+  .main-header .logo a {
+    width: auto;
+  }
+  
+  .main-header .grid .logo svg, 
+  .global-navigation__logo svg {
+    width: 180px;
+    height: 50px;
+  }
+  
+  .hero-image--container {
+    margin-right: -1.75rem;
+    margin-left: -1.75rem;
+  }
+}
+
+/* Keep these rules */
+.global-navigation__list--children {
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+}
+
+/* Toggle links styles */
+.toggle-link {
+    position: relative;
+    cursor: pointer;
+}
+
+.toggle-link::after {
+    content: ' >';
+    display: inline-block;
+    position: static;
+    margin-left: 4px;
+    transform: none;
+    transition: transform 0.3s ease;
+}
+
+.toggle-link.active::after {
+    transform: rotate(90deg);
+    display: inline-block;
+}
+
+/* Nested menu styles */
+.global-navigation__list--children .global-navigation__list--children {
+    margin-left: 15px;
+}
+
+/* "See All" link styling */
+.global-navigation__list--children .global-navigation__list-item:first-child .global-navigation__link {
+    font-weight: 500;
+}
+
+/* 
+===================================
+Navigation Menu
+===================================
+*/
+.global-navigation {
+  position: relative;
+}
+
+.global-navigation__columns {
+  display: flex;
+  flex-direction: row;
+  min-height: 400px;
+  background-color: var(--primary-bg-color);
+}
+
+.global-navigation__column {
+  flex: 0 0 250px;
+  padding: 20px 40px 20px 0;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.global-navigation__column:first-child {
+  flex: 0 0 200px;
+}
+
+.global-navigation__column:not(:first-child) {
+  display: none;
+}
+
+.global-navigation__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.global-navigation__list-item {
+  margin-bottom: 15px;
+}
+
+.global-navigation__link {
+  text-decoration: none;
+  color: var(--text-color);
+  display: block;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.global-navigation__link-head {
+  display: block;
+  font-weight: 500;
+}
+
+.global-navigation__link-sub {
+  display: block;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.global-featured {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.global-featured__title {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.global-featured__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hamburger {
+  display: flex;
+  align-items: center;
+}
+
+.icon--burger {
+  width: 32px;
+  height: 32px;
+}
+
+.hamburger__label {
+  font-size: 1.2rem;
+  margin-left: 0.5rem;
+}
+
+.icon--search-thin {
+  width: 28px;
+  height: 28px;
+}
+
+.booking-bar-cta {
+  padding-left: 2rem;
+} 

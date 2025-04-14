@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Hootel Resorts, Hotels &amp; Residences – Explore Luxury Destinations{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Additional styles specific to the home page */
+  .video--container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+  
+  .video--landscape {
+    position: relative;
+    padding-top: 56.25%;  /* 16:9 Aspect Ratio */
+    overflow: hidden;
+  }
+  
+  .bc-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .slider-cards {
+    margin-top: 4rem;
+  }
+  
+  /* Featured Destinations Grid */
+  .scards--featured {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    height: 100%;
+  }
+  
+  /* Experiences Grid */
+  .scards--experiences {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    height: 100%;
+  }
+  
+  .slider-card {
+    background-color: #F3EEE7;
+    border-radius: 0;
+    overflow: hidden;
+    height: 100%;
+  }
+  
+  .slider-card-medium, .slider-card-small {
+    height: 100%;
+  }
+  
+  .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .card__link {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .media--responsive {
+    height: 400px;  /* Fixed height for all images */
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .media--responsive picture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .media--responsive img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  .hgroup {
+    padding: 2rem;
+    flex: 1;
+  }
+  
+  .card__multiple_links {
+    padding: 1rem 2rem;
+    border-top: 1px solid #dad9d7;
+  }
+  
+  @media (max-width: 768px) {
+    .scards--featured,
+    .scards--experiences {
+      grid-template-columns: 1fr;
+    }
+    
+    .media--responsive {
+      min-height: 300px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Welcome Video Section -->
+<section class="paragraph--type--video container--spacer container gutter bc-player--intro block--video">
+  <div class="video--container">
+    <div class="video--landscape">
+      <div class="bc-player bc-player-hero">
+        <video autoplay muted loop class="w-100">
+          <source src="{% static 'core/videos/hootel_intro.mp4' %}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Heading -->
+  <header class="hgroup hgroup--limited hgroup--plain text--functional-header">
+    <p class="subtitle">A New Urban Sanctuary</p>
+    <h2 class="heading-h">
+      Welcoming Tel Nai Lert Bangkok
+    </h2>
+    <div class="hgroup__intro">
+      <a href="#" class="cta__link card__link__cta underline single-link">Discover more</a>
+    </div>
+  </header>
+</section>
+
+<!-- Featured Destinations Section -->
+<section class="paragraph--type--slider-cards container--spacer container--text-alignment-left portrait-video slider-cards">
+  <div class="container gutter">
+    <div class="scards scards--featured">
+      {% for destination in featured_destinations %}
+      <div class="slider-card">
+        <article class="card venue-card--link">
+          <div class="media media--responsive">
+            <picture>
+              {% if destination.representative_image %}
+              <img src="{{ destination.representative_image}}" alt="{{ destination.name }}" class="img-fluid">
+              {% else %}
+              <img src="{% static 'images/placeholder.jpg' %}" alt="{{ experience.name }}" class="img-fluid">
+              {% endif %}
+
+
+            </picture>
+          </div>
+          <a href="#" class="card__link">
+            <header class="hgroup">
+              <h3 class="subtitle">{% if forloop.first %}hotels &amp; resorts{% else %}featured destination{% endif %}</h3>
+              <h3 class="heading-h card__heading">{{ destination.name }}</h3>
+              <div class="hgroup__intro">{{ destination.description }}</div>
+            </header>
+          </a>
+          <div class="card__multiple_links">
+            <a href="{% url 'catalog:item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline single-link">Discover more</a>
+          </div>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Experiences Section -->
+<section class="paragraph--type--text-and-carousel-of-cards container--spacer container gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <p class="subtitle">Experiences at Hootel</p>
+    <h2 class="heading-h">Journey to extraordinary places</h2>
+    <div class="hgroup__intro">
+      <p>From spiritual pilgrimages to cultural discoveries, Hootel curates transformative experiences that immerse guests in the spirit of each destination.</p>
+    </div>
+  </header>
+  
+  <div class="scards scards--experiences mt-5">
+    {% for experience in experiences %}
+    <div class="slider-card">
+      <article class="card card--centered">
+        <div class="media media--responsive">
+          <picture>
+            <!-- <img src="{% static experience.image %}" alt="Hootel Experiences - {{ experience.name }}" class="img-fluid"> -->
+          
+            {% if experience.representative_image %}
+            <img src="{{ experience.representative_image}}" alt="{{ destination.name }}" class="img-fluid">
+            {% else %}
+            <img src="{% static 'images/placeholder.jpg' %}" alt="{{ experience.name }}" class="img-fluid">
+            {% endif %}
+          </picture>
+        </div>
+        <figcaption class="hgroup">
+          <h3>{{ experience.name }}</h3>
+          <p>{{ experience.description }}</p>
+        </figcaption>
+        <div class="card__multiple_links">
+          <a href="{% url 'catalog:item_detail' item_title=experience.name %}" class="cta__link card__link__cta underline">Discover more</a>
+        </div>
+      </article>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="container--spacer container gutter text--centered">
+  <div class="py-5">
+    <h2 class="heading-h mb-4">Discover the World of Hootel</h2>
+    <a href="{% url 'core:destinations' %}" class="button button--dark">Explore Destinations</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Home page specific JavaScript
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize any home page specific functionality
+  });
+</script>
+{% endblock %} 

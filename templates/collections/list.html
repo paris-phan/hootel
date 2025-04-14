@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Collections</h1>
+    <div class="row">
+        {% for collection in collections %}
+            {% include "collection/collection_card.html" with collection=collection %}
+        {% empty %}
+            <div class="col-12">
+                <p>No collections found.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

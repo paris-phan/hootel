@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Librarian Dashboard</h1>
+        </div>
+    </div>
+
+    <!-- Items Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-3">Items</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Identifier</th>
+                            <th>Status</th>
+                            <th>Location</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.title }}</td>
+                            <td>{{ item.identifier }}</td>
+                            <td>
+                                <span class="badge {% if item.status == 0 %}bg-success{% elif item.status == 1 %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ item.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ item.location }}</td>
+                            <td>{{ item.created_by.username|default:"Unknown" }}</td>
+                            <td>{{ item.created_at|date:"Y-m-d" }}</td>
+                            <td>
+                                <a href="{% url 'item_detail' item.title %}" class="btn btn-sm btn-info">View</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">No items found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collections Section -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-3">Collections</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Visibility</th>
+                            <th>Creator</th>
+                            <th>Created At</th>
+                            <th>Items</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for collection in collections %}
+                        <tr>
+                            <td>{{ collection.title }}</td>
+                            <td>{{ collection.description|truncatewords:20 }}</td>
+                            <td>
+                                <span class="badge {% if collection.visibility == 0 %}bg-success{% else %}bg-warning{% endif %}">
+                                    {{ collection.get_visibility_display }}
+                                </span>
+                            </td>
+                            <td>{{ collection.creator.username }}</td>
+                            <td>{{ collection.created_at|date:"Y-m-d" }}</td>
+                            <td>
+                                {% if collection.collectionitems_set.all %}
+                                    {% for collection_item in collection.collectionitems_set.all %}
+                                        {{ collection_item.item.title }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted">No items</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'collection:list' %}" class="btn btn-sm btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">No collections found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Access Requests Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-3">Access Requests</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Collection</th>
+                            <th>Status</th>
+                            <th>Request Date</th>
+                            <th>Reason</th>
+                            <th>Reviewed By</th>
+                            <th>Review Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in access_requests %}
+                        <tr>
+                            <td>{{ request.user.username }}</td>
+                            <td>{{ request.collection.title }}</td>
+                            <td>
+                                <span class="badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ request.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ request.request_date|date:"Y-m-d" }}</td>
+                            <td>{{ request.reason|truncatewords:10 }}</td>
+                            <td>{{ request.reviewed_by.username|default:"-" }}</td>
+                            <td>{{ request.review_date|date:"Y-m-d"|default:"-" }}</td>
+                            <td>
+                                {% if request.status == 'pending' %}
+                                <button class="btn btn-sm btn-success approve-btn" data-request-id="{{ request.id }}">Approve</button>
+                                <button class="btn btn-sm btn-danger deny-btn" data-request-id="{{ request.id }}">Deny</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">No access requests found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-3">Users</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Date Joined</th>
+                            <th>Last Login</th>
+                            <th>Is Staff</th>
+                            <th>Is Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.last_name }}</td>
+                            <td>{{ user.date_joined|date:"Y-m-d" }}</td>
+                            <td>{{ user.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
+                            <td>
+                                <span class="badge {% if user.role == 1 %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ user.role|yesno:"Librarian,Patron" }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ user.is_active|yesno:"Yes,No" }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'accounts:user_profile' user.username %}" class="btn btn-sm btn-info">View</a>
+                                <button class="btn btn-sm {% if user.role == 0 %}btn-success{% else %}btn-warning{% endif %} toggle-role-btn" 
+                                        data-user-id="{{ user.id }}"
+                                        data-current-role="{{ user.role }}">
+                                    {% if user.role == 0 %}Make Librarian{% else %}Make Patron{% endif %}
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center">No users found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle approve/deny buttons
+    const approveButtons = document.querySelectorAll('.approve-btn');
+    const denyButtons = document.querySelectorAll('.deny-btn');
+    
+    function handleRequest(action, requestId) {
+        fetch(`/librarian-dashboard/access-request/${action}/${requestId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'An error occurred');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while processing the request');
+        });
+    }
+    
+    approveButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to approve this request?')) {
+                handleRequest('approve', this.dataset.requestId);
+            }
+        });
+    });
+    
+    denyButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to deny this request?')) {
+                handleRequest('deny', this.dataset.requestId);
+            }
+        });
+    });
+
+    // Handle role toggle buttons
+    const toggleRoleButtons = document.querySelectorAll('.toggle-role-btn');
+    
+    toggleRoleButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const userId = this.dataset.userId;
+            const currentRole = parseInt(this.dataset.currentRole);
+            const newRole = currentRole === 0 ? 1 : 0;
+            const action = currentRole === 0 ? 'make librarian' : 'make patron';
+            
+            if (confirm(`Are you sure you want to ${action}?`)) {
+                fetch(`/librarian-dashboard/accounts/toggle-role/${userId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'An error occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing the request');
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

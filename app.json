@@ -1,10 +1,10 @@
 {
     "name": "hoo-tel",
     "description": "Hotel management application",
-    "repository": "https://github.com/your-username/project-b-10",
+    "repository": "https://github.com/uva-cs3240-s25/project-b-10",
     "env": {
       "DJANGO_SETTINGS_MODULE": {
-        "value": "hotelmanager6000.settings"
+        "value": "hootel.settings"
       },
       "SECRET_KEY": {
         "generator": "secret"

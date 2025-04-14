@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ item.title }} | Hootel Destinations{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Additional styles specific to the item detail page */
+  .item-hero {
+    position: relative;
+    height: 500px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+  
+  .item-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .item-hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 4rem 2rem 2rem;
+    background: linear-gradient(to top, rgba(0,0,0,1), transparent);
+    color: #F3EEE7;
+    
+  }
+  
+  .item-detail {
+    padding: 4rem 0;
+  }
+  
+  .item-detail:nth-child(even) {
+    background-color: #F3EEE7;
+  }
+  
+  .item-image {
+    position: relative;
+    height: 100%;
+    min-height: 400px;
+  }
+  
+  .item-image img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .item-content {
+    padding: 2rem;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-top: 1rem;
+  }
+  
+  .status-available {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .status-reserved {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  .status-maintenance {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .item-hero {
+      height: 300px;
+    }
+    
+    .item-image {
+      min-height: 300px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<section class="item-hero">
+  {% if item.hero_image %}
+    <img src="{{ item.hero_image.url }}" 
+         srcset="{{ item.hero_image.url }} 1x, {{ item.hero_image.url }} 2x" 
+         alt="{{ item.title }}" 
+         class="img-fluid">
+  {% else %}
+    <img src="{% static 'images/placeholder.jpg' %}" 
+         alt="{{ item.title }}" 
+         class="img-fluid">
+  {% endif %}
+  <div class="item-hero-content">
+    <h1>{{ item.title }}</h1>
+    <p>{{ item.location }}</p>
+  </div>
+</section>
+
+<!-- Intro Section -->
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <p class="subtitle">Destination Details</p>
+    <h2 class="heading-h">{{ item.title }}</h2>
+    <div class="hgroup__intro">
+      <p>{{ item.description }}</p>
+      {% if item.location %}
+        <p><strong>Location:</strong> {{ item.location }}</p>
+      {% endif %}
+      <a href="{% url 'catalog:booking' item.title %}" class="button button--primary">Book Now</a>
+    </div>
+  </header>
+</section>
+
+<!-- Item Details -->
+<section class="item-detail">
+  <div class="container gutter">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="item-image">
+          {% if item.representative_image %}
+            <img src="{{ item.representative_image.url }}" alt="{{ item.title }}" class="img-fluid">
+          {% else %}
+            <img src="{% static 'images/placeholder.jpg' %}" alt="{{ item.title }}" class="img-fluid">
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="item-content">
+          <p class="subtitle">Destination Information</p>
+          <h2 class="heading-h">About {{ item.title }}</h2>
+          <p>{{ item.description }}</p>
+          <p><strong>Location:</strong> {{ item.location }}</p>
+          <p><strong>Status:</strong> {{ item.get_status_display }}</p>
+          <p><strong>Established:</strong> {{ item.created_at|date:"F, Y" }}</p>
+          <p><strong>Collection Visibility:</strong> {% if is_in_private_collection %}Private{% else %}Public{% endif %}</p>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Reviews Section -->
+{% if item.reviews.all %}
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <h2 class="heading-h">Destination Reviews</h2>
+  </header>
+
+  <div class="reviews-list mt-5">
+    <ul class="list-unstyled">
+      {% for review in item.reviews.all %}
+      <li class="review-item mb-4">
+        <div class="d-flex align-items-start">
+          <div class="review-avatar me-3">
+            {% if review.creator.profile_picture %}
+              <img src="{{ review.creator.profile_picture.url }}" alt="{{ review.creator.username }}" class="rounded-circle" width="60" height="60">
+            {% else %}
+              <div class="default-avatar rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                <span class="text-white">{{ review.creator.username|make_list|first|upper }}</span>
+              </div>
+            {% endif %}
+          </div>
+          <div class="review-content">
+            <div class="d-flex align-items-center mb-2">
+              <h5 class="mb-0 me-3"><a href="{% url 'accounts:user_profile' username=review.creator.username %}" class="text-decoration-none">{{ review.creator.username }}</a></h5>
+              <div class="rating">
+                {% for i in "12345"|make_list %}
+                  {% if forloop.counter <= review.rating %}
+                    <span class="text-black">☆</span>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            <p class="review-text mb-2">{{ review.comment }}</p>
+            <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+<!-- Call to Action Section -->
+<section class="container--spacer container gutter text--centered">
+  <div class="py-5">
+    <h2 class="heading-h mb-4">Explore More</h2>
+    <a href="{% url 'core:destinations' %}" class="button button--dark">View All Destinations</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Item detail page specific JavaScript
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animation on scroll for item sections
+    const itemSections = document.querySelectorAll('.item-detail');
+    
+    const revealOnScroll = function() {
+      itemSections.forEach(section => {
+        const sectionTop = section.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (sectionTop < windowHeight * 0.8) {
+          section.classList.add('revealed');
+        }
+      });
+    };
+    
+    window.addEventListener('scroll', revealOnScroll);
+    window.addEventListener('load', revealOnScroll);
+  });
+</script>
+{% endblock %} 
