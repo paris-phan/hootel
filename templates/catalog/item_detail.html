@@ -93,16 +93,19 @@
 {% block content %}
 <!-- Hero Banner -->
 <section class="item-hero">
-  {% if item.representative_image %}
-    <img src="{{ item.representative_image.url }}" alt="{{ item.title }}" class="img-fluid">
+  {% if item.hero_image %}
+    <img src="{{ item.hero_image.url }}" 
+         srcset="{{ item.hero_image.url }} 1x, {{ item.hero_image.url }} 2x" 
+         alt="{{ item.title }}" 
+         class="img-fluid">
   {% else %}
-    <img src="{% static 'images/placeholder.jpg' %}" alt="{{ item.title }}" class="img-fluid">
+    <img src="{% static 'images/placeholder.jpg' %}" 
+         alt="{{ item.title }}" 
+         class="img-fluid">
   {% endif %}
   <div class="item-hero-content">
-    
-      <h1>{{ item.title }}</h1>
-      <p>{{ item.location }}</p>
-    
+    <h1>{{ item.title }}</h1>
+    <p>{{ item.location }}</p>
   </div>
 </section>
 
@@ -142,8 +145,8 @@
           <p><strong>Location:</strong> {{ item.location }}</p>
           <p><strong>Status:</strong> {{ item.get_status_display }}</p>
           <p><strong>Established:</strong> {{ item.created_at|date:"F, Y" }}</p>
-          {% if item.created_by %}
-          {% endif %}
+          <p><strong>Collection Visibility:</strong> {% if is_in_private_collection %}Private{% else %}Public{% endif %}</p>
+          
         </div>
       </div>
     </div>
@@ -156,19 +159,39 @@
   <header class="hgroup hgroup--limited text--centered">
     <h2 class="heading-h">Destination Reviews</h2>
   </header>
-  
-  <div class="row mt-5">
-    {% for review in item.reviews.all %}
-    <div class="col-md-6 mb-4">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Rating: {{ review.rating }}/5</h5>
-          <p class="card-text">{{ review.comment }}</p>
-          <p class="text-muted">By {{ review.creator.username }} on {{ review.created_at|date:"F j, Y" }}</p>
+
+  <div class="reviews-list mt-5">
+    <ul class="list-unstyled">
+      {% for review in item.reviews.all %}
+      <li class="review-item mb-4">
+        <div class="d-flex align-items-start">
+          <div class="review-avatar me-3">
+            {% if review.creator.profile_picture %}
+              <img src="{{ review.creator.profile_picture.url }}" alt="{{ review.creator.username }}" class="rounded-circle" width="60" height="60">
+            {% else %}
+              <div class="default-avatar rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                <span class="text-white">{{ review.creator.username|make_list|first|upper }}</span>
+              </div>
+            {% endif %}
+          </div>
+          <div class="review-content">
+            <div class="d-flex align-items-center mb-2">
+              <h5 class="mb-0 me-3"><a href="{% url 'accounts:user_profile' username=review.creator.username %}" class="text-decoration-none">{{ review.creator.username }}</a></h5>
+              <div class="rating">
+                {% for i in "12345"|make_list %}
+                  {% if forloop.counter <= review.rating %}
+                    <span class="text-black">☆</span>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            <p class="review-text mb-2">{{ review.comment }}</p>
+            <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
+          </div>
         </div>
-      </div>
-    </div>
-    {% endfor %}
+      </li>
+      {% endfor %}
+    </ul>
   </div>
 </section>
 {% endif %}

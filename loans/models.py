@@ -16,6 +16,9 @@ class LoanRequest(models.Model):
     approved_at = models.DateTimeField(null=True, blank=True)
     denied_at = models.DateTimeField(null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
+    start_date = models.DateField(null=False, blank=False)
+    end_date = models.DateField(null=False, blank=False)
+    reservation_total = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
 
     class Meta:
         db_table = 'loan_request'  # <--- Custom table name
