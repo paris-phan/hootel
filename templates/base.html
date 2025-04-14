@@ -421,14 +421,14 @@
             </div>
 
             <!-- Featured section -->
-            <div class="global-featured">
+            <!-- <div class="global-featured">
               <p class="global-featured__title">Discover Hootel in...</p>
               <div class="global-featured__buttons">
                 <a href="#" class="button">USA & the Caribbean</a>
                 <a href="#" class="button">Europe & North Africa</a>
                 <a href="#" class="button">Asia</a>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -556,7 +556,11 @@
 
         // Toggle menu when clicking the menu trigger
         menuTrigger.addEventListener('click', function() {
-          menuOverlay.classList.add('active');
+          if (menuOverlay.classList.contains('active')) {
+            menuOverlay.classList.remove('active');
+          } else {
+            menuOverlay.classList.add('active');
+          }
         });
 
         // Close menu when clicking the close button
