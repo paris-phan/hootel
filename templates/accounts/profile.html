@@ -115,7 +115,7 @@
                             <div class="mb-3">
                                 <span class="subtitle">{{ role_display }}</span>
                             </div>
-                            {% if user.role == 1 %}
+                            {% if user.role == 1 and is_own_profile %}
                             <div>
                                 <a href="{% url 'core:librarian_dashboard' %}" class="button button--slim button--dark">Staff Portal</a>
                             </div>
