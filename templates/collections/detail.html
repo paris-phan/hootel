@@ -3,6 +3,72 @@
 
 {% block title %}{{ collection.title }} - Collection{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Custom modal styles */
+.custom-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+}
+
+.custom-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 80%;
+    max-width: 800px;
+    z-index: 2001;
+}
+
+.custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.custom-modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.custom-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 15px;
+}
+
+.custom-modal-body {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.custom-modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -28,7 +94,14 @@
                     </div>
 
                     <div class="collection-items">
-                        <h3 class="h5 mb-3">Items in this Collection</h3>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="h5 mb-0">Items in this Collection</h3>
+                            {% if request.user == collection.creator %}
+                            <button type="button" class="button button--slim button--dark" id="openAddItemsModal">
+                                Add Items
+                            </button>
+                            {% endif %}
+                        </div>
                         {% if collection.collectionitems_set.all %}
                             <div class="row">
                                 {% for collection_item in collection.collectionitems_set.all %}
@@ -46,6 +119,12 @@
                                                         Location: {{ collection_item.item.location }}
                                                     </small>
                                                 </p>
+                                                {% if request.user == collection.creator %}
+                                                <form method="post" action="{% url 'collection:remove_item' collection.id collection_item.item.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                                </form>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -62,4 +141,81 @@
         </div>
     </div>
 </div>
+
+{% if request.user == collection.creator %}
+<!-- Custom Modal for Adding Items -->
+<div id="addItemsModalOverlay" class="custom-modal-overlay"></div>
+<div id="addItemsModalContent" class="custom-modal">
+    <div class="custom-modal-header">
+        <h5 class="custom-modal-title">Add Items to Collection</h5>
+        <button type="button" class="custom-modal-close" id="closeAddItemsModal">&times;</button>
+    </div>
+    <form method="post" action="{% url 'collection:add_items' collection.id %}" id="addItemsForm">
+        {% csrf_token %}
+        <div class="custom-modal-body">
+            <div class="mb-3">
+                <label class="form-label">Select Items to Add</label>
+                <div class="items-container" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                    {% for item in available_items %}
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="items" value="{{ item.id }}" id="item-{{ item.id }}">
+                        <label class="form-check-label" for="item-{{ item.id }}">
+                            {{ item.title }} - {{ item.identifier }}
+                        </label>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No items available to add.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="custom-modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelAddItemsModal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Add to Collection</button>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const openModalBtn = document.getElementById('openAddItemsModal');
+    const closeModalBtn = document.getElementById('closeAddItemsModal');
+    const cancelModalBtn = document.getElementById('cancelAddItemsModal');
+    const modalOverlay = document.getElementById('addItemsModalOverlay');
+    const modalContent = document.getElementById('addItemsModalContent');
+    
+    function openModal() {
+        modalOverlay.style.display = 'block';
+        modalContent.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+    }
+    
+    function closeModal() {
+        modalOverlay.style.display = 'none';
+        modalContent.style.display = 'none';
+        document.body.style.overflow = ''; // Enable scrolling again
+    }
+    
+    openModalBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelModalBtn.addEventListener('click', closeModal);
+    
+    // Close when clicking outside the modal
+    modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+            closeModal();
+        }
+    });
+    
+    // Close when ESC key is pressed
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endif %}
 {% endblock %} 

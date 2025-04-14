@@ -380,9 +380,11 @@
                   <li class="global-navigation__list-item">
                     <a href="{% url 'core:about' %}" class="global-navigation__link">About Us</a>
                   </li>
+                  {% if user.is_authenticated and user.role == 1 %}
                   <li class="global-navigation__list-item">
                     <a href="{% url 'core:librarian_dashboard' %}" class="global-navigation__link">Staff Portal</a>
                   </li>
+                  {% endif %}
                 </ul>
               </div>
 

@@ -3,6 +3,72 @@
 
 {% block title %}{{ user.get_full_name|default:user.username }} - Hootel{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Custom modal styles */
+.custom-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+}
+
+.custom-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 80%;
+    max-width: 800px;
+    z-index: 2001;
+}
+
+.custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.custom-modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.custom-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 15px;
+}
+
+.custom-modal-body {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.custom-modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -203,8 +269,13 @@
     <div class="row justify-content-center mt-5">
         <div class="col-md-8">
             <div class="card shadow-sm">
-                <div class="card-header bg-white">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h2 class="h4 mb-0">Collections</h2>
+                    {% if is_own_profile %}
+                    <button type="button" class="button button--slim button--dark" id="openCreateCollectionModal">
+                        Create Collection
+                    </button>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -249,6 +320,58 @@
 </div>
 
 {% if is_own_profile %}
+<!-- Custom Modal Implementation -->
+<div id="createCollectionModalOverlay" class="custom-modal-overlay"></div>
+<div id="createCollectionModalContent" class="custom-modal">
+    <div class="custom-modal-header">
+        <h5 class="custom-modal-title">Create New Collection</h5>
+        <button type="button" class="custom-modal-close" id="closeCreateCollectionModal">&times;</button>
+    </div>
+    <form method="post" action="{% url 'collection:create' %}" id="createCollectionForm">
+        {% csrf_token %}
+        <div class="custom-modal-body">
+            <div class="mb-3">
+                <label for="collection-title" class="form-label">Collection Title</label>
+                <input type="text" class="form-control" id="collection-title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="collection-description" class="form-label">Description</label>
+                <textarea class="form-control" id="collection-description" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="collection-visibility" class="form-label">Visibility</label>
+                <select class="form-select" id="collection-visibility" name="visibility">
+                    <option value="0">Public</option>
+                    {% if user.role == 1 %}
+                    <option value="1">Private</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Select Items</label>
+                <div class="items-container" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                    {% for item in all_items %}
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="items" value="{{ item.id }}" id="item-{{ item.id }}">
+                        <label class="form-check-label" for="item-{{ item.id }}">
+                            {{ item.title }} - {{ item.identifier }}
+                        </label>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No items available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="custom-modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelCreateCollectionModal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Collection</button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+{% if is_own_profile %}
 {% block extra_js %}
 <script>
 document.getElementById('profilePhotoInput').addEventListener('change', function(e) {
@@ -269,6 +392,45 @@ document.getElementById('profilePhotoInput').addEventListener('change', function
         // Submit the form
         document.getElementById('profilePhotoForm').submit();
     }
+});
+
+// Custom modal functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const openModalBtn = document.getElementById('openCreateCollectionModal');
+    const closeModalBtn = document.getElementById('closeCreateCollectionModal');
+    const cancelModalBtn = document.getElementById('cancelCreateCollectionModal');
+    const modalOverlay = document.getElementById('createCollectionModalOverlay');
+    const modalContent = document.getElementById('createCollectionModalContent');
+    
+    function openModal() {
+        modalOverlay.style.display = 'block';
+        modalContent.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+    }
+    
+    function closeModal() {
+        modalOverlay.style.display = 'none';
+        modalContent.style.display = 'none';
+        document.body.style.overflow = ''; // Enable scrolling again
+    }
+    
+    openModalBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelModalBtn.addEventListener('click', closeModal);
+    
+    // Close when clicking outside the modal
+    modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+            closeModal();
+        }
+    });
+    
+    // Close when ESC key is pressed
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
 });
 </script>
 {% endblock %}
