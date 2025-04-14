@@ -70,8 +70,7 @@
   }
   
   .media--responsive {
-    height: 100%;
-    min-height: 500px;
+    height: 400px;  /* Fixed height for all images */
     position: relative;
     overflow: hidden;
   }
@@ -149,7 +148,13 @@
         <article class="card venue-card--link">
           <div class="media media--responsive">
             <picture>
-              <img src="{% static destination.image %}" alt="{{ destination.name }}" class="img-fluid">
+              {% if destination.representative_image %}
+              <img src="{{ destination.representative_image}}" alt="{{ destination.name }}" class="img-fluid">
+              {% else %}
+              <img src="{% static 'images/placeholder.jpg' %}" alt="{{ experience.name }}" class="img-fluid">
+              {% endif %}
+
+
             </picture>
           </div>
           <a href="#" class="card__link">
@@ -160,7 +165,7 @@
             </header>
           </a>
           <div class="card__multiple_links">
-            <a href="#" class="cta__link card__link__cta underline single-link">Discover more</a>
+            <a href="{% url 'catalog:item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline single-link">Discover more</a>
           </div>
         </article>
       </div>
@@ -185,7 +190,13 @@
       <article class="card card--centered">
         <div class="media media--responsive">
           <picture>
-            <img src="{% static experience.image %}" alt="Hootel Experiences - {{ experience.name }}" class="img-fluid">
+            <!-- <img src="{% static experience.image %}" alt="Hootel Experiences - {{ experience.name }}" class="img-fluid"> -->
+          
+            {% if experience.representative_image %}
+            <img src="{{ experience.representative_image}}" alt="{{ destination.name }}" class="img-fluid">
+            {% else %}
+            <img src="{% static 'images/placeholder.jpg' %}" alt="{{ experience.name }}" class="img-fluid">
+            {% endif %}
           </picture>
         </div>
         <figcaption class="hgroup">
@@ -193,7 +204,7 @@
           <p>{{ experience.description }}</p>
         </figcaption>
         <div class="card__multiple_links">
-          <a href="#" class="cta__link card__link__cta underline">Discover more</a>
+          <a href="{% url 'catalog:item_detail' item_title=experience.name %}" class="cta__link card__link__cta underline">Discover more</a>
         </div>
       </article>
     </div>
@@ -205,7 +216,7 @@
 <section class="container--spacer container gutter text--centered">
   <div class="py-5">
     <h2 class="heading-h mb-4">Discover the World of Hootel</h2>
-    <a href="#" class="button button--dark">Explore Destinations</a>
+    <a href="{% url 'core:destinations' %}" class="button button--dark">Explore Destinations</a>
   </div>
 </section>
 {% endblock %}

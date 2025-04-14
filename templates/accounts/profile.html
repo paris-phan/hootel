@@ -103,6 +103,61 @@
         </div>
     </div>
 
+    <!-- Loans Section -->
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h2 class="h4 mb-0">Current Bookings</h2>
+                </div>
+                <div class="card-body">
+                    <div class="loans-list">
+                        {% for loan in loans %}
+                        <div class="loan-item mb-4 pb-4 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="d-flex align-items-start">
+                                <div class="loan-content flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="mb-0">
+                                            <a href="{% url 'catalog:item_detail' item_title=loan.item.title %}" class="text-decoration-none">
+                                                {{ loan.item.title }}
+                                            </a>
+                                        </h5>
+                                        <span class="badge {% if loan.status == 0 %}bg-warning{% elif loan.status == 1 %}bg-success{% elif loan.status == 2 %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            {{ loan.get_status_display }}
+                                        </span>
+                                    </div>
+                                    <div class="loan-details">
+                                        <p class="mb-1">
+                                            <strong>Requested:</strong> {{ loan.requested_at|date:"F j, Y" }}
+                                        </p>
+                                        {% if loan.start_date %}
+                                        <p class="mb-1">
+                                            <strong>Start Date:</strong> {{ loan.start_date|date:"F j, Y" }}
+                                        </p>
+                                        {% endif %}
+                                        {% if loan.end_date %}
+                                        <p class="mb-1">
+                                            <strong>End Date:</strong> {{ loan.end_date|date:"F j, Y" }}
+                                        </p>
+                                        {% endif %}
+                                        {% if loan.reservation_total %}
+                                        <p class="mb-1">
+                                            <strong>Total:</strong> ${{ loan.reservation_total }}
+                                        </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">No current loans.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Reviews Section -->
     {% if reviews %}
     <div class="row justify-content-center mt-5">

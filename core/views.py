@@ -1,8 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView
-from catalog.models import Item 
-from collection.models import Collection, CollectionItems
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required, user_passes_test
+from catalog.models import Item 
+from collection.models import Collection, CollectionItems, CollectionAuthorizedUser
+from access_request.models import AccessRequest
+from django.contrib.auth import get_user_model
 
 # Create your views here.
 
@@ -17,37 +21,55 @@ def home(request):
     """
     Homepage view.
     """
+    # Get the first 2 items for featured destinations
+    featured_items = Item.objects.all()[:2]
+    
+    # Get the next 3 items for experiences
+    experience_items = Item.objects.all()[2:5]
+    
+    # Format featured destinations
+    featured_destinations = []
+    for item in featured_items:
+        try:
+            if item.representative_image and hasattr(item.representative_image, 'url'):
+                image_path = item.representative_image.url
+            else:
+                image_path = 'core/images/destination-feature.jpg'
+        except Exception:
+            # In case of any errors with the image, use default
+            image_path = 'core/images/destination-feature.jpg'
+
+
+        featured_destinations.append({
+            'name': item.title,
+            'description': item.description or '',
+            'representative_image': image_path,
+            'id': item.id,
+        })
+    
+    # Format experiences
+    experiences = []
+    for item in experience_items:
+        try:
+            if item.representative_image and hasattr(item.representative_image, 'url'):
+                image_path = item.representative_image.url
+            else:
+                image_path = 'core/images/destination-feature.jpg'
+        except Exception:
+            # In case of any errors with the image, use default
+            image_path = 'core/images/destination-feature.jpg'
+
+        experiences.append({
+            'name': item.title,
+            'description': item.description or '',
+            'representative_image': image_path,
+            'id': item.id,
+        })
+    
     context = {
         'page_title': 'Tel Resorts, Hotels & Residences – Explore Luxury Destinations',
-        'featured_destinations': [
-            {
-                'name': 'Telzoe, Greece',
-                'description': 'Telzoe welcomes a new season on the beach-fringed Peloponnese.',
-                'image': 'core/images/destination-feature.jpg',
-            },
-            {
-                'name': 'Tel Nai Lert Bangkok',
-                'description': '"Introducing 52-suites, a 1,500-square-metre Tel Spa & Wellness centre and seven venues for dining and socialising to the city. Tel Nai Lert blends timeless Thai elegance with modern sophistication. Each suite is thoughtfully designed to reflect the rich cultural heritage of the Nai Lert Park area while offering state-of-the-art comfort. The Tel Spa & Wellness centre provides a sanctuary for holistic rejuvenation, featuring bespoke treatments and serene spaces. With seven distinct dining and social venues, guests can explore a vibrant tapestry of flavors and experiences that celebrate both local and international culinary artistry.',
-                'image': 'core/images/destination-feature.jpg',
-            },
-        ],
-        'experiences': [
-            {
-                'name': 'Wellness Journeys',
-                'description': 'Embark on a path to wellbeing with Tel\'s immersive wellness programs.',
-                'image': 'core/images/destination-feature.jpg',
-            },
-            {
-                'name': 'Cultural Discoveries',
-                'description': 'Immerse yourself in local traditions and authentic cultural experiences.',
-                'image': 'core/images/destination-feature.jpg',
-            },
-            {
-                'name': 'Active Adventures',
-                'description': 'Explore dramatic landscapes and natural wonders with expert guides.',
-                'image': 'core/images/destination-feature.jpg',
-            },
-        ]
+        'featured_destinations': featured_destinations,
+        'experiences': experiences
     }
     return render(request, 'core/home.html', context)
 
@@ -109,33 +131,71 @@ def destinations(request):
     return render(request, 'core/destinations.html', context)
 
 def experiences(request):
-    #"""
-    #Experiences page view.
-    #"""
+    """
+    Experiences page view.
+    """
+    # Get all items from the catalog
+    items = Item.objects.all()
+    
     # Get all collections
     collections = Collection.objects.all()
     
+    # Map items to destination format
+    destinations = []
+    for item in items:
+        # Get collections this item belongs to
+        item_collections = CollectionItems.objects.filter(item=item).select_related('collection')
+        
+        # Check if the item is in any private collections
+        is_in_private_collection = any(ci.collection.visibility == 1 for ci in item_collections)
+        
+        # Skip items that are not in private collections
+        if not is_in_private_collection:
+            continue
+            
+        collection_ids = [ci.collection.id for ci in item_collections]
+        
+        # Check if user is authorized for any of the collections
+        is_authorized = False
+        if request.user.is_authenticated:
+            # Check if user is authorized for any of this item's collections
+            authorized_collections = CollectionAuthorizedUser.objects.filter(
+                collection__id__in=collection_ids,
+                user=request.user
+            ).exists()
+            is_authorized = authorized_collections
+        
+        # Map location to region
+        region = 'asia'  # default
+        if item.location and 'europe' in item.location.lower():
+            region = 'europe'
+        elif item.location and ('america' in item.location.lower() or 'caribbean' in item.location.lower()):
+            region = 'americas'
+            
+        # Handle image - use a safe default
+        try:
+            if item.representative_image and hasattr(item.representative_image, 'url'):
+                image_path = item.representative_image.url
+            else:
+                image_path = 'images/default-destination.jpg'
+        except Exception:
+            # In case of any errors with the image, use default
+            image_path = 'images/default-destination.jpg'
+            
+        destinations.append({
+            'name': item.title,
+            'description': item.description or '',
+            'representative_image': image_path,
+            'region': region,
+            'collection_ids': collection_ids,
+            'has_private_collection': True,  # Since we only include items with private collections
+            'is_authorized_for_user': is_authorized  # Add authorization flag
+        })
+    
     context = {
         'page_title': 'Experiences | Tel Resorts',
-        'collections': collections,
-        'experiences': [
-            {
-                'name': 'Wellness Journeys',
-                'description': 'Embark on a path to wellbeing with Tel\'s immersive wellness programs.',
-                'image': 'images/experiences-1.jpg',
-            },
-            {
-                'name': 'Cultural Discoveries',
-                'description': 'Immerse yourself in local traditions and authentic cultural experiences.',
-                'image': 'images/experiences-2.jpg',
-            },
-            {
-                'name': 'Active Adventures',
-                'description': 'Explore dramatic landscapes and natural wonders with expert guides.',
-                'image': 'images/experiences-3.jpg',
-            },
-            # Add more experiences here
-        ]
+        'destinations': destinations,
+        'collections': collections
     }
     return render(request, 'core/experiences.html', context)
 
@@ -163,9 +223,72 @@ def librarian_dashboard(request):
     # Get all collections with their items
     collections = Collection.objects.all().select_related('creator').prefetch_related('collectionitems_set__item')
     
+    # Get all access requests
+    access_requests = AccessRequest.objects.all().select_related('user', 'collection', 'reviewed_by')
+    
+    # Get all users
+    users = get_user_model().objects.all().order_by('date_joined')
+    
     context = {
         'page_title': 'Librarian Dashboard',
         'items': items,
         'collections': collections,
+        'access_requests': access_requests,
+        'users': users,
     }
-    return render(request, 'core/librarian_dashboard.html', context) 
+    return render(request, 'core/librarian_dashboard.html', context)
+
+@login_required
+@user_passes_test(is_librarian)
+@require_POST
+def handle_access_request(request, action, request_id):
+    """Handle access request approval or denial"""
+    try:
+        access_request = get_object_or_404(AccessRequest, id=request_id)
+        
+        if action == 'approve':
+            # Create CollectionAuthorizedUser entry
+            CollectionAuthorizedUser.objects.create(
+                collection=access_request.collection,
+                user=access_request.user
+            )
+            # Delete the access request
+            access_request.delete()
+            message = 'Access request approved successfully'
+        else:  # deny
+            access_request.deny(request.user)
+            message = 'Access request denied successfully'
+            
+        return JsonResponse({
+            'success': True,
+            'message': message
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=500)
+
+@login_required
+@user_passes_test(is_librarian)
+@require_POST
+def toggle_user_role(request, user_id):
+    """Toggle a user's role between librarian and patron"""
+    try:
+        user = get_object_or_404(get_user_model(), id=user_id)
+        current_role = user.role
+        new_role = 1 if current_role == 0 else 0
+        
+        user.role = new_role
+        user.save()
+        
+        action = 'made librarian' if new_role == 1 else 'made patron'
+        return JsonResponse({
+            'success': True,
+            'message': f'User has been {action} successfully'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=500) 
