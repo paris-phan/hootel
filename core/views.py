@@ -8,6 +8,7 @@ from collection.models import Collection, CollectionItems, CollectionAuthorizedU
 from access_request.models import AccessRequest
 from django.contrib.auth import get_user_model
 import json
+from loans.models import Loan
 
 # Create your views here.
 
@@ -230,12 +231,16 @@ def librarian_dashboard(request):
     # Get all users
     users = get_user_model().objects.all().order_by('date_joined')
     
+    # Get all loans
+    loans = Loan.objects.all().select_related('item', 'requester').order_by('-requested_at')
+    
     context = {
         'page_title': 'Librarian Dashboard',
         'items': items,
         'collections': collections,
         'access_requests': access_requests,
         'users': users,
+        'loans': loans,
     }
     return render(request, 'core/librarian_dashboard.html', context)
 
@@ -260,6 +265,41 @@ def handle_access_request(request, action, request_id):
             # Just delete the access request
             access_request.delete()
             message = 'Access request denied successfully'
+            
+        return JsonResponse({
+            'success': True,
+            'message': message
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=500)
+
+@login_required
+@user_passes_test(is_librarian)
+@require_POST
+def handle_loan_action(request, action, loan_id):
+    """Handle loan approval, return, or deletion"""
+    try:
+        loan = get_object_or_404(Loan, id=loan_id)
+        
+        if action == 'approve':
+            loan.status = 1  # Approved
+            loan.save()
+            message = 'Loan approved successfully'
+        elif action == 'return':
+            loan.status = 3  # Returned
+            loan.save()
+            message = 'Item returned successfully'
+        elif action == 'delete':
+            loan.delete()
+            message = 'Loan deleted successfully'
+        else:
+            return JsonResponse({
+                'success': False,
+                'message': 'Invalid action'
+            }, status=400)
             
         return JsonResponse({
             'success': True,

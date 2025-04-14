@@ -11,4 +11,5 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('librarian-dashboard/', views.librarian_dashboard, name='librarian_dashboard'),
     path('access-request/<str:action>/<int:request_id>/', views.handle_access_request, name='handle_access_request'),
+    path('loan/<str:action>/<int:loan_id>/', views.handle_loan_action, name='handle_loan_action'),
 ] 

@@ -7,7 +7,7 @@ from catalog.models import Item
 # Create your views here.
 
 def collection_list(request):
-    collections = Collection.objects.filter(is_region=False)
+    collections = Collection.objects.filter(is_region=False, visibility=0)
     return render(request, 'collections/list.html', {
         'collections': collections
     })

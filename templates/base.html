@@ -384,7 +384,7 @@
                     <a href="{% url 'core:about' %}" class="global-navigation__link">About Us</a>
                   </li>
 
-                  {% if user.is_authenticated and user.role == 1 %}
+                  {% if user.is_authenticated and user.role == 1 and is_own_profile %}
                   <li class="global-navigation__list-item">
                     <a href="{% url 'core:librarian_dashboard' %}" class="global-navigation__link">Staff Portal</a>
                   </li>
@@ -477,7 +477,7 @@
                   <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="button button--slim button--dark" href="{% url 'accounts:user_profile' username=user.username %}">Profile</a>
+                            <a class="button button--slim button--dark" href="{% url 'accounts:profile' %}">Profile</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
