@@ -171,8 +171,18 @@
     border-color: #333 !important;
   }
 
+  /* Custom styles for disabled dates */
   .flatpickr-day.disabled {
-    color: #ccc !important;
+    color: #999 !important;
+    background: #f8f8f8 !important;
+    border-color: #eee !important;
+    text-decoration: line-through !important;
+    cursor: not-allowed !important;
+  }
+
+  .flatpickr-day.disabled:hover {
+    background: #f8f8f8 !important;
+    border-color: #eee !important;
   }
 
   .btn-primary {
@@ -249,7 +259,13 @@
         <p><strong>Price per Night:</strong> $<span id="price-per-night">{{ item.price_per_night }}</span></p>
         <p><strong>Total Price:</strong> $<span id="total-price">0.00</span></p>
       </div>
-      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Book Now</button>
+      <form id="booking-form" method="post" action="{% url 'catalog:booking' item.title %}">
+        {% csrf_token %}
+        <input type="hidden" name="start_date" id="start-date-input">
+        <input type="hidden" name="end_date" id="end-date-input">
+        <input type="hidden" name="total_price" id="total-price-input">
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Book Now</button>
+      </form>
     </div>
   </div>
 </section>
@@ -260,6 +276,17 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Initialize disabled dates array
+    const disabledDates = [];
+    
+    // Get the disabled dates from the template context
+    {% for date_range in disabled_dates %}
+    disabledDates.push({
+      from: "{{ date_range.from }}",
+      to: "{{ date_range.to }}"
+    });
+    {% endfor %}
+    
     const fp = flatpickr("#date-range", {
       mode: "range",
       dateFormat: "Y-m-d",
@@ -268,6 +295,13 @@
       disableMobile: true,
       showMonths: 1,
       monthSelectorType: "static",
+      disable: disabledDates,
+      onDayCreate: function(dObj, dStr, fp, dayElem) {
+        // Add custom class to disabled dates
+        if (dayElem.classList.contains('flatpickr-disabled')) {
+          dayElem.classList.add('disabled');
+        }
+      },
       onChange: function(selectedDates, dateStr, instance) {
         if (selectedDates.length === 2) {
           const startDate = selectedDates[0];
@@ -286,6 +320,11 @@
           const pricePerNight = parseFloat(document.getElementById('price-per-night').textContent);
           const totalPrice = (diffDays * pricePerNight).toFixed(2);
           document.getElementById('total-price').textContent = totalPrice;
+
+          // Update hidden form inputs
+          document.getElementById('start-date-input').value = startDate.toISOString().split('T')[0];
+          document.getElementById('end-date-input').value = endDate.toISOString().split('T')[0];
+          document.getElementById('total-price-input').value = totalPrice;
         }
       }
     });

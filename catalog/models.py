@@ -19,6 +19,7 @@ class Item(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     location = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
+    price_per_night = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     representative_image = models.ImageField(
         upload_to=item_image_path,
         blank=True,

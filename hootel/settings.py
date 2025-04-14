@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'catalog',
     'collection',
     'loans',
+    'access_request',
 ]
 
 MIDDLEWARE = [

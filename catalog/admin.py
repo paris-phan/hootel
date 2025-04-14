@@ -3,13 +3,13 @@ from .models import Item, ItemReview
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('title', 'identifier', 'status', 'location', 'created_at', 'created_by')
+    list_display = ('title', 'identifier', 'status', 'location', 'price_per_night', 'created_at', 'created_by')
     list_filter = ('status', 'created_at')
     search_fields = ('title', 'identifier', 'description')
     readonly_fields = ('created_at', 'updated_at')
     fieldsets = (
         ('Basic Information', {
-            'fields': ('title', 'identifier', 'status', 'location')
+            'fields': ('title', 'identifier', 'status', 'location', 'price_per_night')
         }),
         ('Details', {
             'fields': ('description', 'representative_image', 'hero_image')
