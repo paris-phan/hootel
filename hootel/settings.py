@@ -34,6 +34,7 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ["*"]
 
+
 # Security Settings
 SECURE_SSL_REDIRECT = not DEBUG  # redirect all non-HTTPS requests to HTTPS
 SESSION_COOKIE_SECURE = not DEBUG  # only send session cookie over HTTPS
@@ -44,7 +45,6 @@ SECURE_HSTS_PRELOAD = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
-
 
 # Application definition
 
