@@ -8,8 +8,8 @@ General Styles
 ===================================
 */
 :root {
-  --primary-bg-color: #f3eee7;
-  --text-color: #313131;
+  --primary-bg-color: #F7F5F1;
+  --text-color: #9D5248;
   --header-menu-content-offset: 20px;
   --header-menu-height-lg: 88px;
   --booking-bar-height-lg: 70px;
@@ -38,7 +38,7 @@ body {
 }
 
 .bg-white {
-  background-color: #F3EEE7;
+  background-color: #F7F5F1;
 }
 
 .container {
@@ -142,9 +142,9 @@ a.button, button.button {
 }
 
 a.button--dark, button.button--dark {
-  border-color: #313131;
-  background-color: #313131;
-  color: #f3eee7;
+  border-color: #9D5248;
+  background-color: #9D5248;
+  color: #F7F5F1;
 }
 
 a.button--slim, button.button--slim {
@@ -191,7 +191,7 @@ Header
   background: transparent;
   padding: 0;
   outline: 0;
-  color: #313131;
+  color: #9D5248;
   display: flex;
   align-items: center;
 }
