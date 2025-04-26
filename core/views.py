@@ -100,13 +100,15 @@ def destinations(request):
             
         collection_ids = [ci.collection.id for ci in item_collections]
         
-        # Map location to region
-        region = 'asia'  # default
-        if item.location and 'europe' in item.location.lower():
-            region = 'europe'
-        elif item.location and ('america' in item.location.lower() or 'caribbean' in item.location.lower()):
-            region = 'americas'
-            
+        # Find the region collection this item belongs to
+        region_collection = next((
+            ci.collection for ci in item_collections 
+            if ci.collection.is_region
+        ), None)
+
+        # Set region based on collection, default to 'asia' if no region collection found
+        region = region_collection.title.lower() if region_collection else 'asia'
+        
         # Handle image - use a safe default
         try:
             if item.representative_image and hasattr(item.representative_image, 'url'):
@@ -157,6 +159,9 @@ def experiences(request):
             
         collection_ids = [ci.collection.id for ci in item_collections]
         
+
+        # special to experiences
+        #
         # Check if user is authorized for any of the collections
         is_authorized = False
         if request.user.is_authenticated:
@@ -166,14 +171,19 @@ def experiences(request):
                 user=request.user
             ).exists()
             is_authorized = authorized_collections
+        #
+        #
+        # end special to experiences
         
-        # Map location to region
-        region = 'asia'  # default
-        if item.location and 'europe' in item.location.lower():
-            region = 'europe'
-        elif item.location and ('america' in item.location.lower() or 'caribbean' in item.location.lower()):
-            region = 'americas'
-            
+        # Find the region collection this item belongs to
+        region_collection = next((
+            ci.collection for ci in item_collections 
+            if ci.collection.is_region
+        ), None)
+
+        # Set region based on collection, default to 'asia' if no region collection found
+        region = region_collection.title.lower() if region_collection else 'asia'
+        
         # Handle image - use a safe default
         try:
             if item.representative_image and hasattr(item.representative_image, 'url'):
@@ -209,6 +219,15 @@ def about(request):
         'page_title': 'About Us | Tel Resorts',
     }
     return render(request, 'core/about.html', context)
+
+def sources(request):
+    """
+    Sources page view.
+    """
+    context = {
+        'page_title': 'Sources | Tel Resorts',
+    }
+    return render(request, 'core/sources.html', context)
 
 def is_librarian(user):
     return user.is_staff or user.is_superuser or user.role == 1

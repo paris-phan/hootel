@@ -3,17 +3,129 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #dad9d7;
+  }
+  
+  .filter-bar button {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    color: #9D5248;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  
+  .filter-bar button.active {
+    opacity: 1;
+    border-bottom: 1px solid #9D5248;
+  }
+
+  /* Action buttons styling */
+  .action-btn {
+    background: #9D5248;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    color: #9D5248;
+    opacity: 0.7;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+
+  .action-btn:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+
+  .action-btn.btn-success {
+    color: #eee;
+  }
+
+  .action-btn.btn-danger {
+    color: #eee;
+  }
+
+  .action-btn.btn-info {
+    color: #eee;
+  }
+
+  .action-btn.btn-primary {
+    color: #eee;
+  }
+
+  .action-btn.btn-warning {
+    color: #eee;
+  }
+
+  /* Status badge styling */
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    /* border-radius: 0.25rem; */
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+  }
+
+  .status-badge.bg-success {
+    background-color: rgba(167, 204, 176, 0.1);
+    color: #fff;
+  }
+
+  .status-badge.bg-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #111;
+  }
+
+  .status-badge.bg-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #eee;
+  }
+
+  .status-badge.bg-secondary {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #eee;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     {% csrf_token %}
     <div class="row">
         <div class="col-12">
             <h1 class="mb-4">Librarian Dashboard</h1>
+            <!-- Navigation Menu -->
+            <div class="filter-bar">
+                <button class="active" data-section="items">Items</button>
+                <button data-section="collections">Collections</button>
+                <button data-section="users">Users</button>
+            </div>
         </div>
     </div>
 
     <!-- Items Section -->
-    <div class="row mb-5">
+    <div class="row mb-5 dashboard-section" id="items-section">
         <div class="col-12">
             <h2 class="mb-3">Items</h2>
             <div class="table-responsive">
@@ -35,7 +147,7 @@
                             <td>{{ item.title }}</td>
                             <td>{{ item.identifier }}</td>
                             <td>
-                                <span class="badge {% if item.status == 0 %}bg-success{% elif item.status == 1 %}bg-warning{% else %}bg-danger{% endif %}">
+                                <span class="status-badge {% if item.status == 0 %}bg-success{% elif item.status == 1 %}bg-warning{% else %}bg-danger{% endif %}">
                                     {{ item.get_status_display }}
                                 </span>
                             </td>
@@ -43,7 +155,7 @@
                             <td>{{ item.created_by.username|default:"Unknown" }}</td>
                             <td>{{ item.created_at|date:"Y-m-d" }}</td>
                             <td>
-                                <a href="{% url 'item_detail' item.title %}" class="btn btn-sm btn-info">View</a>
+                                <a href="{% url 'item_detail' item.title %}" class="action-btn btn-info">View</a>
                             </td>
                         </tr>
                         {% empty %}
@@ -58,7 +170,7 @@
     </div>
 
     <!-- Loans Section -->
-    <div class="row mb-5">
+    <div class="row mb-5 dashboard-section" id="items-section" style="display: none;">
         <div class="col-12">
             <h2 class="mb-3">Loans</h2>
             <div class="table-responsive">
@@ -81,7 +193,7 @@
                             <td>{{ loan.item.title }}</td>
                             <td>{{ loan.requester.username }}</td>
                             <td>
-                                <span class="badge {% if loan.status == 1 %}bg-success{% elif loan.status == 2 %}bg-danger{% elif loan.status == 3 %}bg-secondary{% else %}bg-warning{% endif %}">
+                                <span class="status-badge {% if loan.status == 1 %}bg-success{% elif loan.status == 2 %}bg-danger{% elif loan.status == 3 %}bg-secondary{% else %}bg-warning{% endif %}">
                                     {{ loan.get_status_display }}
                                 </span>
                             </td>
@@ -91,13 +203,13 @@
                             <td>{{ loan.end_date|date:"Y-m-d"|default:"-" }}</td>
                             <td>
                                 {% if loan.status == 0 %}
-                                <button class="btn btn-sm btn-success approve-loan-btn" data-loan-id="{{ loan.id }}">Approve</button>
-                                <button class="btn btn-sm btn-danger delete-loan-btn" data-loan-id="{{ loan.id }}">Delete</button>
+                                <button class="action-btn btn-success approve-loan-btn" data-loan-id="{{ loan.id }}">Approve</button>
+                                <button class="action-btn btn-danger delete-loan-btn" data-loan-id="{{ loan.id }}">Delete</button>
                                 {% elif loan.status == 1 %}
-                                <button class="btn btn-sm btn-primary return-btn" data-loan-id="{{ loan.id }}">Return</button>
-                                <button class="btn btn-sm btn-danger delete-loan-btn" data-loan-id="{{ loan.id }}">Delete</button>
+                                <button class="action-btn btn-primary return-btn" data-loan-id="{{ loan.id }}">Return</button>
+                                <button class="action-btn btn-danger delete-loan-btn" data-loan-id="{{ loan.id }}">Delete</button>
                                 {% else %}
-                                <button class="btn btn-sm btn-danger delete-loan-btn" data-loan-id="{{ loan.id }}">Delete</button>
+                                <button class="action-btn btn-danger delete-loan-btn" data-loan-id="{{ loan.id }}">Delete</button>
                                 {% endif %}
                             </td>
                         </tr>
@@ -113,7 +225,7 @@
     </div>
 
     <!-- Collections Section -->
-    <div class="row">
+    <div class="row dashboard-section" id="collections-section" style="display: none;">
         <div class="col-12">
             <h2 class="mb-3">Collections</h2>
             <div class="table-responsive">
@@ -135,7 +247,7 @@
                             <td>{{ collection.title }}</td>
                             <td>{{ collection.description|truncatewords:20 }}</td>
                             <td>
-                                <span class="badge {% if collection.visibility == 0 %}bg-success{% else %}bg-warning{% endif %}">
+                                <span class="status-badge {% if collection.visibility == 0 %}bg-success{% else %}bg-warning{% endif %}">
                                     {{ collection.get_visibility_display }}
                                 </span>
                             </td>
@@ -151,7 +263,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'collection:list' %}" class="btn btn-sm btn-primary">View</a>
+                                <a href="{% url 'collection:list' %}" class="action-btn btn-primary">View</a>
                             </td>
                         </tr>
                         {% empty %}
@@ -166,7 +278,7 @@
     </div>
 
     <!-- Access Requests Section -->
-    <div class="row mb-5">
+    <div class="row mb-5 dashboard-section" id="collections-section" style="display: none;">
         <div class="col-12">
             <h2 class="mb-3">Access Requests</h2>
             <div class="table-responsive">
@@ -189,7 +301,7 @@
                             <td>{{ request.user.username }}</td>
                             <td>{{ request.collection.title }}</td>
                             <td>
-                                <span class="badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">
+                                <span class="status-badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">
                                     {{ request.get_status_display }}
                                 </span>
                             </td>
@@ -199,8 +311,8 @@
                             <td>{{ request.review_date|date:"Y-m-d"|default:"-" }}</td>
                             <td>
                                 {% if request.status == 'pending' %}
-                                <button class="btn btn-sm btn-success approve-btn" data-request-id="{{ request.id }}">Approve</button>
-                                <button class="btn btn-sm btn-danger deny-btn" data-request-id="{{ request.id }}">Deny</button>
+                                <button class="action-btn btn-success approve-btn" data-request-id="{{ request.id }}">Approve</button>
+                                <button class="action-btn btn-danger deny-btn" data-request-id="{{ request.id }}">Deny</button>
                                 {% endif %}
                             </td>
                         </tr>
@@ -216,7 +328,7 @@
     </div>
 
     <!-- Users Section -->
-    <div class="row mb-5">
+    <div class="row mb-5 dashboard-section" id="users-section" style="display: none;">
         <div class="col-12">
             <h2 class="mb-3">Users</h2>
             <div class="table-responsive">
@@ -244,18 +356,18 @@
                             <td>{{ user.date_joined|date:"Y-m-d" }}</td>
                             <td>{{ user.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
                             <td>
-                                <span class="badge {% if user.role == 1 %}bg-success{% else %}bg-secondary{% endif %}">
+                                <span class="status-badge {% if user.role == 1 %}bg-success{% else %}bg-secondary{% endif %}">
                                     {{ user.role|yesno:"Librarian,Patron" }}
                                 </span>
                             </td>
                             <td>
-                                <span class="badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                <span class="status-badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %}">
                                     {{ user.is_active|yesno:"Yes,No" }}
                                 </span>
                             </td>
                             <td>
-                                <a href="{% url 'accounts:user_profile' user.username %}" class="btn btn-sm btn-info">View</a>
-                                <button class="btn btn-sm {% if user.role == 0 %}btn-success{% else %}btn-warning{% endif %} toggle-role-btn" 
+                                <a href="{% url 'accounts:user_profile' user.username %}" class="action-btn btn-info">View</a>
+                                <button class="action-btn {% if user.role == 0 %}btn-success{% else %}btn-warning{% endif %} toggle-role-btn" 
                                         data-user-id="{{ user.id }}"
                                         data-current-role="{{ user.role }}">
                                     {% if user.role == 0 %}Make Librarian{% else %}Make Patron{% endif %}
@@ -278,6 +390,28 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Handle section navigation
+    const filterButtons = document.querySelectorAll('.filter-bar button');
+    const sections = document.querySelectorAll('.dashboard-section');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active state of buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show/hide sections
+            const targetSection = this.dataset.section;
+            sections.forEach(section => {
+                if (section.id === `${targetSection}-section`) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        });
+    });
+
     // Handle approve/deny buttons
     const approveButtons = document.querySelectorAll('.approve-btn');
     const denyButtons = document.querySelectorAll('.deny-btn');

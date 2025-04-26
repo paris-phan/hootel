@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Item
+from .models import Item, ItemReview
 from collection.models import CollectionItems
 from loans.models import Loan
 from datetime import datetime
@@ -25,6 +25,22 @@ def item_detail(request, item_title):
         'item': item,
         'is_in_private_collection': is_in_private_collection
     })
+
+@login_required
+def delete_review(request, review_id):
+    review = get_object_or_404(ItemReview, id=review_id)
+    
+    # Check if the user is the creator of the review
+    if request.user != review.creator:
+        messages.error(request, 'You do not have permission to delete this review.')
+        return redirect('accounts:user_profile', username=request.user.username)
+    
+    # Delete the review
+    review.delete()
+    messages.success(request, 'Review deleted successfully.')
+    
+    # Redirect back to the user's profile
+    return redirect('accounts:user_profile', username=request.user.username)
 
 @login_required
 def booking_view(request, item_title):
