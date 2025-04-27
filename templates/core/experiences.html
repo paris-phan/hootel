@@ -51,6 +51,25 @@
     background-color: #1a1a1a;
   }
   
+  /* Selected Collection Info styles */
+  .selected-collection-info {
+    max-width: 800px;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: #F7F5F1;
+    border-left: 3px solid #9D5248;
+  }
+  
+  .selected-collection-info h3 {
+    color: #9D5248;
+    margin-bottom: 0.5rem;
+  }
+  
+  .selected-collection-info p {
+    margin-bottom: 0;
+    line-height: 1.6;
+  }
+  
   .experience-hero {
     position: relative;
     height: 600px;
@@ -114,13 +133,63 @@
     }
   }
 
+  /* Content area and curtain styles */
+  .content-area {
+    position: relative;
+    min-height: 400px; /* Ensure there's space even if no content */
+  }
+  
+  .content-curtain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(1px);
+    background: linear-gradient(to bottom, 
+                               rgba(255, 255, 255, 0) 0%, 
+                               rgba(255, 255, 255, 0.5) 5%, 
+                               rgba(255, 255, 255, 0.5) 95%, 
+                               rgba(255, 255, 255, 0) 100%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+    padding-top: 10rem;
+  }
 
+  .content-curtain h3 {
+    margin-bottom: 1rem;
+    color: #9D5248;
+  }
+
+  .content-curtain p {
+    margin-bottom: 2rem;
+  }
+
+  .content-curtain .button {
+    background-color: #9D5248;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 3px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .content-curtain .button:hover {
+    background-color: #8a453c;
+  }
 
   .destinations-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
     margin-top: 3rem;
+    min-height: 1000px;
   }
 
   .filter-bar {
@@ -311,62 +380,79 @@
     <!-- <button class="active" data-filter="none">Select a Collection</button> -->
     {% for collection in collections %}
       {% if collection.visibility == 1 %}
-        <button data-filter="collection-{{ collection.id }}">{{ collection.title }}</button>
+        <button data-filter="collection-{{ collection.id }}" 
+                data-authorized="{{ collection.is_authorized|yesno:"true,false" }}"
+                data-title="{{ collection.title }}"
+                data-description="{{ collection.description }}">{{ collection.title }}</button>
       {% endif %}
     {% endfor %}
+  </div>
+
+  <!-- Selected Collection Info -->
+  <div id="selected-collection-info" class="selected-collection-info mb-4" style="display: none;">
+    <h3 id="collection-title" class="heading-h--small mb-2"></h3>
+    <p id="collection-description" class="mb-3"></p>
   </div>
 
   <!-- Search Bar -->
   <div class="search-bar mb-4">
     <input type="text" id="destinationSearch" class="form-control" placeholder="Search destinations..." aria-label="Search destinations">
   </div>
-    
-  
-<!-- Destinations Grid -->
-  <div class="destinations-grid" style="display: none;">
-    {% for destination in destinations %}
-    <div class="slider-card" data-region="{{ destination.region }}" data-collections="{{ destination.collection_ids|join:',' }}">
-      <article class="card card--centered">
-        <div class="media media--responsive">
-          {% if destination.representative_image %}
-            <img src="{{ destination.representative_image }}" alt="{{ destination.name }}" class="img-fluid">
-          {% else %}
-            <img src="{% static 'images/placeholder.jpg' %}" alt="{{ destination.name }}" class="img-fluid">
-          {% endif %}
-        </div>
-        <figcaption>
-          <h3>{{ destination.name }}</h3>
-          <p>{{ destination.description }}</p>
-        </figcaption>
-        <div class="card__post-link-content">
-          <a href="{% url 'item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline">Discover</a>
-          <p>From ${{ destination.price|floatformat:2 }}</p>
-        </div>
-      </article>
-    </div>
-    {% endfor %}
-  </div>
 </section>
 
-
-
-
-<!-- Banner Section -->
-<section class="container container--spacer gutter bg-white banner-section">
-  <div class="row">
-    <div class="col-md-6">
-      <img src="{% static 'core/images/destination-feature.jpg' %}" alt="Hootel Experience" class="img-fluid">
+<!-- Content area that can be blurred -->
+<div class="content-area">
+  <!-- Content curtain that will cover the entire content area -->
+  <div id="content-curtain" class="content-curtain" style="display: none;">
+    <h3>Exclusive Content</h3>
+    <p>You need to be authorized to view this exclusive collection.</p>
+    <button class="button request-access-btn">Request Access</button>
+  </div>
+    
+  <!-- Destinations Grid -->
+  <section class="container container--spacer gutter">
+    <div class="destinations-grid" style="display: none;">
+      {% for destination in destinations %}
+      <div class="slider-card" data-region="{{ destination.region }}" data-collections="{{ destination.collection_ids|join:',' }}">
+        <article class="card card--centered">
+          <div class="media media--responsive">
+            {% if destination.representative_image %}
+              <img src="{{ destination.representative_image }}" alt="{{ destination.name }}" class="img-fluid">
+            {% else %}
+              <img src="{% static 'images/placeholder.jpg' %}" alt="{{ destination.name }}" class="img-fluid">
+            {% endif %}
+          </div>
+          <figcaption>
+            <h3>{{ destination.name }}</h3>
+            <p>{{ destination.description }}</p>
+          </figcaption>
+          <div class="card__post-link-content">
+            <a href="{% url 'item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline">Discover</a>
+            <p>From ${{ destination.price|floatformat:2 }}</p>
+          </div>
+        </article>
+      </div>
+      {% endfor %}
     </div>
-    <div class="col-md-6 d-flex align-items-center">
-      <div class="px-4 py-5">
-        <p class="subtitle">The Classic Hootel Experience</p>
-        <h2 class="heading-h">First-Class Luxury</h2>
-        <p>Explore our regular collection of experiences, available to all Hootel guests.</p>
-        <a href="/destinations/" class="button button--dark mt-4">Explore Destinations</a>
+  </section>
+</div>
+
+  <!-- Banner Section -->
+  <section class="container container--spacer gutter bg-white banner-section">
+    <div class="row">
+      <div class="col-md-6">
+        <img src="{% static 'core/images/destination-feature.jpg' %}" alt="Hootel Experience" class="img-fluid">
+      </div>
+      <div class="col-md-6 d-flex align-items-center">
+        <div class="px-4 py-5">
+          <p class="subtitle">The Classic Hootel Experience</p>
+          <h2 class="heading-h">First-Class Luxury</h2>
+          <p>Explore our regular collection of experiences, available to all Hootel guests.</p>
+          <a href="/destinations/" class="button button--dark mt-4">Explore Destinations</a>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
 <!-- Request Modal -->
 <div id="requestModal" class="modal">
@@ -378,13 +464,6 @@
 </div>
 {% endblock %}
 
-
-
-
-
-
-
-
 {% block extra_js %}
 <script>
   // Destinations page specific JavaScript
@@ -394,10 +473,32 @@
     const filterButtons = document.querySelectorAll('.filter-bar button');
     const destinations = document.querySelectorAll('.destinations-grid .slider-card');
     const destinationsGrid = document.querySelector('.destinations-grid');
+    const contentCurtain = document.getElementById('content-curtain');
+    const contentArea = document.querySelector('.content-area');
+    const selectedCollectionInfo = document.getElementById('selected-collection-info');
+    const collectionTitle = document.getElementById('collection-title');
+    const collectionDescription = document.getElementById('collection-description');
+    let currentCollectionId = null;
     
     function filterDestinations() {
       const searchTerm = searchInput.value.toLowerCase();
-      const activeFilter = document.querySelector('.filter-bar button.active').getAttribute('data-filter');
+      const activeFilterButton = document.querySelector('.filter-bar button.active');
+      if (!activeFilterButton) return;
+      
+      const activeFilter = activeFilterButton.getAttribute('data-filter');
+      const isAuthorized = activeFilterButton.getAttribute('data-authorized') === 'true';
+      
+      // Get and display collection info
+      const collectionTitleText = activeFilterButton.getAttribute('data-title');
+      const collectionDescText = activeFilterButton.getAttribute('data-description');
+      
+      if (collectionTitleText) {
+        collectionTitle.textContent = collectionTitleText;
+        collectionDescription.textContent = collectionDescText || 'No description available';
+        selectedCollectionInfo.style.display = 'block';
+      } else {
+        selectedCollectionInfo.style.display = 'none';
+      }
       
       // Hide grid if no collection is selected
       if (activeFilter === 'none') {
@@ -407,6 +508,16 @@
       
       // Show grid if a collection is selected
       destinationsGrid.style.display = 'grid';
+      
+      // Show/hide content curtain based on authorization
+      if (isAuthorized) {
+        contentCurtain.style.display = 'none';
+      } else {
+        contentCurtain.style.display = 'flex';
+        if (activeFilter.startsWith('collection-')) {
+          currentCollectionId = activeFilter.split('-')[1];
+        }
+      }
       
       destinations.forEach(dest => {
         const title = dest.querySelector('h3').textContent.toLowerCase();
@@ -445,10 +556,46 @@
 
     // Access Request functionality
     const expressInterestBtns = document.querySelectorAll('.express-interest-btn');
+    const requestAccessBtn = document.querySelector('.request-access-btn');
     const modal = document.getElementById('requestModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalMessage = document.getElementById('modalMessage');
     const closeModal = document.getElementById('closeModal');
+    
+    if (requestAccessBtn) {
+      requestAccessBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        if (!currentCollectionId) {
+          modalTitle.textContent = 'Error';
+          modalMessage.textContent = 'Please select a collection first.';
+          modal.style.display = 'block';
+          return;
+        }
+        
+        try {
+          const response = await fetch('/access-request/create/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: `collection_id=${currentCollectionId}&reason=Requesting access to exclusive collection`
+          });
+          
+          const data = await response.json();
+          
+          modalTitle.textContent = data.success ? 'Success' : 'Error';
+          modalMessage.textContent = data.message;
+          modal.style.display = 'block';
+          
+        } catch (error) {
+          modalTitle.textContent = 'Error';
+          modalMessage.textContent = 'An error occurred while submitting your request. Please try again.';
+          modal.style.display = 'block';
+        }
+      });
+    }
     
     expressInterestBtns.forEach(btn => {
       btn.addEventListener('click', async function(e) {
@@ -506,6 +653,11 @@
         }
       }
       return cookieValue;
+    }
+    
+    // Select first button by default to initialize the view
+    if (filterButtons.length > 0) {
+      filterButtons[0].click();
     }
   });
 </script>

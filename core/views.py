@@ -145,6 +145,25 @@ def experiences(request):
     # Get all collections
     collections = Collection.objects.all()
     
+    # Add authorization status to collections
+    collections_with_auth = []
+    for collection in collections:
+        is_auth = False
+        if request.user.is_authenticated:
+            is_auth = CollectionAuthorizedUser.objects.filter(
+                collection=collection,
+                user=request.user
+            ).exists()
+        
+        collections_with_auth.append({
+            'id': collection.id,
+            'title': collection.title,
+            'description': collection.description,
+            'visibility': collection.visibility,
+            'is_region': collection.is_region,
+            'is_authorized': is_auth
+        })
+    
     # Map items to destination format
     destinations = []
     for item in items:
@@ -209,7 +228,7 @@ def experiences(request):
     context = {
         'page_title': 'Experiences | Tel Resorts',
         'destinations': destinations,
-        'collections': collections
+        'collections': collections_with_auth
     }
     return render(request, 'core/experiences.html', context)
 

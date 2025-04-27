@@ -343,7 +343,8 @@
     <div class="profile-section" id="collections-section">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card shadow-sm">
+                <!-- User's Collections -->
+                <div class="card shadow-sm mb-4">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
                         <h2 class="h4 mb-0">Collections</h2>
                         {% if is_own_profile %}
@@ -390,6 +391,88 @@
                             </div>
                             {% endfor %}
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Exclusive Access Section -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h2 class="h4 mb-0">Exclusive Access</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Authorized Collections -->
+                        {% if exclusive_access_data.authorized %}
+                        <h5 class="mb-3">Authorized Collections</h5>
+                        <div class="row">
+                            {% for auth in exclusive_access_data.authorized %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="{% url 'collection:detail' auth.collection.id %}" class="text-decoration-none">
+                                                {{ auth.collection.title }}
+                                            </a>
+                                        </h5>
+                                        <p class="card-text">{{ auth.collection.description|truncatewords:20 }}</p>
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                Created by: {{ auth.collection.creator.username }}
+                                            </small>
+                                        </p>
+                                        <p class="card-text">
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Access Requests -->
+                        {% if exclusive_access_data.requests %}
+                        <h5 class="mb-3 {% if exclusive_access_data.authorized %}mt-4{% endif %}">Pending Access Requests</h5>
+                        <div class="row">
+                            {% for request in exclusive_access_data.requests %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            {{ request.collection.title }}
+                                        </h5>
+                                        <p class="card-text">{{ request.collection.description|truncatewords:20 }}</p>
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                Created by: {{ request.collection.creator.username }}
+                                            </small>
+                                        </p>
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                Requested on: {{ request.request_date|date:"F j, Y" }}
+                                            </small>
+                                        </p>
+                                        <span class="badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ request.status|capfirst }}
+                                        </span>
+                                        {% if request.status == 'pending' and is_own_profile %}
+                                        <div class="mt-2">
+                                            <form method="post" action="{% url 'accounts:cancel_access_request' request.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm" style="background-color: #9D5248; color: white;" onclick="return confirm('Are you sure you want to cancel this access request?')">
+                                                    <i class="fas fa-times"></i> Cancel Request
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if not exclusive_access_data.authorized and not exclusive_access_data.requests %}
+                        <p class="text-muted">No exclusive access collections or pending requests.</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
