@@ -164,13 +164,11 @@
 
             </picture>
           </div>
-          <a href="#" class="card__link">
             <header class="hgroup">
               <h3 class="subtitle">{% if forloop.first %}hotels &amp; resorts{% else %}featured destination{% endif %}</h3>
               <h3 class="heading-h card__heading">{{ destination.name }}</h3>
               <div class="hgroup__intro">{{ destination.description }}</div>
             </header>
-          </a>
           <div class="card__multiple_links">
             <a href="{% url 'catalog:item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline single-link">Discover more</a>
           </div>

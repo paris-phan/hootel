@@ -15,7 +15,6 @@ class Item(models.Model):
         (2, 'Maintenance'),
     )
     title = models.CharField(max_length=255, unique=True)
-    identifier = models.CharField(max_length=50, unique=True)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     location = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
@@ -46,7 +45,7 @@ class Item(models.Model):
     )
 
     def __str__(self):
-        return f"{self.title} ({self.identifier})"
+        return self.title
 
     def delete(self, *args, **kwargs):
         # Delete the images from S3 before deleting the item

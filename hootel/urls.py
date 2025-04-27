@@ -30,6 +30,7 @@ urlpatterns = [
     path('catalog/', include('catalog.urls')),
     path('collection/', include('collection.urls')),
     path('access-request/', include('access_request.urls')),
+    path('loans/', include('loans.urls')),
 ]
 
 handler404 = 'core.views.handler404'

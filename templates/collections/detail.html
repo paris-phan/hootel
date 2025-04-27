@@ -80,9 +80,18 @@
                             <h2 class="h4 mb-0">{{ collection.title }}</h2>
                             <small class="text-muted">Created by {{ collection.creator.username }}</small>
                         </div>
-                        <span class="badge {% if collection.visibility == 0 %}bg-success{% else %}bg-warning{% endif %}">
-                            {{ collection.get_visibility_display }}
-                        </span>
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if collection.visibility == 0 %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ collection.get_visibility_display }}
+                            </span>
+                            {% if is_creator %}
+                            <button type="button" class="btn btn-sm btn-primary ms-2" id="openModifyDetailsModal">Modify Details</button>
+                            <form method="post" action="{% url 'collection:delete' collection.id %}" class="ms-2" onsubmit="return confirm('Are you sure you want to delete this collection? This action cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger">Delete Collection</button>
+                            </form>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -99,7 +108,7 @@
                     <div class="collection-items">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h3 class="h5 mb-0">Items in this Collection</h3>
-                            {% if request.user == collection.creator %}
+                            {% if is_creator %}
                             <button type="button" class="button button--slim button--dark" id="openAddItemsModal">
                                 Add Items
                             </button>
@@ -113,7 +122,9 @@
                                             <div class="card-body">
                                                 <h5 class="card-title">
                                                     <a href="{% url 'catalog:item_detail' item_title=collection_item.item.title %}" class="text-decoration-none">
-                                                        {{ collection_item.item.title }}
+                                                        <div class="item-title">
+                                                            {{ collection_item.item.title }}
+                                                        </div>
                                                     </a>
                                                 </h5>
                                                 <p class="card-text">{{ collection_item.item.description|truncatewords:30 }}</p>
@@ -122,7 +133,7 @@
                                                         Location: {{ collection_item.item.location }}
                                                     </small>
                                                 </p>
-                                                {% if request.user == collection.creator %}
+                                                {% if is_creator %}
                                                 <form method="post" action="{% url 'collection:remove_item' collection.id collection_item.item.id %}">
                                                     {% csrf_token %}
                                                     <button type="submit" class="btn btn-sm btn-danger">Remove</button>
@@ -145,7 +156,7 @@
     </div>
 </div>
 
-{% if request.user == collection.creator %}
+{% if is_creator %}
 <!-- Custom Modal for Adding Items -->
 <div id="addItemsModalOverlay" class="custom-modal-overlay"></div>
 <div id="addItemsModalContent" class="custom-modal">
@@ -179,42 +190,99 @@
     </form>
 </div>
 
+<!-- Custom Modal for Modifying Collection Details -->
+<div id="modifyDetailsModalOverlay" class="custom-modal-overlay"></div>
+<div id="modifyDetailsModalContent" class="custom-modal">
+    <div class="custom-modal-header">
+        <h5 class="custom-modal-title">Modify Collection Details</h5>
+        <button type="button" class="custom-modal-close" id="closeModifyDetailsModal">&times;</button>
+    </div>
+    <form method="post" action="{% url 'collection:update' collection.id %}" id="modifyDetailsForm">
+        {% csrf_token %}
+        <div class="custom-modal-body">
+            <div class="mb-3">
+                <label for="collection-title" class="form-label">Collection Name</label>
+                <input type="text" class="form-control" id="collection-title" name="title" value="{{ collection.title }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="collection-description" class="form-label">Description</label>
+                <textarea class="form-control" id="collection-description" name="description" rows="4" required>{{ collection.description }}</textarea>
+            </div>
+        </div>
+        <div class="custom-modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelModifyDetailsModal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+</div>
+
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const openModalBtn = document.getElementById('openAddItemsModal');
-    const closeModalBtn = document.getElementById('closeAddItemsModal');
-    const cancelModalBtn = document.getElementById('cancelAddItemsModal');
-    const modalOverlay = document.getElementById('addItemsModalOverlay');
-    const modalContent = document.getElementById('addItemsModalContent');
+    // Add Items Modal
+    const openAddItemsModalBtn = document.getElementById('openAddItemsModal');
+    const closeAddItemsModalBtn = document.getElementById('closeAddItemsModal');
+    const cancelAddItemsModalBtn = document.getElementById('cancelAddItemsModal');
+    const addItemsModalOverlay = document.getElementById('addItemsModalOverlay');
+    const addItemsModalContent = document.getElementById('addItemsModalContent');
     
-    function openModal() {
-        modalOverlay.style.display = 'block';
-        modalContent.style.display = 'block';
+    function openAddItemsModal() {
+        addItemsModalOverlay.style.display = 'block';
+        addItemsModalContent.style.display = 'block';
         document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
     }
     
-    function closeModal() {
-        modalOverlay.style.display = 'none';
-        modalContent.style.display = 'none';
+    function closeAddItemsModal() {
+        addItemsModalOverlay.style.display = 'none';
+        addItemsModalContent.style.display = 'none';
         document.body.style.overflow = ''; // Enable scrolling again
     }
     
-    openModalBtn.addEventListener('click', openModal);
-    closeModalBtn.addEventListener('click', closeModal);
-    cancelModalBtn.addEventListener('click', closeModal);
+    openAddItemsModalBtn.addEventListener('click', openAddItemsModal);
+    closeAddItemsModalBtn.addEventListener('click', closeAddItemsModal);
+    cancelAddItemsModalBtn.addEventListener('click', closeAddItemsModal);
     
     // Close when clicking outside the modal
-    modalOverlay.addEventListener('click', function(e) {
-        if (e.target === modalOverlay) {
-            closeModal();
+    addItemsModalOverlay.addEventListener('click', function(e) {
+        if (e.target === addItemsModalOverlay) {
+            closeAddItemsModal();
+        }
+    });
+
+    // Modify Details Modal
+    const openModifyDetailsModalBtn = document.getElementById('openModifyDetailsModal');
+    const closeModifyDetailsModalBtn = document.getElementById('closeModifyDetailsModal');
+    const cancelModifyDetailsModalBtn = document.getElementById('cancelModifyDetailsModal');
+    const modifyDetailsModalOverlay = document.getElementById('modifyDetailsModalOverlay');
+    const modifyDetailsModalContent = document.getElementById('modifyDetailsModalContent');
+    
+    function openModifyDetailsModal() {
+        modifyDetailsModalOverlay.style.display = 'block';
+        modifyDetailsModalContent.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModifyDetailsModal() {
+        modifyDetailsModalOverlay.style.display = 'none';
+        modifyDetailsModalContent.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    
+    openModifyDetailsModalBtn.addEventListener('click', openModifyDetailsModal);
+    closeModifyDetailsModalBtn.addEventListener('click', closeModifyDetailsModal);
+    cancelModifyDetailsModalBtn.addEventListener('click', closeModifyDetailsModal);
+    
+    modifyDetailsModalOverlay.addEventListener('click', function(e) {
+        if (e.target === modifyDetailsModalOverlay) {
+            closeModifyDetailsModal();
         }
     });
     
-    // Close when ESC key is pressed
+    // Close all modals when ESC key is pressed
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            closeModal();
+            closeAddItemsModal();
+            closeModifyDetailsModal();
         }
     });
 });

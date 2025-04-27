@@ -122,6 +122,7 @@ def destinations(request):
         destinations.append({
             'name': item.title,
             'description': item.description or '',
+            'price': item.price_per_night or 0,
             'representative_image': image_path,
             'region': region,
             'collection_ids': collection_ids
@@ -197,6 +198,7 @@ def experiences(request):
         destinations.append({
             'name': item.title,
             'description': item.description or '',
+            'price': item.price_per_night or 0,
             'representative_image': image_path,
             'region': region,
             'collection_ids': collection_ids,

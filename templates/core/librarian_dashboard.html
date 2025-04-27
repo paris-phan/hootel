@@ -5,6 +5,116 @@
 
 {% block extra_css %}
 <style>
+  /* Custom modal styles */
+  .custom-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+  }
+  
+  .custom-modal {
+    display: none;
+    position: fixed;
+    top: 15vh;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 600px;
+    max-height: 70vh;
+    overflow-y: auto;
+    z-index: 2001;
+  }
+
+  .custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+  }
+
+  .custom-modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .custom-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 15px;
+  }
+
+  .custom-modal-body {
+    padding: 20px;
+    max-height: calc(70vh - 100px);
+    overflow-y: auto;
+  }
+
+  .custom-modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    z-index: 1;
+  }
+
+  /* Image preview styles */
+  #representative_image_preview,
+  #hero_image_preview {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* Form styles */
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #9D5248;
+    box-shadow: 0 0 0 0.25rem rgba(157, 82, 72, 0.25);
+  }
+
+  .btn-primary {
+    background-color: #9D5248;
+    border-color: #9D5248;
+  }
+
+  .btn-primary:hover {
+    background-color: #7a4038;
+    border-color: #7a4038;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+  }
+
+  /* Filter Bar Styles */
   .filter-bar {
     display: flex;
     flex-wrap: wrap;
@@ -82,7 +192,6 @@
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
-    /* border-radius: 0.25rem; */
     text-transform: uppercase;
     letter-spacing: 0.05rem;
   }
@@ -106,6 +215,23 @@
     background-color: rgba(108, 117, 125, 0.1);
     color: #eee;
   }
+
+  /* Table row height consistency */
+  #users-section table tbody tr {
+    height: 60px; /* Fixed height for all rows */
+  }
+
+  #users-section table td {
+    vertical-align: middle; /* Center content vertically */
+    padding: 0.75rem; /* Consistent padding */
+  }
+
+  #users-section .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px; /* Minimum height for badges */
+  }
 </style>
 {% endblock %}
 
@@ -127,17 +253,20 @@
     <!-- Items Section -->
     <div class="row mb-5 dashboard-section" id="items-section">
         <div class="col-12">
-            <h2 class="mb-3">Items</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Items</h2>
+                <button type="button" class="button button--slim button--dark" id="openCreateItemModal">
+                    Create Item
+                </button>
+            </div>
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
                             <th>Title</th>
-                            <th>Identifier</th>
                             <th>Status</th>
                             <th>Location</th>
-                            <th>Created By</th>
-                            <th>Created At</th>
+                            <th>Price per Night</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -145,17 +274,30 @@
                         {% for item in items %}
                         <tr>
                             <td>{{ item.title }}</td>
-                            <td>{{ item.identifier }}</td>
-                            <td>
-                                <span class="status-badge {% if item.status == 0 %}bg-success{% elif item.status == 1 %}bg-warning{% else %}bg-danger{% endif %}">
-                                    {{ item.get_status_display }}
-                                </span>
-                            </td>
+                            <td>{{ item.get_status_display }}</td>
                             <td>{{ item.location }}</td>
-                            <td>{{ item.created_by.username|default:"Unknown" }}</td>
-                            <td>{{ item.created_at|date:"Y-m-d" }}</td>
+                            <td>{{ item.price_per_night }}</td>
                             <td>
-                                <a href="{% url 'item_detail' item.title %}" class="action-btn btn-info">View</a>
+                                <button class="btn btn-sm btn-primary edit-item" 
+                                        data-item-id="{{ item.id }}"
+                                        data-item-title="{{ item.title }}"
+                                        data-item-status="{{ item.status }}"
+                                        data-item-location="{{ item.location }}"
+                                        data-item-price="{{ item.price_per_night }}"
+                                        data-item-description="{{ item.description }}"
+                                        {% if item.representative_image %}
+                                        data-item-thumbnail="{{ item.representative_image.url }}"
+                                        {% endif %}
+                                        {% if item.hero_image %}
+                                        data-item-banner="{{ item.hero_image.url }}"
+                                        {% endif %}>
+                                    Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-item" 
+                                        data-item-id="{{ item.id }}"
+                                        data-item-title="{{ item.title }}">
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
@@ -170,7 +312,7 @@
     </div>
 
     <!-- Loans Section -->
-    <div class="row mb-5 dashboard-section" id="items-section" style="display: none;">
+    <div class="row mb-5 dashboard-section" id="items-section">
         <div class="col-12">
             <h2 class="mb-3">Loans</h2>
             <div class="table-responsive">
@@ -263,7 +405,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'collection:list' %}" class="action-btn btn-primary">View</a>
+                                <a href="{% url 'collection:detail' collection.id %}" class="action-btn btn-primary">Modify</a>
                             </td>
                         </tr>
                         {% empty %}
@@ -314,6 +456,7 @@
                                 <button class="action-btn btn-success approve-btn" data-request-id="{{ request.id }}">Approve</button>
                                 <button class="action-btn btn-danger deny-btn" data-request-id="{{ request.id }}">Deny</button>
                                 {% endif %}
+                                
                             </td>
                         </tr>
                         {% empty %}
@@ -367,11 +510,14 @@
                             </td>
                             <td>
                                 <a href="{% url 'accounts:user_profile' user.username %}" class="action-btn btn-info">View</a>
-                                <button class="action-btn {% if user.role == 0 %}btn-success{% else %}btn-warning{% endif %} toggle-role-btn" 
+                                {% if user.role == 0 %}
+                                <button class="action-btn btn-warning toggle-role-btn" 
                                         data-user-id="{{ user.id }}"
                                         data-current-role="{{ user.role }}">
-                                    {% if user.role == 0 %}Make Librarian{% else %}Make Patron{% endif %}
+                                    Promote Account
                                 </button>
+                                {% endif %}
+
                             </td>
                         </tr>
                         {% empty %}
@@ -385,11 +531,73 @@
         </div>
     </div>
 </div>
+
+<!-- Custom Modal Implementation -->
+<div id="createItemModalOverlay" class="custom-modal-overlay"></div>
+<div id="createItemModalContent" class="custom-modal">
+    <div class="custom-modal-header">
+        <h5 class="custom-modal-title">Item Details</h5>
+        <button type="button" class="custom-modal-close" id="closeCreateItemModal">&times;</button>
+    </div>
+    <form method="post" action="{% url 'catalog:create_item' %}" id="createItemForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" id="item-id" name="item_id">
+        <div class="custom-modal-body">
+            <div class="mb-3">
+                <label for="item-title" class="form-label">Item Title</label>
+                <input type="text" class="form-control" id="item-title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="item-status" class="form-label">Status</label>
+                <select class="form-select" id="item-status" name="status">
+                    <option value="0">Available</option>
+                    <option value="1">On Loan</option>
+                    <option value="2">Maintenance</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="item-location" class="form-label">Location</label>
+                <input type="text" class="form-control" id="item-location" name="location" required>
+            </div>
+            <div class="mb-3">
+                <label for="item-price_per_night" class="form-label">Price per Night</label>
+                <input type="number" class="form-control" id="item-price_per_night" name="price_per_night" step="0.01">
+            </div>
+            <div class="mb-3">
+                <label for="item-description" class="form-label">Description</label>
+                <textarea class="form-control" id="item-description" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="item-representative_image" class="form-label">Thumbnail Image</label>
+                <input type="file" class="form-control" id="item-representative_image" name="representative_image" accept="image/*">
+                <div class="form-text">The thumbnail image for the item</div>
+                <div class="mt-2">
+                    <img id="representative_image_preview" src="#" alt="Thumbnail preview" style="max-width: 200px; display: none;">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="item-hero_image" class="form-label">Banner Image</label>
+                <input type="file" class="form-control" id="item-hero_image" name="hero_image" accept="image/*">
+                <div class="form-text">The main banner image for the item</div>
+                <div class="mt-2">
+                    <img id="hero_image_preview" src="#" alt="Banner preview" style="max-width: 200px; display: none;">
+                </div>
+            </div>
+        </div>
+        <div class="custom-modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelCreateItemModal">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="submitItemForm">Update Item</button>
+        </div>
+    </form>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing dashboard functionality');
+    
     // Handle section navigation
     const filterButtons = document.querySelectorAll('.filter-bar button');
     const sections = document.querySelectorAll('.dashboard-section');
@@ -412,11 +620,324 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Handle approve/deny buttons
-    const approveButtons = document.querySelectorAll('.approve-btn');
-    const denyButtons = document.querySelectorAll('.deny-btn');
+    // Create Item Modal functionality
+    const openItemModalBtn = document.getElementById('openCreateItemModal');
+    const closeItemModalBtn = document.getElementById('closeCreateItemModal');
+    const cancelItemModalBtn = document.getElementById('cancelCreateItemModal');
+    const itemModalOverlay = document.getElementById('createItemModalOverlay');
+    const itemModalContent = document.getElementById('createItemModalContent');
+    const createItemForm = document.getElementById('createItemForm');
+    const submitItemBtn = document.getElementById('submitItemForm');
+    const modalTitle = document.querySelector('.custom-modal-title');
+
+    if (openItemModalBtn && closeItemModalBtn && cancelItemModalBtn && itemModalOverlay && itemModalContent && createItemForm) {
+        function openItemModal(isEditing = false) {
+            console.log('Opening modal...');
+            itemModalOverlay.style.display = 'block';
+            itemModalContent.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Set modal title and button text based on action
+            if (isEditing) {
+                modalTitle.textContent = 'Edit Item';
+                submitItemBtn.textContent = 'Update Item';
+            } else {
+                modalTitle.textContent = 'Create New Item';
+                submitItemBtn.textContent = 'Create Item';
+                // Reset form when opening for new item
+                createItemForm.reset();
+                document.getElementById('item-id').value = '';
+                document.getElementById('representative_image_preview').style.display = 'none';
+                document.getElementById('hero_image_preview').style.display = 'none';
+            }
+        }
+        
+        function closeItemModal() {
+            console.log('Closing modal...');
+            itemModalOverlay.style.display = 'none';
+            itemModalContent.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        openItemModalBtn.addEventListener('click', function(e) {
+            console.log('Create Item button clicked');
+            e.preventDefault();
+            openItemModal(false);
+        });
+        
+        closeItemModalBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeItemModal();
+        });
+        
+        cancelItemModalBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeItemModal();
+        });
+        
+        // Close when clicking outside the modal
+        itemModalOverlay.addEventListener('click', function(e) {
+            if (e.target === itemModalOverlay) {
+                closeItemModal();
+            }
+        });
+        
+        // Close when ESC key is pressed
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeItemModal();
+            }
+        });
+
+        // Image preview functionality
+        function readURL(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById(previewId);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.getElementById('item-representative_image').addEventListener('change', function() {
+            readURL(this, 'representative_image_preview');
+        });
+
+        document.getElementById('item-hero_image').addEventListener('change', function() {
+            readURL(this, 'hero_image_preview');
+        });
+
+        // Handle form submission
+        createItemForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submitted');
+            
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response received:', data);
+                if (data.success) {
+                    closeItemModal();
+                    showNotification('Item saved successfully', 'success');
+                    setTimeout(() => location.reload(), 1000); // Small delay before reload
+                } else {
+                    // Display form errors
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(field => {
+                            const input = document.getElementById(`item-${field}`);
+                            if (input) {
+                                input.classList.add('is-invalid');
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'invalid-feedback';
+                                errorDiv.textContent = data.errors[field][0];
+                                input.parentNode.appendChild(errorDiv);
+                            }
+                        });
+                    } else {
+                        showNotification(data.message || 'An error occurred while saving the item.', 'error');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred while saving the item.', 'error');
+            });
+        });
+
+        // Clear validation errors when inputs change
+        createItemForm.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+                const errorDiv = this.parentNode.querySelector('.invalid-feedback');
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
+            });
+        });
+    } else {
+        console.error('One or more modal elements not found');
+    }
     
-    function handleRequest(action, requestId) {
+    // Use event delegation for all action buttons
+    document.addEventListener('click', function(e) {
+        // Handle edit item buttons
+        if (e.target.matches('.edit-item')) {
+            e.preventDefault();
+            // Get item ID from data attribute
+            const itemId = e.target.dataset.itemId;
+            
+            // Get the item data from data attributes
+            const title = e.target.dataset.itemTitle;
+            const statusValue = e.target.dataset.itemStatus;
+            const location = e.target.dataset.itemLocation;
+            const price = e.target.dataset.itemPrice;
+            const description = e.target.dataset.itemDescription || '';
+            const thumbnailUrl = e.target.dataset.itemThumbnail || '';
+            const bannerUrl = e.target.dataset.itemBanner || '';
+            
+            // Set the action for editing
+            createItemForm.action = "{% url 'catalog:update_item' %}";
+            
+            // Set form field values
+            document.getElementById('item-id').value = itemId;
+            document.getElementById('item-title').value = title;
+            document.getElementById('item-status').value = statusValue;
+            document.getElementById('item-location').value = location;
+            document.getElementById('item-price_per_night').value = price;
+            document.getElementById('item-description').value = description;
+            
+            // Show existing images if available
+            const thumbnailPreview = document.getElementById('representative_image_preview');
+            const bannerPreview = document.getElementById('hero_image_preview');
+            
+            if (thumbnailUrl) {
+                thumbnailPreview.src = thumbnailUrl;
+                thumbnailPreview.style.display = 'block';
+            } else {
+                thumbnailPreview.style.display = 'none';
+            }
+            
+            if (bannerUrl) {
+                bannerPreview.src = bannerUrl;
+                bannerPreview.style.display = 'block';
+            } else {
+                bannerPreview.style.display = 'none';
+            }
+            
+            // Open the modal in edit mode
+            openItemModal(true);
+        }
+        // Handle delete item buttons
+        else if (e.target.matches('.delete-item')) {
+            e.preventDefault();
+            const itemId = e.target.dataset.itemId;
+            const itemTitle = e.target.dataset.itemTitle;
+            
+            if (confirm(`Are you sure you want to delete the item "${itemTitle}"? This will also delete all relations and files associated with this item. This action cannot be undone.`)) {
+                deleteItem(itemId, e.target.closest('tr'));
+            }
+        }
+        // Handle approve loan button
+        else if (e.target.matches('.approve-loan-btn')) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to approve this loan?')) {
+                const row = e.target.closest('tr');
+                handleLoanAction('approve', e.target.dataset.loanId, row);
+            }
+        }
+        // Handle delete loan button
+        else if (e.target.matches('.delete-loan-btn')) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to delete this loan? This action cannot be undone.')) {
+                const row = e.target.closest('tr');
+                handleLoanAction('delete', e.target.dataset.loanId, row);
+            }
+        }
+        // Handle return button
+        else if (e.target.matches('.return-btn')) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to mark this item as returned?')) {
+                const row = e.target.closest('tr');
+                handleLoanAction('return', e.target.dataset.loanId, row);
+            }
+        }
+        // Handle approve request button
+        else if (e.target.matches('.approve-btn')) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to approve this request?')) {
+                const row = e.target.closest('tr');
+                handleRequest('approve', e.target.dataset.requestId, row);
+            }
+        }
+        // Handle deny request button
+        else if (e.target.matches('.deny-btn')) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to deny this request?')) {
+                const row = e.target.closest('tr');
+                handleRequest('deny', e.target.dataset.requestId, row);
+            }
+        }
+        // Handle toggle role button
+        else if (e.target.matches('.toggle-role-btn')) {
+            e.preventDefault();
+            const userId = e.target.dataset.userId;
+            const currentRole = parseInt(e.target.dataset.currentRole);
+            const newRole = currentRole === 0 ? 1 : 0;
+            const action = currentRole === 0 ? 'make librarian' : 'make patron';
+            const row = e.target.closest('tr');
+            
+            if (confirm(`Are you sure you want to ${action}?`)) {
+                handleRoleToggle(userId, newRole, row, e.target);
+            }
+        }
+    });
+    
+    // Utility function to update a row's status
+    function updateRowStatus(row, newStatus, newStatusClass, updateButtons = true) {
+        // Update status badge
+        const statusBadge = row.querySelector('.status-badge');
+        if (statusBadge) {
+            // Remove old status classes
+            statusBadge.classList.remove('bg-success', 'bg-warning', 'bg-danger', 'bg-secondary');
+            // Add new status class
+            statusBadge.classList.add(newStatusClass);
+            // Update text
+            statusBadge.textContent = newStatus;
+        }
+        
+        // If we need to update buttons
+        if (updateButtons) {
+            const actionCell = row.querySelector('td:last-child');
+            if (actionCell) {
+                // Clear existing buttons
+                actionCell.innerHTML = '';
+                
+                // Add appropriate new buttons based on status
+                if (newStatus === "Pending") {
+                    const requestId = row.querySelector('button')?.dataset.requestId || 
+                                     row.querySelector('button')?.dataset.loanId;
+                    
+                    if (requestId) {
+                        actionCell.innerHTML = `
+                            <button class="action-btn btn-success approve-btn" data-request-id="${requestId}">Approve</button>
+                            <button class="action-btn btn-danger deny-btn" data-request-id="${requestId}">Deny</button>
+                        `;
+                    }
+                } else if (newStatus === "Approved" && row.classList.contains('loan-row')) {
+                    const loanId = row.querySelector('button')?.dataset.loanId;
+                    
+                    if (loanId) {
+                        actionCell.innerHTML = `
+                            <button class="action-btn btn-primary return-btn" data-loan-id="${loanId}">Return</button>
+                            <button class="action-btn btn-danger delete-loan-btn" data-loan-id="${loanId}">Delete</button>
+                        `;
+                    }
+                } else {
+                    // For completed/denied statuses
+                    const requestId = row.querySelector('button')?.dataset.requestId || 
+                                     row.querySelector('button')?.dataset.loanId;
+                    
+                    if (requestId) {
+                        actionCell.innerHTML = `<button class="action-btn btn-danger delete-loan-btn" data-loan-id="${requestId}">Delete</button>`;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Handle access request actions
+    function handleRequest(action, requestId, row) {
         fetch(`/access-request/${action}/${requestId}/`, {
             method: 'POST',
             headers: {
@@ -427,39 +948,26 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                // Update the row instead of reloading
+                const newStatus = action === 'approve' ? 'Approved' : 'Denied';
+                const statusClass = action === 'approve' ? 'bg-success' : 'bg-danger';
+                updateRowStatus(row, newStatus, statusClass);
+                
+                // Show a success notification
+                showNotification(`Request ${action}d successfully`, 'success');
             } else {
-                alert(data.message || 'An error occurred');
+                showNotification(data.message || 'An error occurred', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while processing the request');
+            showNotification('An error occurred while processing the request', 'error');
         });
     }
-    
-    approveButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to approve this request?')) {
-                handleRequest('approve', this.dataset.requestId);
-            }
-        });
-    });
-    
-    denyButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to deny this request?')) {
-                handleRequest('deny', this.dataset.requestId);
-            }
-        });
-    });
 
     // Handle loan actions
-    const approveLoanButtons = document.querySelectorAll('.approve-loan-btn');
-    const deleteLoanButtons = document.querySelectorAll('.delete-loan-btn');
-    const returnButtons = document.querySelectorAll('.return-btn');
-    
-    function handleLoanAction(action, loanId) {
+    function handleLoanAction(action, loanId, row) {
+        console.log(`Handling loan action: ${action} for loan ID: ${loanId}`);
         fetch(`/loan/${action}/${loanId}/`, {
             method: 'POST',
             headers: {
@@ -470,77 +978,159 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                if (action === 'delete') {
+                    // Remove the row if it's a delete action
+                    row.remove();
+                    showNotification('Loan deleted successfully', 'success');
+                } else {
+                    // Update the row for other actions
+                    let newStatus, statusClass;
+                    if (action === 'approve') {
+                        newStatus = 'Approved';
+                        statusClass = 'bg-success';
+                    } else if (action === 'return') {
+                        newStatus = 'Returned';
+                        statusClass = 'bg-secondary';
+                    }
+                    
+                    if (newStatus) {
+                        updateRowStatus(row, newStatus, statusClass);
+                        showNotification(`Loan ${action}d successfully`, 'success');
+                    }
+                }
             } else {
-                alert(data.message || 'An error occurred');
+                showNotification(data.message || 'An error occurred', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while processing the request');
+            showNotification('An error occurred while processing the request', 'error');
         });
     }
     
-    approveLoanButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to approve this loan?')) {
-                handleLoanAction('approve', this.dataset.loanId);
+    // Handle role toggle
+    function handleRoleToggle(userId, newRole, row, button) {
+        fetch(`/accounts/toggle-role/${userId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                new_role: newRole
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the row
+                const roleBadge = row.querySelector('td:nth-child(7) .status-badge');
+                if (roleBadge) {
+                    roleBadge.textContent = newRole === 1 ? 'Librarian' : 'Patron';
+                    roleBadge.classList.toggle('bg-success', newRole === 1);
+                    roleBadge.classList.toggle('bg-secondary', newRole === 0);
+                }
+                
+                // Update the button
+                button.textContent = newRole === 1 ? 'Make Patron' : 'Promote Account';
+                button.dataset.currentRole = newRole;
+                
+                showNotification('Role updated successfully', 'success');
+            } else {
+                showNotification(data.message || 'An error occurred', 'error');
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred while processing the request', 'error');
         });
+    }
+    
+    // Handle item deletion
+    function deleteItem(itemId, row) {
+        console.log(`Deleting item with ID: ${itemId}`);
+        fetch(`/catalog/delete/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the row
+                row.remove();
+                showNotification('Item deleted successfully', 'success');
+            } else {
+                showNotification(data.message || 'An error occurred', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred while deleting the item', 'error');
+        });
+    }
+    
+    // Display notification
+    function showNotification(message, type = 'info') {
+        // Create notification element if it doesn't exist
+        let notification = document.getElementById('notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'notification';
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '10px 15px';
+            notification.style.borderRadius = '4px';
+            notification.style.color = 'white';
+            notification.style.zIndex = '9999';
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.3s ease-in-out';
+            document.body.appendChild(notification);
+        }
+        
+        // Set style based on type
+        if (type === 'success') {
+            notification.style.backgroundColor = '#28a745';
+        } else if (type === 'error') {
+            notification.style.backgroundColor = '#dc3545';
+        } else {
+            notification.style.backgroundColor = '#17a2b8';
+        }
+        
+        // Set message and show
+        notification.textContent = message;
+        notification.style.opacity = '1';
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            notification.style.opacity = '0';
+        }, 3000);
+    }
+    
+    // Add row class to loan rows for identification
+    document.querySelectorAll('#items-section table tbody tr').forEach(row => {
+        row.classList.add('loan-row');
     });
     
-    deleteLoanButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to delete this loan? This action cannot be undone.')) {
-                handleLoanAction('delete', this.dataset.loanId);
-            }
-        });
-    });
-    
-    returnButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to mark this item as returned?')) {
-                handleLoanAction('return', this.dataset.loanId);
-            }
-        });
-    });
-
-    // Handle role toggle buttons
-    const toggleRoleButtons = document.querySelectorAll('.toggle-role-btn');
-    
-    toggleRoleButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const userId = this.dataset.userId;
-            const currentRole = parseInt(this.dataset.currentRole);
-            const newRole = currentRole === 0 ? 1 : 0;
-            const action = currentRole === 0 ? 'make librarian' : 'make patron';
-            
-            if (confirm(`Are you sure you want to ${action}?`)) {
-                fetch(`/accounts/toggle-role/${userId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    },
-                    body: JSON.stringify({
-                        new_role: newRole
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert(data.message || 'An error occurred');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while processing the request');
-                });
-            }
-        });
-    });
+    // Add notification styles
+    const style = document.createElement('style');
+    style.textContent = `
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            color: white;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+    `;
+    document.head.appendChild(style);
 });
 </script>
 {% endblock %} 

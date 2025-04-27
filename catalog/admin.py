@@ -3,20 +3,23 @@ from .models import Item, ItemReview
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('title', 'identifier', 'status', 'location', 'price_per_night', 'created_at', 'created_by')
+    list_display = ('title', 'status', 'location', 'price_per_night', 'created_at', 'created_by')
     list_filter = ('status', 'created_at')
-    search_fields = ('title', 'identifier', 'description')
-    readonly_fields = ('created_at', 'updated_at')
+    search_fields = ('title', 'description')
+    date_hierarchy = 'created_at'
     fieldsets = (
         ('Basic Information', {
-            'fields': ('title', 'identifier', 'status', 'location', 'price_per_night')
+            'fields': ('title', 'status', 'location', 'price_per_night')
         }),
-        ('Details', {
-            'fields': ('description', 'representative_image', 'hero_image')
+        ('Description', {
+            'fields': ('description',)
+        }),
+        ('Images', {
+            'fields': ('representative_image', 'hero_image')
         }),
         ('Metadata', {
-            'fields': ('created_at', 'updated_at', 'created_by')
-        }),
+            'fields': ('created_by',)
+        })
     )
 
 @admin.register(ItemReview)
