@@ -360,7 +360,9 @@
 </section>
 
 <!-- Intro Section -->
+
 <section class="container container--spacer gutter">
+  {% if user.is_authenticated %}
   <header class="hgroup hgroup--limited text--centered">
     <p class="subtitle">Experiences at Hootel</p>
     <h2 class="heading-h">The Premier Exclusive Experience</h2>
@@ -372,9 +374,24 @@
 
       </div>
   </header>
+  {% else %}
+  <header class="hgroup hgroup--limited text--centered">
+    <p class="subtitle">Experiences at Hootel</p>
+    <h2 class="heading-h">The Premier Exclusive Experience</h2>
+    <div class="hgroup__intro">
+      <p>From spiritual pilgrimages to cultural discoveries, Hootel curates transformative experiences that immerse guests in the spirit of each destination. Each Hootel property offers its own selection of activities that celebrate the surrounding landscape and culture.</p>
+    </div>
+    <div class="hgroup__intro">
+      <p>Experiences are curated by Hootel's team and are <strong><u>invite-only</u></strong>. If you'd like to be added to the list of authorized users, please request access.</p>
+    </div>
+    <div class="h3">
+      <p>To view the full collection, please <b>login with your Hootel member account</b>.</p>
+    </div>
+  </header>
+  {% endif %}
 
 
-
+  {% if user.is_authenticated %}
   <!-- Filter Bar -->
   <div class="filter-bar">
     <!-- <button class="active" data-filter="none">Select a Collection</button> -->
@@ -394,12 +411,11 @@
     <p id="collection-description" class="mb-3"></p>
   </div>
 
-  <!-- Search Bar -->
-  <div class="search-bar mb-4">
-    <input type="text" id="destinationSearch" class="form-control" placeholder="Search destinations..." aria-label="Search destinations">
-  </div>
+
+  {% endif %}
 </section>
 
+{% if user.is_authenticated %}
 <!-- Content area that can be blurred -->
 <div class="content-area">
   <!-- Content curtain that will cover the entire content area -->
@@ -407,6 +423,11 @@
     <h3>Exclusive Content</h3>
     <p>You need to be authorized to view this exclusive collection.</p>
     <button class="button request-access-btn">Request Access</button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar mb-4">
+    <input type="text" id="destinationSearch" class="form-control" placeholder="Search destinations..." aria-label="Search destinations">
   </div>
     
   <!-- Destinations Grid -->
@@ -436,6 +457,7 @@
     </div>
   </section>
 </div>
+{% endif %}
 
   <!-- Banner Section -->
   <section class="container container--spacer gutter bg-white banner-section">

@@ -20,7 +20,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    border: none;
+    border: 1px solid #dad9d7;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: transform 0.3s ease;
   }
@@ -76,49 +76,166 @@
   .collection-card small a:hover {
     color: #7a3f37;
   }
+
+
+  /* Search Bar Styles */
+  .search-bar {
+    max-width: 500px;
+    margin: 0;
+  }
+  
+  .search-bar input {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-bottom: 1px solid #dad9d7;
+    border-radius: 0;
+    font-size: 1rem;
+    width: 100%;
+    background: transparent;
+  }
+  
+  .search-bar input:focus {
+    outline: none;
+    border-color: #9D5248;
+  }
+
+  /* No results message */
+  .no-results {
+    display: none;
+    text-align: center;
+    width: 100%;
+    padding: 2rem;
+    color: #666;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center mb-4">Influential Collections</h1>
-    <div class="collections-grid">
-        {% for collection in collections %}
+
+
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <p class="subtitle">Hootel collections</p>
+    <h2 class="heading-h">Curated Sets</h2>
+    <div class="hgroup__intro">
+      <p>Hootel's curated sets are designed to inspire and inform, offering a glimpse into the unique experiences and stories of each destination.</p>
+    </div>
+  </header>
+  
+  <!-- Search Bar -->
+  <div class="search-bar mb-4">
+    <input type="text" id="collectionSearch" class="form-control" placeholder="Search collections..." aria-label="Search collections">
+  </div>
+
+
+  <div class="collections-grid">
+    {% for collection in collections %}
+
+        {% if collection.visibility == 0 or user.is_authenticated %}
+
             <div class="collection-card">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">
-                            <a href="{% url 'collection:detail' collection.id %}">{{ collection.title }}</a>
+                            {% if collection.visibility == 0 and collection.is_region == False %}
+
+                                <a href="{% url 'collection:detail' collection.id %}">{{ collection.title }}</a>
+                            {% else %}
+
+                                {{ collection.title }}
+                            {% endif %}
                         </h5>
-                        <p class="card-text">
-                            <small>
-                                Created by <a href="{% url 'accounts:user_profile' username=collection.creator.username %}">{{ collection.creator.username }}</a>
-                            </small>
-                        </p>
                         <p class="card-text">{{ collection.description|truncatewords:30 }}</p>
                         <p class="card-text">
                             <small>
                                 Visibility: {{ collection.get_visibility_display }}
                             </small>
                         </p>
-                        {% if collection.collectionitems_set.all %}
-                            <h6>Items in this collection:</h6>
-                            <ul class="list-unstyled">
-                                {% for item in collection.collectionitems_set.all %}
-                                    <li>{{ item.item.title }}</li>
-                                {% endfor %}
-                            </ul>
+                        {% if collection.visibility == 0 and collection.is_region == False %}
+
+                            <p class="card-text">
+                                <small>
+                                    Created by <a href="{% url 'accounts:user_profile' username=collection.creator.username %}">{{ collection.creator.username }}</a>
+                                </small>
+                            </p>
+                            {% if collection.collectionitems_set.all %}
+
+                                <h6>Items in this collection:</h6>
+                                <ul class="list-unstyled">
+                                    {% for item in collection.collectionitems_set.all %}
+
+                                        <li>{{ item.item.title }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+
+                                <p class="text-muted">No items in this collection.</p>
+                            {% endif %}
+                        {% elif collection.is_region == False %}
+
+                            <p class="card-text">View Private Collections in 'Experiences'</p>
                         {% else %}
-                            <p class="text-muted">No items in this collection.</p>
+
+                            <p class="card-text">View Region Collections in 'Destinations'</p>
                         {% endif %}
                     </div>
                 </div>
             </div>
-        {% empty %}
-            <div class="col-12 text-center">
-                <p>No collections found.</p>
-            </div>
-        {% endfor %}
-    </div>
-</div>
+        {% endif %}
+    {% empty %}
+        <div class="col-12 text-center">
+            <p>No collections found.</p>
+        </div>
+    {% endfor %}
+  </div>
+
+  <!-- No results message -->
+  <div id="noResults" class="no-results">
+      <p>No collections match your search.</p>
+  </div>
+
+</section>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('collectionSearch');
+        const collectionCards = document.querySelectorAll('.collection-card');
+        const noResultsMessage = document.getElementById('noResults');
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let matchCount = 0;
+            
+            collectionCards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const description = card.querySelector('.card-text:nth-of-type(2)').textContent.toLowerCase();
+                const creator = card.querySelector('small a').textContent.toLowerCase();
+                const items = Array.from(card.querySelectorAll('.list-unstyled li')).map(li => li.textContent.toLowerCase());
+                
+                // Check if any card content matches the search term
+                const matches = title.includes(searchTerm) || 
+                               //description.includes(searchTerm) || 
+                               //creator.includes(searchTerm) ||
+                               items.some(item => item.includes(searchTerm));
+                
+                if (matches) {
+                    card.style.display = '';
+                    matchCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show or hide the "no results" message
+            if (matchCount === 0 && searchTerm !== '') {
+                noResultsMessage.style.display = 'block';
+            } else {
+                noResultsMessage.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}
+
 {% endblock %} 

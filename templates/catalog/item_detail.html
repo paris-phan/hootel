@@ -78,6 +78,91 @@
     color: white;
   }
   
+  /* Modal styles */
+  .custom-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+  }
+
+  .custom-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 80%;
+    max-width: 600px;
+    z-index: 2001;
+  }
+
+  .custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .custom-modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .custom-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 15px;
+  }
+
+  .custom-modal-body {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .custom-modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
+
+  .star-rating input {
+    display: none;
+  }
+
+  .star-rating label {
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0 0.1rem;
+    color: #ddd;
+  }
+
+  .star-rating label:hover,
+  .star-rating label:hover ~ label,
+  .star-rating input:checked ~ label {
+    color: #9D5248;
+  }
+  
   @media (max-width: 768px) {
     .item-hero {
       height: 300px;
@@ -158,6 +243,9 @@
 <section class="container container--spacer gutter">
   <header class="hgroup hgroup--limited text--centered">
     <h2 class="heading-h">Destination Reviews</h2>
+    <div class="mt-3">
+      <button type="button" class="button button--primary" id="openReviewModal">Write a Review</button>
+    </div>
   </header>
 
   <div class="reviews-list mt-5">
@@ -194,6 +282,16 @@
     </ul>
   </div>
 </section>
+{% else %}
+<section class="container container--spacer gutter">
+  <header class="hgroup hgroup--limited text--centered">
+    <h2 class="heading-h">Destination Reviews</h2>
+    <p class="mt-3">Be the first to review this destination!</p>
+    <div class="mt-3">
+      <button type="button" class="button button--primary" id="openReviewModal">Write a Review</button>
+    </div>
+  </header>
+</section>
 {% endif %}
 
 <!-- Call to Action Section -->
@@ -203,6 +301,43 @@
     <a href="{% url 'core:destinations' %}" class="button button--dark">View All Destinations</a>
   </div>
 </section>
+
+<!-- Review Modal -->
+<div id="reviewModalOverlay" class="custom-modal-overlay"></div>
+<div id="reviewModalContent" class="custom-modal">
+  <div class="custom-modal-header">
+    <h5 class="custom-modal-title">Write a Review for {{ item.title }}</h5>
+    <button type="button" class="custom-modal-close" id="closeReviewModal">&times;</button>
+  </div>
+  <form method="post" action="{% url 'catalog:add_review' item.id %}" id="reviewForm">
+    {% csrf_token %}
+    <div class="custom-modal-body">
+      <div class="mb-4">
+        <label class="form-label">Rating</label>
+        <div class="star-rating">
+          <input type="radio" id="star5" name="rating" value="5" required />
+          <label for="star5">★</label>
+          <input type="radio" id="star4" name="rating" value="4" />
+          <label for="star4">★</label>
+          <input type="radio" id="star3" name="rating" value="3" />
+          <label for="star3">★</label>
+          <input type="radio" id="star2" name="rating" value="2" />
+          <label for="star2">★</label>
+          <input type="radio" id="star1" name="rating" value="1" />
+          <label for="star1">★</label>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="review-comment" class="form-label">Your Review</label>
+        <textarea class="form-control" id="review-comment" name="comment" rows="5" required></textarea>
+      </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary" id="cancelReviewModal">Cancel</button>
+      <button type="submit" class="btn btn-primary">Submit Review</button>
+    </div>
+  </form>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -225,6 +360,51 @@
     
     window.addEventListener('scroll', revealOnScroll);
     window.addEventListener('load', revealOnScroll);
+    
+    // Review modal functionality
+    const openModalBtn = document.getElementById('openReviewModal');
+    const closeModalBtn = document.getElementById('closeReviewModal');
+    const cancelModalBtn = document.getElementById('cancelReviewModal');
+    const modalOverlay = document.getElementById('reviewModalOverlay');
+    const modalContent = document.getElementById('reviewModalContent');
+    
+    function openModal() {
+      modalOverlay.style.display = 'block';
+      modalContent.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModal() {
+      modalOverlay.style.display = 'none';
+      modalContent.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    
+    if (openModalBtn) {
+      openModalBtn.addEventListener('click', openModal);
+    }
+    
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener('click', closeModal);
+    }
+    
+    if (cancelModalBtn) {
+      cancelModalBtn.addEventListener('click', closeModal);
+    }
+    
+    if (modalOverlay) {
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+          closeModal();
+        }
+      });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
   });
 </script>
 {% endblock %} 
