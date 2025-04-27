@@ -420,9 +420,6 @@
                                             </small>
                                         </p>
                                         <p class="card-text">
-                                            <small class="text-muted">
-                                                Authorized on: {{ auth.created_at|date:"F j, Y" }}
-                                            </small>
                                         </p>
                                     </div>
                                 </div>
@@ -456,6 +453,16 @@
                                         <span class="badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">
                                             {{ request.status|capfirst }}
                                         </span>
+                                        {% if request.status == 'pending' and is_own_profile %}
+                                        <div class="mt-2">
+                                            <form method="post" action="{% url 'accounts:cancel_access_request' request.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm" style="background-color: #9D5248; color: white;" onclick="return confirm('Are you sure you want to cancel this access request?')">
+                                                    <i class="fas fa-times"></i> Cancel Request
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

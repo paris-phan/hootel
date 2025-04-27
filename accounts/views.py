@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import get_user_model
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from catalog.models import ItemReview, Item
 from loans.models import Loan
 from collection.models import CollectionAuthorizedUser
@@ -57,6 +57,27 @@ def update_profile_photo(request):
             messages.success(request, 'Profile picture updated successfully!')
         else:
             messages.error(request, 'No file was uploaded.')
+    return redirect('accounts:user_profile', username=request.user.username)
+
+@login_required
+def cancel_access_request(request, request_id):
+    """Cancel an access request made by the current user"""
+    if request.method == 'POST':
+        access_request = get_object_or_404(AccessRequest, id=request_id)
+        
+        # Ensure the request belongs to the current user
+        if access_request.user != request.user:
+            return HttpResponseForbidden("You don't have permission to cancel this request")
+        
+        # Only allow cancelling pending requests
+        if access_request.status != 'pending':
+            messages.error(request, "Only pending requests can be cancelled")
+            return redirect('accounts:user_profile', username=request.user.username)
+        
+        # Delete the request
+        access_request.delete()
+        messages.success(request, "Access request cancelled successfully")
+        
     return redirect('accounts:user_profile', username=request.user.username)
 
 @login_required
