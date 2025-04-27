@@ -189,3 +189,39 @@ def delete_item(request, item_id):
             'success': False,
             'message': str(e)
         })
+
+@login_required
+def add_review(request, item_id):
+    item = get_object_or_404(Item, id=item_id)
+    
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+        
+        # Simple validation
+        if not rating or not comment:
+            messages.error(request, 'Please provide both a rating and comment.')
+            return redirect('catalog:item_detail', item_title=item.title)
+        
+        # Check if user already has a review for this item
+        existing_review = ItemReview.objects.filter(item=item, creator=request.user).first()
+        if existing_review:
+            # Update existing review
+            existing_review.rating = rating
+            existing_review.comment = comment
+            existing_review.save()
+            messages.success(request, 'Your review has been updated.')
+        else:
+            # Create new review
+            ItemReview.objects.create(
+                item=item,
+                creator=request.user,
+                rating=rating,
+                comment=comment
+            )
+            messages.success(request, 'Your review has been submitted.')
+        
+        return redirect('catalog:item_detail', item_title=item.title)
+    
+    # If not POST, redirect to item detail page
+    return redirect('catalog:item_detail', item_title=item.title)

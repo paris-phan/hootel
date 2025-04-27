@@ -3,11 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Collection, CollectionItems
 from catalog.models import Item
+from django.db.models import Case, When, Value, IntegerField
 
 # Create your views here.
 
 def collection_list(request):
-    collections = Collection.objects.filter(is_region=False, visibility=0)
+    collections = Collection.objects.filter()
+
     return render(request, 'collections/list.html', {
         'collections': collections
     })
