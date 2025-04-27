@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.http import JsonResponse
 from catalog.models import ItemReview, Item
 from loans.models import Loan
+from collection.models import CollectionAuthorizedUser
+from access_request.models import AccessRequest
 from core.views import is_librarian
 
 # Create your views here.
@@ -19,6 +21,16 @@ def user_profile(request, username):
     reviews = ItemReview.objects.filter(creator=user).select_related('item').order_by('-created_at')
     loans = Loan.objects.filter(requester=user).select_related('item').order_by('-requested_at')
     
+    # Get authorized collections and access requests
+    authorized_collections = CollectionAuthorizedUser.objects.filter(user=user).select_related('collection')
+    access_requests = AccessRequest.objects.filter(user=user).select_related('collection')
+    
+    # Combine data for exclusive access section
+    exclusive_access_data = {
+        'authorized': authorized_collections,
+        'requests': access_requests
+    }
+    
     # Get all items for the collection creation modal if this is the user's own profile
     all_items = Item.objects.all() if is_own_profile else None
     
@@ -28,6 +40,9 @@ def user_profile(request, username):
         'is_own_profile': is_own_profile,
         'reviews': reviews,
         'loans': loans,
+        'authorized_collections': authorized_collections,
+        'access_requests': access_requests,
+        'exclusive_access_data': exclusive_access_data,
         'all_items': all_items
     }
     return render(request, 'accounts/profile.html', context)
@@ -66,6 +81,6 @@ def toggle_user_role(request, user_id):
             
             return JsonResponse({'success': True})
         except Exception as e:
-            return JsonResponse({'success': False, 'message': str(e)})
+            return JsonResponse({'success': False, 'message': 'Invalid request method'})
     
     return JsonResponse({'success': False, 'message': 'Invalid request method'})
