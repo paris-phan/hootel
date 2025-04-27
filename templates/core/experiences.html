@@ -205,6 +205,32 @@
     text-overflow: ellipsis;
     margin-bottom: 1rem;
   }
+
+  .slider-card .card__post-link-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: var(--color-background);
+    border-top: 1px solid var(--color-border);
+  }
+  
+  .card__link__cta {
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .card__link__cta:hover {
+    color: var(--color-primary);
+  }
+  
+  .card__post-link-content p {
+    margin: 0;
+    color: var(--color-text);
+    font-weight: 500;
+  }
   
   @media (max-width: 768px) {
     .destination-hero {
@@ -268,7 +294,7 @@
 <section class="container container--spacer gutter">
   <header class="hgroup hgroup--limited text--centered">
     <p class="subtitle">Experiences at Hootel</p>
-    <h2 class="heading-h">Extraordinary Journeys for the Eextraordinary</h2>
+    <h2 class="heading-h">The Premier Exclusive Experience</h2>
     <div class="hgroup__intro">
       <p>From spiritual pilgrimages to cultural discoveries, Hootel curates transformative experiences that immerse guests in the spirit of each destination. Each Hootel property offers its own selection of activities that celebrate the surrounding landscape and culture.</p>
     </div>
@@ -279,67 +305,66 @@
   </header>
 
 
-  <!-- Search Bar -->
-  <div class="search-bar mb-4">
-    <input type="text" id="destinationSearch" class="form-control" placeholder="Search destinations..." aria-label="Search destinations">
-  </div>
-  
+
   <!-- Filter Bar -->
   <div class="filter-bar">
-    <button class="active" data-filter="all">All Experiences</button>
+    <!-- <button class="active" data-filter="none">Select a Collection</button> -->
     {% for collection in collections %}
-      {% if collection.visibility == 'private' %}
+      {% if collection.visibility == 1 %}
         <button data-filter="collection-{{ collection.id }}">{{ collection.title }}</button>
       {% endif %}
     {% endfor %}
   </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar mb-4">
+    <input type="text" id="destinationSearch" class="form-control" placeholder="Search destinations..." aria-label="Search destinations">
+  </div>
+    
   
-  <!-- Destinations Grid -->
-  <div class="destinations-grid">
+<!-- Destinations Grid -->
+  <div class="destinations-grid" style="display: none;">
     {% for destination in destinations %}
-      {% if destination.has_private_collection %}
-        <div class="slider-card" data-region="{{ destination.region }}" data-collections="{{ destination.collection_ids|join:',' }}">
-          <article class="card card--centered">
-            <div class="media media--responsive">
-              {% if destination.representative_image %}
-                <img src="{{ destination.representative_image }}" alt="{{ destination.name }}" class="img-fluid">
-              {% else %}
-                <img src="{% static 'images/placeholder.jpg' %}" alt="{{ destination.name }}" class="img-fluid">
-              {% endif %}
-            </div>
-            <figcaption>
-              <h3>{{ destination.name }}</h3>
-              <p>{{ destination.description }}</p>
-            </figcaption>
-            <div class="card__post-link-content">
-              {% if destination.is_authorized_for_user %}
-                <a href="{% url 'item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline">Discover</a>
-              {% else %}
-                <a href="#" class="cta__link card__link__cta express-interest-btn" 
-                   data-collection-id="{{ destination.collection_ids|first }}"
-                   data-destination-name="{{ destination.name }}">
-                  Express Interest
-                </a>
-              {% endif %}
-            </div>
-          </article>
+    <div class="slider-card" data-region="{{ destination.region }}" data-collections="{{ destination.collection_ids|join:',' }}">
+      <article class="card card--centered">
+        <div class="media media--responsive">
+          {% if destination.representative_image %}
+            <img src="{{ destination.representative_image }}" alt="{{ destination.name }}" class="img-fluid">
+          {% else %}
+            <img src="{% static 'images/placeholder.jpg' %}" alt="{{ destination.name }}" class="img-fluid">
+          {% endif %}
         </div>
-      {% endif %}
+        <figcaption>
+          <h3>{{ destination.name }}</h3>
+          <p>{{ destination.description }}</p>
+        </figcaption>
+        <div class="card__post-link-content">
+          <a href="{% url 'item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline">Discover</a>
+          <p>From ${{ destination.price|floatformat:2 }}</p>
+        </div>
+      </article>
+    </div>
     {% endfor %}
   </div>
-
-
-
 </section>
 
 
 
 
-<!-- Call to Action Section -->
-<section class="container--spacer container gutter text--centered">
-  <div class="py-5">
-    <h2 class="heading-h mb-4">Plan Your Hootel Journey</h2>
-    <a href="#" class="button button--dark">Contact Us</a>
+<!-- Banner Section -->
+<section class="container container--spacer gutter bg-white banner-section">
+  <div class="row">
+    <div class="col-md-6">
+      <img src="{% static 'core/images/destination-feature.jpg' %}" alt="Hootel Experience" class="img-fluid">
+    </div>
+    <div class="col-md-6 d-flex align-items-center">
+      <div class="px-4 py-5">
+        <p class="subtitle">The Classic Hootel Experience</p>
+        <h2 class="heading-h">First-Class Luxury</h2>
+        <p>Explore our regular collection of experiences, available to all Hootel guests.</p>
+        <a href="/destinations/" class="button button--dark mt-4">Explore Destinations</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -368,10 +393,20 @@
     const searchInput = document.getElementById('destinationSearch');
     const filterButtons = document.querySelectorAll('.filter-bar button');
     const destinations = document.querySelectorAll('.destinations-grid .slider-card');
+    const destinationsGrid = document.querySelector('.destinations-grid');
     
     function filterDestinations() {
       const searchTerm = searchInput.value.toLowerCase();
       const activeFilter = document.querySelector('.filter-bar button.active').getAttribute('data-filter');
+      
+      // Hide grid if no collection is selected
+      if (activeFilter === 'none') {
+        destinationsGrid.style.display = 'none';
+        return;
+      }
+      
+      // Show grid if a collection is selected
+      destinationsGrid.style.display = 'grid';
       
       destinations.forEach(dest => {
         const title = dest.querySelector('h3').textContent.toLowerCase();

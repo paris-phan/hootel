@@ -129,18 +129,25 @@
   
   <!-- Heading -->
   <header class="hgroup hgroup--limited hgroup--plain text--functional-header">
-    <p class="subtitle">A Sanctuary in the Modern World</p>
     <h2 class="heading-h">
       Welcome to the World of Hootel
     </h2>
     <div class="hgroup__intro">
-      <a href="#" class="cta__link card__link__cta underline single-link">Discover more</a>
+      <a href="#" class="cta__link card__link__cta underline single-link">Discover</a>
     </div>
   </header>
 </section>
 
 <!-- Featured Destinations Section -->
 <section class="paragraph--type--slider-cards container--spacer container--text-alignment-left portrait-video slider-cards">
+  <header class="hgroup hgroup--limited text--centered">
+    <p class="subtitle">Featured Destinations</p>
+    <h2 class="heading-h">The Best of Hootel</h2>
+    <div class="hgroup__intro">
+      <p>Explore our flagship destinations, offering unparalleled luxury and unforgettable experiences, in a uniquely Hoo-tel style.</p>
+    </div>
+  </header>
+  
   <div class="container gutter">
     <div class="scards scards--featured">
       {% for destination in featured_destinations %}
@@ -157,13 +164,11 @@
 
             </picture>
           </div>
-          <a href="#" class="card__link">
             <header class="hgroup">
               <h3 class="subtitle">{% if forloop.first %}hotels &amp; resorts{% else %}featured destination{% endif %}</h3>
               <h3 class="heading-h card__heading">{{ destination.name }}</h3>
               <div class="hgroup__intro">{{ destination.description }}</div>
             </header>
-          </a>
           <div class="card__multiple_links">
             <a href="{% url 'catalog:item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline single-link">Discover more</a>
           </div>

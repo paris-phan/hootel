@@ -386,6 +386,11 @@
                   <li class="global-navigation__list-item">
                     <a href="{% url 'core:about' %}" class="global-navigation__link">About Us</a>
                   </li>
+                  
+
+                  <li class="global-navigation__list-item">
+                    <a href="/about/sources" class="global-navigation__link">Sources & Citations</a>
+                  </li>
 
                   {% if user.is_authenticated and user.role == 1 and is_own_profile %}
                   <li class="global-navigation__list-item">
@@ -513,19 +518,19 @@
               <p>Explore the world of Hootel. 35 luxury resorts, hotels & private residences in 20 countries.</p>
             </div>
             <div class="col-md-4">
-              <h3>Contact</h3>
+              <h3>Company</h3>
               <ul class="list-unstyled">
-                <li><a href="#">please don't</a></li>
-                <li><a href="#">no contact us</a></li>
-                <li><a href="#">do not contact us</a></li>
+                <li><a href="/about/team/">Our Team</a></li>
+                <li><a href="/about/team/">Our Story</a></li>
+                <li><a href="/about/team/">Careers</a></li>
               </ul>
             </div>
             <div class="col-md-4">
               <h3>Legal</h3>
               <ul class="list-unstyled">
-                <li><a href="#">this is not legal</a></li>
-                <li><a href="#">dont sue us</a></li>
-                <li><a href="#">Cookies!</a></li>
+                <li><a href="/about/sources/">Sources</a></li>
+                <li><a href="/about/sources/">Inspirations</a></li>
+                <li><a href="/about/sources/">Terms & Agreements</a></li>
               </ul>
             </div>
           </div>

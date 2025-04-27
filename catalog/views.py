@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Item
+from django.http import JsonResponse
+from .models import Item, ItemReview
+from .forms import ItemForm
 from collection.models import CollectionItems
 from loans.models import Loan
 from datetime import datetime
@@ -25,6 +27,22 @@ def item_detail(request, item_title):
         'item': item,
         'is_in_private_collection': is_in_private_collection
     })
+
+@login_required
+def delete_review(request, review_id):
+    review = get_object_or_404(ItemReview, id=review_id)
+    
+    # Check if the user is the creator of the review
+    if request.user != review.creator:
+        messages.error(request, 'You do not have permission to delete this review.')
+        return redirect('accounts:user_profile', username=request.user.username)
+    
+    # Delete the review
+    review.delete()
+    messages.success(request, 'Review deleted successfully.')
+    
+    # Redirect back to the user's profile
+    return redirect('accounts:user_profile', username=request.user.username)
 
 @login_required
 def booking_view(request, item_title):
@@ -77,3 +95,97 @@ def booking_view(request, item_title):
         'item': item,
         'disabled_dates': disabled_dates
     })
+
+@login_required
+def create_item(request):
+    if not request.user.role == 1:  # Check if user is a librarian
+        messages.error(request, 'You do not have permission to create items.')
+        return redirect('core:librarian_dashboard')
+    
+    if request.method == 'POST':
+        form = ItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.created_by = request.user
+            item.save()
+            messages.success(request, 'Item created successfully!')
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({
+                'success': False,
+                'errors': form.errors
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method'
+    })
+
+@login_required
+def update_item(request):
+    if not request.user.role == 1:  # Check if user is a librarian
+        messages.error(request, 'You do not have permission to modify items.')
+        return redirect('core:librarian_dashboard')
+    
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        try:
+            item = Item.objects.get(id=item_id)
+        except Item.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Item not found'
+            })
+        
+        form = ItemForm(request.POST, request.FILES, instance=item)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Item updated successfully!')
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({
+                'success': False,
+                'errors': form.errors
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method'
+    })
+
+@login_required
+def delete_item(request, item_id):
+    if not request.user.role == 1:  # Check if user is a librarian
+        messages.error(request, 'You do not have permission to delete items.')
+        return JsonResponse({
+            'success': False,
+            'message': 'Permission denied'
+        })
+    
+    try:
+        item = Item.objects.get(id=item_id)
+        
+        # Check if item has any active loans
+        active_loans = Loan.objects.filter(item=item, status__in=[0, 1])  # Pending or Approved
+        if active_loans.exists():
+            return JsonResponse({
+                'success': False,
+                'message': 'Cannot delete item with active loans.'
+            })
+        
+        # Delete the item - this will also delete related files due to the signal handler
+        item.delete()
+        
+        return JsonResponse({
+            'success': True
+        })
+    except Item.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Item not found'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        })

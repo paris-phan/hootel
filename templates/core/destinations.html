@@ -126,8 +126,29 @@
   }
   
   .slider-card .card__post-link-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 1rem;
-    border-top: 1px solid #dad9d7;
+    background-color: var(--color-background);
+    border-top: 1px solid var(--color-border);
+  }
+  
+  .card__link__cta {
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .card__link__cta:hover {
+    color: var(--color-primary);
+  }
+  
+  .card__post-link-content p {
+    margin: 0;
+    color: var(--color-text);
+    font-weight: 500;
   }
   
   @media (max-width: 768px) {
@@ -215,6 +236,7 @@
         </figcaption>
         <div class="card__post-link-content">
           <a href="{% url 'item_detail' item_title=destination.name %}" class="cta__link card__link__cta underline">Discover</a>
+          <p>From ${{ destination.price|floatformat:0 }}</p>
         </div>
       </article>
     </div>
@@ -230,10 +252,10 @@
     </div>
     <div class="col-md-6 d-flex align-items-center">
       <div class="px-4 py-5">
-        <p class="subtitle">Experience Hootel</p>
-        <h2 class="heading-h">Journey of a Lifetime</h2>
-        <p>Hootel's constellation of destinations spans 20 countries, with each resort and setting offering a gateway to the most remarkable locations and experiences.</p>
-        <a href="#" class="button button--dark mt-4">Explore Experiences</a>
+        <p class="subtitle">Experience Hootel Exclusive</p>
+        <h2 class="heading-h">The Journey of a Lifetime</h2>
+        <p>Discover the world's most exclusive experiences, curated by Hootel's team and available only to our most valued guests.</p>
+        <a href="/experiences/" class="button button--dark mt-4">Explore Private Experiences</a>
       </div>
     </div>
   </div>

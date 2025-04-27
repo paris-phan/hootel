@@ -1,13 +1,121 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Collections | Hootel Resorts, Hotels &amp; Residences{% endblock %}
+
+{% block extra_css %}
+<style>
+  .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  
+  .collection-card {
+    height: 100%;
+  }
+  
+  .collection-card .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .collection-card .card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .collection-card .card-body {
+    flex: 1;
+    padding: 1.5rem;
+  }
+  
+  .collection-card .card-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  .collection-card .card-title a {
+    color: #9D5248;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .collection-card .card-title a:hover {
+    color: #7a3f37;
+  }
+  
+  .collection-card .card-text {
+    color: #666;
+    margin-bottom: 1rem;
+  }
+  
+  .collection-card .list-unstyled {
+    margin-top: 1rem;
+  }
+  
+  .collection-card .list-unstyled li {
+    padding: 0.25rem 0;
+    color: #666;
+  }
+  
+  .collection-card small {
+    color: #888;
+  }
+  
+  .collection-card small a {
+    color: #9D5248;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .collection-card small a:hover {
+    color: #7a3f37;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>Influential Collections</h1>
-    <div class="row">
+    <h1 class="text-center mb-4">Influential Collections</h1>
+    <div class="collections-grid">
         {% for collection in collections %}
-            {% include "collection/collection_card.html" with collection=collection %}
+            <div class="collection-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'collection:detail' collection.id %}">{{ collection.title }}</a>
+                        </h5>
+                        <p class="card-text">
+                            <small>
+                                Created by <a href="{% url 'accounts:user_profile' username=collection.creator.username %}">{{ collection.creator.username }}</a>
+                            </small>
+                        </p>
+                        <p class="card-text">{{ collection.description|truncatewords:30 }}</p>
+                        <p class="card-text">
+                            <small>
+                                Visibility: {{ collection.get_visibility_display }}
+                            </small>
+                        </p>
+                        {% if collection.collectionitems_set.all %}
+                            <h6>Items in this collection:</h6>
+                            <ul class="list-unstyled">
+                                {% for item in collection.collectionitems_set.all %}
+                                    <li>{{ item.item.title }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">No items in this collection.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         {% empty %}
-            <div class="col-12">
+            <div class="col-12 text-center">
                 <p>No collections found.</p>
             </div>
         {% endfor %}
