@@ -346,10 +346,10 @@
                             <td>
                                 {% if loan.status == 0 %}
                                 <button class="action-btn btn-success approve-loan-btn" data-loan-id="{{ loan.id }}">Approve</button>
-                                <button class="action-btn btn-danger delete-loan-btn" data-loan-id="{{ loan.id }}">Delete</button>
+                                <button class="action-btn btn-danger deny-loan-btn" data-loan-id="{{ loan.id }}">Deny</button>
                                 {% elif loan.status == 1 %}
-                                <button class="action-btn btn-primary return-btn" data-loan-id="{{ loan.id }}">Return</button>
-                                <button class="action-btn btn-danger delete-loan-btn" data-loan-id="{{ loan.id }}">Delete</button>
+                                    <button class="action-btn btn-primary return-btn" data-loan-id="{{ loan.id }}">Return</button>
+                                    <button class="action-btn btn-danger delete-loan-btn" data-loan-id="{{ loan.id }}">Delete</button>
                                 {% else %}
                                 <button class="action-btn btn-danger delete-loan-btn" data-loan-id="{{ loan.id }}">Delete</button>
                                 {% endif %}
@@ -911,6 +911,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 handleLoanAction('delete', e.target.dataset.loanId, row);
             }
         }
+        // Handle deny loan button
+        else if (e.target.matches('.deny-loan-btn')) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to deny this loan?')) {
+                const row = e.target.closest('tr');
+                handleLoanAction('deny', e.target.dataset.loanId, row);
+            }
+        }
         // Handle return button
         else if (e.target.matches('.return-btn')) {
             e.preventDefault();
@@ -1021,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         `;
                     }
                 } else {
-                    // For completed/denied statuses
+                    // For completed/denied/returned statuses
                     const requestId = row.querySelector('button')?.dataset.requestId || 
                                      row.querySelector('button')?.dataset.loanId;
                     
@@ -1088,6 +1096,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else if (action === 'return') {
                         newStatus = 'Returned';
                         statusClass = 'bg-secondary';
+                    } else if (action === 'deny') {
+                        newStatus = 'Denied';
+                        statusClass = 'bg-danger';
                     }
                     
                     if (newStatus) {

@@ -374,6 +374,10 @@ def handle_loan_action(request, action, loan_id):
         elif action == "delete":
             loan.delete()
             message = "Loan deleted successfully"
+        elif action == "deny":
+            loan.status = 2  # Denied
+            loan.save()
+            message = "Loan denied successfully"
         else:
             return JsonResponse(
                 {"success": False, "message": "Invalid action"}, status=400
