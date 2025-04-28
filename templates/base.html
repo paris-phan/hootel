@@ -484,9 +484,16 @@
                   <!-- <a href="#" class="button button--slim button--dark">Reserve</a> -->
                   <ul class="navbar-nav">
                     {% if user.is_authenticated %}
+                      {% if user.role == 1 %}
+                          <li class="nav-item">
+                              <a class="button button--slim button--dark" href="{% url 'core:librarian_dashboard' %}">Librarian Portal</a>
+                              <a class="button button--slim button--dark" href="{% url 'accounts:profile' %}">Account</a>
+                          </li>
+                      {% else %}
                         <li class="nav-item">
-                            <a class="button button--slim button--dark" href="{% url 'accounts:profile' %}">Profile</a>
+                            <a class="button button--slim button--dark" href="{% url 'accounts:profile' %}">Account</a>
                         </li>
+                      {% endif %}
                     {% else %}
                         <li class="nav-item">
                             <a class="button button--slim button--dark" href="{% url 'account_login' %}">Login</a>
