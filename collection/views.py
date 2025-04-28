@@ -45,8 +45,9 @@ def collection_detail(request, collection_id):
         available_items = available_items.exclude(id__in=already_in_this_collection)
 
     is_creator = False
-    if request.user == collection.creator or request.user.role == 1:
-        is_creator = True
+    if request.user.is_authenticated:
+        if request.user == collection.creator or request.user.role == 1:
+            is_creator = True
 
     return render(
         request,

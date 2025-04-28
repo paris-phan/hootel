@@ -166,8 +166,8 @@ def experiences(request):
                 collection=collection, user=request.user
             ).exists()
 
-        if request.user.role == 1:
-            is_auth = True
+            if request.user.role == 1:
+                is_auth = True
         
         # Get authorized users for this collection
         authorized_users = []
