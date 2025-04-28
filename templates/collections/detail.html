@@ -66,11 +66,221 @@
     justify-content: flex-end;
     gap: 10px;
 }
+
+/* Search Bar Styles */
+.search-bar {
+    max-width: 500px;
+    margin: 0;
+}
+
+.search-bar input {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-bottom: 1px solid #dad9d7;
+    border-radius: 0;
+    font-size: 1rem;
+    width: 100%;
+    background: transparent;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: #9D5248;
+}
+
+
+/* Selected Collection Info styles */
+.selected-collection-info {
+    max-width: 800px;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: #F7F5F1;
+    border-left: 3px solid #9D5248;
+}
+
+.selected-collection-info h3 {
+    color: #9D5248;
+    margin-bottom: 0.5rem;
+}
+
+.selected-collection-info p {
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+
+
+
+.destinations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+/* Card Styles */
+.slider-card {
+    height: 100%;
+}
+
+.slider-card .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.slider-card .media--responsive {
+    height: 250px;
+    overflow: hidden;
+}
+
+.slider-card .media--responsive img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.slider-card .media--responsive img:hover {
+    transform: scale(1.05);
+}
+
+.slider-card figcaption {
+    flex: 1;
+    padding: 1rem;
+}
+
+.slider-card figcaption p {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 1rem;
+}
+
+.slider-card .card__post-link-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: var(--color-background);
+    border-top: 1px solid var(--color-border);
+}
+
+.card__link__cta {
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.card__link__cta:hover {
+    color: var(--color-primary);
+}
+
+.card__post-link-content p {
+    margin: 0;
+    color: var(--color-text);
+    font-weight: 500;
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<!-- Intro Section -->
+<section class="container container--spacer gutter">
+    <header class="hgroup hgroup--limited text--centered">
+      <p class="subtitle">Influential Collections</p>
+      <h2 class="heading-h">{{ collection.title }}</h2>
+      <div class="hgroup__intro">
+        
+        <p>Curated By: {{ collection.creator.username }}</p>
+      </div>
+    </header>
+
+    <!-- Selected Collection Info -->
+    <div id="selected-collection-info" class="selected-collection-info mb-4">
+        <p>{{ collection.description }}</p>
+
+        <div class="d-flex align-items-center text-muted mb-3">
+            <small>
+                Created by <a href="{% url 'accounts:user_profile' username=collection.creator.username %}" class="text-decoration-none">{{ collection.creator.username }}</a>
+                on {{ collection.created_at|date:"F j, Y" }}
+            </small>
+        </div>
+
+        <span class="badge {% if collection.visibility == 0 %}bg-success{% else %}bg-warning{% endif %} mb-3">
+            {{ collection.get_visibility_display }}
+        </span>
+
+
+
+        <div class="d-flex align-items-center">
+            {% if is_creator %}
+            <button type="button" class="button button--slim button--dark" id="openAddItemsModal">
+                Add Items
+            </button>
+            <button type="button" class="ms-2 button button--slim button--dark" id="openModifyDetailsModal">Modify Details</button>
+            <form method="post" action="{% url 'collection:delete' collection.id %}" class="ms-2" onsubmit="return confirm('Are you sure you want to delete this collection? This action cannot be undone.');">
+                {% csrf_token %}
+                <button type="submit" class="button button--slim button--dark btn-danger">Delete Collection</button>
+            </form>
+            {% endif %}
+        </div>
+
+    </div>
+    {% if collection.collectionitems_set.all %}
+        <!-- Search Bar -->
+        <div class="search-bar mb-4">
+            <input type="text" id="destinationSearch" class="form-control" placeholder="Search Collection" aria-label="Search destinations">
+        </div>
+
+        <div class="destinations-grid">
+            {% for destination in collection.collectionitems_set.all %}
+
+
+            
+                <div class="slider-card">
+                    <article class="card card--centered">
+                    <div class="media media--responsive">
+                        {% if destination.item.representative_image %}
+                            <img src="{{ destination.item.representative_image.url }}" alt="{{ destination.item.title }}" class="img-fluid">
+                        {% else %}
+                            <img src="{% static 'images/placeholder.jpg' %}" alt="{{ destination.item.title }}" class="img-fluid">
+                        {% endif %}
+                    </div>
+                    <figcaption>
+                        <h3>{{ destination.item.title }}</h3>
+                        <p>{{ destination.item.description }}</p>
+                    </figcaption>
+                    <div class="card__post-link-content">
+                        <a href="{% url 'item_detail' item_title=destination.item.title %}" class="cta__link card__link__cta underline">Discover</a>
+                        <p>From ${{ destination.item.price_per_night|floatformat:0 }}</p>
+                        {% if is_creator %}
+                        <form method="post" action="{% url 'collection:remove_item' collection.id destination.item.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No items have been added to this collection yet.
+        </div>
+    {% endif %}
+</section>
+
+
+
+
+
+<!-- <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow-sm">
@@ -81,9 +291,7 @@
                             <small class="text-muted">Created by {{ collection.creator.username }}</small>
                         </div>
                         <div class="d-flex align-items-center">
-                            <span class="badge {% if collection.visibility == 0 %}bg-success{% else %}bg-warning{% endif %}">
-                                {{ collection.get_visibility_display }}
-                            </span>
+
                             {% if is_creator %}
                             <button type="button" class="btn btn-sm btn-primary ms-2" id="openModifyDetailsModal">Modify Details</button>
                             <form method="post" action="{% url 'collection:delete' collection.id %}" class="ms-2" onsubmit="return confirm('Are you sure you want to delete this collection? This action cannot be undone.');">
@@ -154,7 +362,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 {% if is_creator %}
 <!-- Custom Modal for Adding Items -->
@@ -220,12 +428,29 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Add Items Modal
+    const searchInput = document.getElementById('destinationSearch');
     const openAddItemsModalBtn = document.getElementById('openAddItemsModal');
     const closeAddItemsModalBtn = document.getElementById('closeAddItemsModal');
     const cancelAddItemsModalBtn = document.getElementById('cancelAddItemsModal');
     const addItemsModalOverlay = document.getElementById('addItemsModalOverlay');
     const addItemsModalContent = document.getElementById('addItemsModalContent');
     
+    function filterDestinations() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const destinations = document.querySelectorAll('.destinations-grid .slider-card');
+        
+        destinations.forEach(dest => {
+            const title = dest.querySelector('h3').textContent.toLowerCase();
+            const description = dest.querySelector('p').textContent.toLowerCase();
+            const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+            
+            dest.style.display = matchesSearch ? 'block' : 'none';
+        });
+    }
+    
+    // Add search input event listener
+    searchInput.addEventListener('input', filterDestinations);
+
     function openAddItemsModal() {
         addItemsModalOverlay.style.display = 'block';
         addItemsModalContent.style.display = 'block';

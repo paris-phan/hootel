@@ -15,6 +15,7 @@ from core.views import is_librarian
 def profile(request):
     return redirect('accounts:user_profile', username=request.user.username)
 
+@login_required
 def user_profile(request, username):
     user = get_object_or_404(get_user_model(), username=username)
     is_own_profile = request.user.is_authenticated and request.user == user

@@ -19,7 +19,7 @@ def collection_detail(request, collection_id):
     
     # If the user is the creator, get items that are not already in the collection
     available_items = []
-    if request.user == collection.creator:
+    if request.user == collection.creator or request.user.role == 1:
         # Get IDs of items already in the collection
         existing_item_ids = collection.collectionitems_set.values_list('item_id', flat=True)
         # Get items not in the collection

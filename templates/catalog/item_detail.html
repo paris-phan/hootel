@@ -243,9 +243,11 @@
 <section class="container container--spacer gutter">
   <header class="hgroup hgroup--limited text--centered">
     <h2 class="heading-h">Destination Reviews</h2>
-    <div class="mt-3">
-      <button type="button" class="button button--primary" id="openReviewModal">Write a Review</button>
-    </div>
+    {% if user.is_authenticated %}
+      <div class="mt-3">
+        <button type="button" class="button button--primary" id="openReviewModal">Write a Review</button>
+      </div>
+    {% endif %}
   </header>
 
   <div class="reviews-list mt-5">
