@@ -406,7 +406,7 @@
                     </div>
                     
                     <!-- Exclusive Access Section -->
-                    {% if is_own_profile %}
+                    {% if is_own_profile and request.user.role != 1 %}
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">
                             <h2 class="h4 mb-0">Exclusive Access</h2>
