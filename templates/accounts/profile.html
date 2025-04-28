@@ -502,30 +502,19 @@
                     <label for="collection-description" class="form-label">Description</label>
                     <textarea class="form-control" id="collection-description" name="description" rows="3"></textarea>
                 </div>
-                <div class="mb-3">
-                    <label for="collection-visibility" class="form-label">Visibility</label>
-                    <select class="form-select" id="collection-visibility" name="visibility">
-                        <option value="0">Public</option>
-                        {% if user.role == 1 %}
-                        <option value="1">Private</option>
-                        {% endif %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Select Items</label>
-                    <div class="items-container" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
-                        {% for item in all_items %}
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" name="items" value="{{ item.id }}" id="item-{{ item.id }}">
-                            <label class="form-check-label" for="item-{{ item.id }}">
-                                {{ item.title }}
-                            </label>
-                        </div>
-                        {% empty %}
-                        <p class="text-muted">No items available.</p>
-                        {% endfor %}
+                {% if user.role == 1 %}
+                    <div class="mb-3">
+                        <label for="collection-visibility" class="form-label">Visibility</label>
+                        <select class="form-select" id="collection-visibility" name="visibility">
+                            <option value="0">Public</option>
+                            
+                            <option value="1">Private</option>
+                            
+                        </select>
                     </div>
-                </div>
+                {% else %}
+                    <label for="collection-visibility" class="form-label">Patrons may only create public collections.</label>
+                {% endif %}
             </div>
             <div class="custom-modal-footer">
                 <button type="button" class="btn btn-secondary" id="cancelCreateCollectionModal">Cancel</button>

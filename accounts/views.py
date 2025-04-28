@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponseForbidden
 from catalog.models import ItemReview, Item
 from loans.models import Loan
-from collection.models import CollectionAuthorizedUser
+from collection.models import CollectionAuthorizedUser, CollectionItems
 from access_request.models import AccessRequest
 from core.views import is_librarian
 
@@ -32,8 +32,15 @@ def user_profile(request, username):
         'requests': access_requests
     }
     
-    # Get all items for the collection creation modal if this is the user's own profile
-    all_items = Item.objects.all() if is_own_profile else None
+
+    #gets all 'available to add' items for the collection creation modal if this is the user's own profile
+    all_items = None
+    if is_own_profile:
+        all_items = Item.objects.exclude(
+            id__in=CollectionItems.objects.filter(
+                collection__visibility=1
+            ).values_list('item_id', flat=True)
+        )
     
     context = {
         'user': user,
