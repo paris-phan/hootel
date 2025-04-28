@@ -165,6 +165,12 @@ def experiences(request):
             is_auth = CollectionAuthorizedUser.objects.filter(
                 collection=collection, user=request.user
             ).exists()
+        
+        # Get authorized users for this collection
+        authorized_users = []
+        if collection.visibility == 1:  # Private collection
+            auth_users = CollectionAuthorizedUser.objects.filter(collection=collection)
+            authorized_users = [{'id': au.user.id, 'username': au.user.username} for au in auth_users]
 
         collections_with_auth.append(
             {
@@ -174,6 +180,7 @@ def experiences(request):
                 "visibility": collection.visibility,
                 "is_region": collection.is_region,
                 "is_authorized": is_auth,
+                "authorized_users": authorized_users
             }
         )
 
@@ -293,6 +300,11 @@ def librarian_dashboard(request):
     access_requests = AccessRequest.objects.all().select_related(
         "user", "collection", "reviewed_by"
     )
+    
+    # Get all collection authorized users
+    authorized_users = CollectionAuthorizedUser.objects.all().select_related(
+        "user", "collection"
+    )
 
     # Get all users
     users = get_user_model().objects.all().order_by("date_joined")
@@ -307,6 +319,7 @@ def librarian_dashboard(request):
         "items": items,
         "collections": collections,
         "access_requests": access_requests,
+        "authorized_users": authorized_users,
         "users": users,
         "loans": loans,
     }
@@ -364,5 +377,18 @@ def handle_loan_action(request, action, loan_id):
             )
 
         return JsonResponse({"success": True, "message": message})
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+
+@login_required
+@user_passes_test(is_librarian)
+@require_POST
+def revoke_collection_access(request, auth_id):
+    """Revoke a user's access to a collection"""
+    try:
+        auth_user = get_object_or_404(CollectionAuthorizedUser, id=auth_id)
+        auth_user.delete()
+        return JsonResponse({"success": True, "message": "Access revoked successfully"})
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)

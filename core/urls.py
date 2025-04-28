@@ -21,4 +21,9 @@ urlpatterns = [
         views.handle_loan_action,
         name="handle_loan_action",
     ),
+    path(
+        "revoke-access/<int:auth_id>/",
+        views.revoke_collection_access,
+        name="revoke_collection_access",
+    ),
 ]

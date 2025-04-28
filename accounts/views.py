@@ -21,30 +21,61 @@ def profile(request):
 def user_profile(request, username):
     user = get_object_or_404(get_user_model(), username=username)
     is_own_profile = request.user.is_authenticated and request.user == user
-    reviews = (
-        ItemReview.objects.filter(creator=user)
-        .select_related("item")
-        .order_by("-created_at")
-    )
+
+    # Filter reviews based on whether it's own profile or not
+    if is_own_profile or user.role == 1:
+        # Show all reviews if viewing own profile
+        reviews = (
+            ItemReview.objects.filter(creator=user)
+            .select_related("item")
+            .order_by("-created_at")
+        )
+    else:
+        # For other users' profiles, exclude reviews of items in private collections
+        private_collection_items = CollectionItems.objects.filter(
+            collection__visibility=1
+        ).values_list("item_id", flat=True)
+        
+        reviews = (
+            ItemReview.objects.filter(creator=user)
+            .exclude(item_id__in=private_collection_items)
+            .select_related("item")
+            .order_by("-created_at")
+        )
+    
     loans = (
         Loan.objects.filter(requester=user)
         .select_related("item")
         .order_by("-requested_at")
     )
 
-    # Get authorized collections and access requests
-    authorized_collections = CollectionAuthorizedUser.objects.filter(
-        user=user
-    ).select_related("collection")
-    access_requests = AccessRequest.objects.filter(user=user).select_related(
-        "collection"
-    )
+    # Get authorized collections and access requests only for own profile
+    authorized_collections = None
+    access_requests = None
+    exclusive_access_data = {}
+    
+    if is_own_profile:
+        # Only fetch this data for the user's own profile
+        authorized_collections = CollectionAuthorizedUser.objects.filter(
+            user=user
+        ).select_related("collection")
+        access_requests = AccessRequest.objects.filter(user=user).select_related(
+            "collection"
+        )
 
-    # Combine data for exclusive access section
-    exclusive_access_data = {
-        "authorized": authorized_collections,
-        "requests": access_requests,
-    }
+        # Combine data for exclusive access section
+        exclusive_access_data = {
+            "authorized": authorized_collections,
+            "requests": access_requests,
+        }
+
+    # Filter collections based on visibility for other users' profiles
+    if is_own_profile:
+        # If viewing own profile, fetch all collections
+        user_collections = user.collections_created.all()
+    else:
+        # If viewing someone else's profile, only show public collections
+        user_collections = user.collections_created.filter(visibility=0)
 
     # gets all 'available to add' items for the collection creation modal if this is the user's own profile
     all_items = None
@@ -64,6 +95,7 @@ def user_profile(request, username):
         "authorized_collections": authorized_collections,
         "access_requests": access_requests,
         "exclusive_access_data": exclusive_access_data,
+        "user_collections": user_collections,
         "all_items": all_items,
     }
     return render(request, "accounts/profile.html", context)

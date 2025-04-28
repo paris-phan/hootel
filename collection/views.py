@@ -10,7 +10,18 @@ from django.http import JsonResponse
 
 
 def collection_list(request):
-    collections = Collection.objects.filter()
+    collections = Collection.objects.annotate(
+        display_order=Case(
+            # 1. Public collections with is_region=False
+            When(visibility=0, is_region=False, then=Value(1)),
+            # 2. Private collections
+            When(visibility=1, then=Value(2)),
+            # 3. Collections with is_region=True
+            When(is_region=True, then=Value(3)),
+            default=Value(4),
+            output_field=IntegerField(),
+        )
+    ).order_by('display_order')
 
     return render(request, "collections/list.html", {"collections": collections})
 

@@ -427,7 +427,7 @@
     <!-- Access Requests Section -->
     <div class="row mb-5 dashboard-section" id="collections-section" style="display: none;">
         <div class="col-12">
-            <h2 class="mb-3">Access Requests</h2>
+            <h2 class="mb-3">Access Requests & Authorized Users</h2>
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
                     <thead>
@@ -461,14 +461,36 @@
                                 <button class="action-btn btn-success approve-btn" data-request-id="{{ request.id }}">Approve</button>
                                 <button class="action-btn btn-danger deny-btn" data-request-id="{{ request.id }}">Deny</button>
                                 {% endif %}
-                                
                             </td>
                         </tr>
                         {% empty %}
-                        <tr>
-                            <td colspan="8" class="text-center">No access requests found.</td>
-                        </tr>
                         {% endfor %}
+                        
+                        {% for auth_user in authorized_users %}
+                        <tr>
+                            <td>{{ auth_user.user.username }}</td>
+                            <td>{{ auth_user.collection.title }}</td>
+                            <td>
+                                <span class="status-badge bg-success">
+                                    Authorized
+                                </span>
+                            </td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>
+                                <button class="action-btn btn-danger revoke-access-btn" data-auth-id="{{ auth_user.id }}">Revoke Access</button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        {% endfor %}
+                        
+                        {% if not access_requests and not authorized_users %}
+                        <tr>
+                            <td colspan="8" class="text-center">No access requests or authorized users found.</td>
+                        </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
@@ -520,6 +542,12 @@
                                         data-user-id="{{ user.id }}"
                                         data-current-role="{{ user.role }}">
                                     Promote Account
+                                </button>
+                                {% else %}
+                                <button class="action-btn btn-warning toggle-role-btn" 
+                                        data-user-id="{{ user.id }}"
+                                        data-current-role="{{ user.role }}">
+                                    Demote Account
                                 </button>
                                 {% endif %}
 
@@ -918,6 +946,36 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (confirm(`Are you sure you want to ${action}?`)) {
                 handleRoleToggle(userId, newRole, row, e.target);
+            }
+        }
+        // Handle revoke access button
+        else if (e.target.matches('.revoke-access-btn')) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to revoke this user\'s access to the collection?')) {
+                const row = e.target.closest('tr');
+                const authId = e.target.dataset.authId;
+                
+                fetch(`/revoke-access/${authId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the row
+                        row.remove();
+                        showNotification('Access revoked successfully', 'success');
+                    } else {
+                        showNotification(data.message || 'An error occurred', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred while processing the request', 'error');
+                });
             }
         }
     });
