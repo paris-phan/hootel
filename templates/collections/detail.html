@@ -223,7 +223,7 @@
                 Add Items
             </button>
             <button type="button" class="ms-2 button button--slim button--dark" id="openModifyDetailsModal">Modify Details</button>
-            <form method="post" action="{% url 'collection:delete' collection.id %}" class="ms-2" onsubmit="return confirm('Are you sure you want to delete this collection? This action cannot be undone.');">
+            <form method="post" action="{% url 'collection:delete' collection.id %}" class="ms-2" id="deleteCollectionForm">
                 {% csrf_token %}
                 <button type="submit" class="button button--slim button--dark btn-danger">Delete Collection</button>
             </form>
@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modifyDetailsForm = document.getElementById('modifyDetailsForm');
     
     // Delete form
-    const deleteCollectionForm = document.querySelector('form[action*="delete"]');
+    const deleteCollectionForm = document.getElementById('deleteCollectionForm');
     
     // AJAX form submissions
     if (addItemsForm) {
@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteCollectionForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            if (!confirm('Are you sure you want to delete this collection? This action cannot be undone.')) {
+            if (!confirm('Are you sure you want to delete this collection? This action cannot be undone.!!!')) {
                 return false;
             }
             

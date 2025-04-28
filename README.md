@@ -1,15 +1,16 @@
-Last Updated: April 28, 2025
+*Last Updated: April 28, 2025* 
 
+**Login:** 
 The user can login into the application via the Login button at the top right corner of the page. The user MUST use their Google account to log into any account, and their Google account can only be associated with one account at a time. If the user's Google account is not already associated with an account on the site, a patron account with their Gmail is made for them the first time that they log in. 
 
 Note that if the user presses the back arrow after logging in without logging out, another login attempt will trigger a Third-Party Login Failure because the user is already logged into one of their accounts. It is strongly recommended that all users log out before logging in again. Also note that if the user leaves the page before logging out, then when they reopen the application, they will be automatically logged into the last account they were logged into when they left. 
 
-After the user successfully logins in, the Login button changes to an Account button, which redirects the user to their Account dashboard, where they can view their Profile, Bookings, Reviews, and Collections. 
+**User Profile:**
+On a successful login, the Login button changes to an **Account** button, which redirects the user to their Account dashboard, where they can view their **Profile**, **Bookings**, **Reviews**, and **Collections**. 
 
-On the Profile page, all users can view their first name, last name, username, and email, as well as the date that they joined and the last time they logged in. Users can also change their profile photo. 
+On the **Profile** page, all users can view their **first name**, **last name**, **username**, and **email**, as well as the **date that they joined** and the **date of their last login**. Users can also change their profile photo. 
 Note that users are given a default photo when their account is first made, once they change it, they cannot delete their photo or change it back to the default photo unless they delete their account. 
 Also note that users are not able to delete their account. 
-
 
 Users may interact with our site through 3 types of profiles:
 Anonymous users: Users will be an anonymous user before they login. These users have no profile associated with them. They can can view hotels on the "All Destinations" page but cannot book hotels or leave reviews. These users can view public collections on the "Influential Collections" page but cannot see private collections on the "Experiences" page. They cannot create any collections.
@@ -21,5 +22,3 @@ All Destinations: On this page users will see a list of all hotels. They can sea
 Experiences: Anonymous users should see no collections on this page. Patrons and librarians should see a list of collections, each with a "Request Access" button. If the user clicks "Request Access", they should see a pop-up: "Access request submitted successfully". Once their request is approved, the user should be able to view items in this collection.
 Influential Collections: Here users can see all public collections. They can click on the collections to see all items in the collection.
 About Us: Finally, the About Us page has information on the website and our team.  
-
-
