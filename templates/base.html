@@ -392,7 +392,7 @@
                     <a href="/about/sources" class="global-navigation__link">Sources & Citations</a>
                   </li>
 
-                  {% if user.is_authenticated and user.role == 1 and is_own_profile %}
+                  {% if user.is_authenticated and request.user.role == 1 and is_own_profile %}
                   <li class="global-navigation__list-item">
                     <a href="{% url 'core:librarian_dashboard' %}" class="global-navigation__link">Staff Portal</a>
                   </li>
@@ -484,7 +484,7 @@
                   <!-- <a href="#" class="button button--slim button--dark">Reserve</a> -->
                   <ul class="navbar-nav">
                     {% if user.is_authenticated %}
-                      {% if user.role == 1 %}
+                      {% if request.user.role == 1 %}
                           <li class="nav-item">
                               <a class="button button--slim button--dark" href="{% url 'core:librarian_dashboard' %}">Librarian Portal</a>
                               <a class="button button--slim button--dark" href="{% url 'accounts:profile' %}">Account</a>
