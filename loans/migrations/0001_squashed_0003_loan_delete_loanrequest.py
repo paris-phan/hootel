@@ -7,32 +7,71 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('loans', '0001_initial'), ('loans', '0002_loanrequest_end_date_loanrequest_reservation_total_and_more'), ('loans', '0003_loan_delete_loanrequest')]
+    replaces = [
+        ("loans", "0001_initial"),
+        ("loans", "0002_loanrequest_end_date_loanrequest_reservation_total_and_more"),
+        ("loans", "0003_loan_delete_loanrequest"),
+    ]
 
     initial = True
 
     dependencies = [
-        ('catalog', '0001_initial'),
-        ('catalog', '0005_remove_item_hero_video_item_hero_image'),
+        ("catalog", "0001_initial"),
+        ("catalog", "0005_remove_item_hero_video_item_hero_image"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Loan',
+            name="Loan",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.IntegerField(choices=[(0, 'Pending'), (1, 'Approved'), (2, 'Denied'), (3, 'Returned')], default=0)),
-                ('requested_at', models.DateTimeField(auto_now_add=True)),
-                ('due_date', models.DateField(blank=True, null=True)),
-                ('start_date', models.DateField(blank=True, null=True)),
-                ('end_date', models.DateField(blank=True, null=True)),
-                ('reservation_total', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='catalog.item')),
-                ('requester', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.IntegerField(
+                        choices=[
+                            (0, "Pending"),
+                            (1, "Approved"),
+                            (2, "Denied"),
+                            (3, "Returned"),
+                        ],
+                        default=0,
+                    ),
+                ),
+                ("requested_at", models.DateTimeField(auto_now_add=True)),
+                ("due_date", models.DateField(blank=True, null=True)),
+                ("start_date", models.DateField(blank=True, null=True)),
+                ("end_date", models.DateField(blank=True, null=True)),
+                (
+                    "reservation_total",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True
+                    ),
+                ),
+                (
+                    "item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="catalog.item"
+                    ),
+                ),
+                (
+                    "requester",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'loan',
+                "db_table": "loan",
             },
         ),
     ]

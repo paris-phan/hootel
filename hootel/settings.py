@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -27,10 +28,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -39,118 +40,114 @@ ALLOWED_HOSTS = ["*"]
 SECURE_SSL_REDIRECT = not DEBUG  # redirect all non-HTTPS requests to HTTPS
 SESSION_COOKIE_SECURE = not DEBUG  # only send session cookie over HTTPS
 CSRF_COOKIE_SECURE = not DEBUG  # only send CSRF cookie over HTTPS
-SECURE_HSTS_SECONDS = 31536000 #arbitrary large number
+SECURE_HSTS_SECONDS = 31536000  # arbitrary large number
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = "DENY"
 
 # Application definition
 
 INSTALLED_APPS = [
-    #django apps
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites',
-
-
-    #third party apps
-    'storages',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-
-    #local apps
-    'core',
-    'accounts',
-    'catalog',
-    'collection',
-    'loans',
-    'access_request',
+    # django apps
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    # third party apps
+    "storages",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    # local apps
+    "core",
+    "accounts",
+    "catalog",
+    "collection",
+    "loans",
+    "access_request",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    #allauth middleware
-    'allauth.account.middleware.AccountMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # allauth middleware
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
-ROOT_URLCONF = 'hootel.urls'
+ROOT_URLCONF = "hootel.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR / 'templates',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
+            BASE_DIR / "templates",
         ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'hootel.wsgi.application'
+WSGI_APPLICATION = "hootel.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if 'DATABASE_URL' in os.environ:
+if "DATABASE_URL" in os.environ:
     DATABASES = {
-        'default': dj_database_url.config(
+        "default": dj_database_url.config(
             conn_max_age=600,
             conn_health_checks=True,
         )
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'hootel_db'),
-            'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '5432'),
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "hootel_db"),
+            "USER": os.getenv("DB_USER", "postgres"),
+            "PASSWORD": os.getenv("DB_PASSWORD", "postgres"),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "PORT": os.getenv("DB_PORT", "5432"),
         }
     }
 
 
 # Password validation
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = "accounts.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -158,9 +155,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -170,8 +167,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-#/**----------------------------------------------------------------------**/#
-
+# /**----------------------------------------------------------------------**/#
 
 
 ##############################
@@ -182,50 +178,61 @@ STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
-            "bucket_name": os.getenv('AWS_STORAGE_BUCKET_NAME'),
-            "access_key": os.getenv('AWS_ACCESS_KEY_ID'),
-            "secret_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
-            "region_name": os.getenv('AWS_S3_REGION_NAME'),
+            "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
+            "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+            "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+            "region_name": os.getenv("AWS_S3_REGION_NAME"),
             "default_acl": "public-read",
             "file_overwrite": True,
         },
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage" if DEBUG else "storages.backends.s3.S3Storage",
+        "BACKEND": (
+            "django.contrib.staticfiles.storage.StaticFilesStorage"
+            if DEBUG
+            else "storages.backends.s3.S3Storage"
+        ),
         "OPTIONS": {
-            **({"location": "static", "base_url": "/static/"} if DEBUG else {
-                "bucket_name": os.getenv('AWS_STORAGE_BUCKET_NAME'),
-                "access_key": os.getenv('AWS_ACCESS_KEY_ID'),
-                "secret_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
-                "region_name": os.getenv('AWS_S3_REGION_NAME'),
-                "default_acl": "public-read",
-                "file_overwrite": True,
-                "location": "static"
-            })
+            **(
+                {"location": "static", "base_url": "/static/"}
+                if DEBUG
+                else {
+                    "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
+                    "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+                    "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+                    "region_name": os.getenv("AWS_S3_REGION_NAME"),
+                    "default_acl": "public-read",
+                    "file_overwrite": True,
+                    "location": "static",
+                }
+            )
         },
     },
 }
 
 # Media files configuration
-MEDIA_URL = 'https://%s.s3.amazonaws.com/media/' % os.getenv('AWS_STORAGE_BUCKET_NAME')
-MEDIA_ROOT = ''
+MEDIA_URL = "https://%s.s3.amazonaws.com/media/" % os.getenv("AWS_STORAGE_BUCKET_NAME")
+MEDIA_ROOT = ""
 
 # Static files configuration
-STATIC_URL = '/static/' if DEBUG else 'https://%s.s3.amazonaws.com/static/' % os.getenv('AWS_STORAGE_BUCKET_NAME')
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = (
+    "/static/"
+    if DEBUG
+    else "https://%s.s3.amazonaws.com/static/" % os.getenv("AWS_STORAGE_BUCKET_NAME")
+)
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Add this line to tell Django where to find static files during development
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / "static",
 ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-#/**----------------------------------------------------------------------**/#
-
+# /**----------------------------------------------------------------------**/#
 
 
 ##############################
@@ -236,41 +243,37 @@ SITE_ID = 1
 
 # allauth's backend (+default) for user management integration into django auth system
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 # google login settings
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile', 
-            'email'
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {
+            "access_type": "online",
         },
     }
 }
 
 # redirection url after login/logout
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
 
-#requires email but no verification from inbox
-#ACCOUNT_SIGNUP_FIELDS = ['username', 'email']
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+# requires email but no verification from inbox
+# ACCOUNT_SIGNUP_FIELDS = ['username', 'email']
+ACCOUNT_EMAIL_VERIFICATION = "none"
 
-#disable standard sign-up
+# disable standard sign-up
 SOCIALACCOUNT_AUTO_SIGNUP = True
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 
-ACCOUNT_ADAPTER = 'accounts.adapters.NoUsernamePasswordAdapter'
-SOCIALACCOUNT_ADAPTER = 'accounts.adapters.CustomSocialAccountAdapter'
+ACCOUNT_ADAPTER = "accounts.adapters.NoUsernamePasswordAdapter"
+SOCIALACCOUNT_ADAPTER = "accounts.adapters.CustomSocialAccountAdapter"
 
 
-#/**----------------------------------------------------------------------**/#
-
+# /**----------------------------------------------------------------------**/#
 
 
 ##############################
@@ -281,22 +284,22 @@ django_heroku.settings(locals())
 
 # After your current settings
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'WARNING',
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
-            'propagate': False,
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "WARNING"),
+            "propagate": False,
         },
     },
 }

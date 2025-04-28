@@ -11,23 +11,73 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('collection', '0003_collection_is_region'),
+        ("collection", "0003_collection_is_region"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AccessRequest',
+            name="AccessRequest",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('request_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('reason', models.TextField(help_text='Why the patron is requesting access to this collection')),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('approved', 'Approved'), ('denied', 'Denied')], default='pending', max_length=10)),
-                ('review_date', models.DateTimeField(blank=True, null=True)),
-                ('review_notes', models.TextField(blank=True)),
-                ('collection', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='access_requests', to='collection.collection')),
-                ('reviewed_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='reviews', to=settings.AUTH_USER_MODEL)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='access_requests', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "request_date",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                (
+                    "reason",
+                    models.TextField(
+                        help_text="Why the patron is requesting access to this collection"
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("approved", "Approved"),
+                            ("denied", "Denied"),
+                        ],
+                        default="pending",
+                        max_length=10,
+                    ),
+                ),
+                ("review_date", models.DateTimeField(blank=True, null=True)),
+                ("review_notes", models.TextField(blank=True)),
+                (
+                    "collection",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="access_requests",
+                        to="collection.collection",
+                    ),
+                ),
+                (
+                    "reviewed_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="reviews",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="access_requests",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]
