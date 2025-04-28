@@ -1,14 +1,22 @@
-Last Updated: April 28, 2025
+*Last Updated: April 28, 2025* 
 
+**Login:** 
 The user can login into the application via the Login button at the top right corner of the page. The user MUST use their Google account to log into any account, and their Google account can only be associated with one account at a time. If the user's Google account is not already associated with an account on the site, a patron account with their Gmail is made for them the first time that they log in. 
 
 Note that if the user presses the back arrow after logging in without login out, another login attempt will trigger a Third-Party Login Failure because the user is already logged into one of their accounts. It is strongly recommended that all users log out before logging in again. Also note that if the user leaves the page before logging out, then when they reopen the application, they will be automatically logged into the last account they were logged into when they left. 
 
-After the user successfully logins in, the Login button changes to an Account button, which redirects the user to their Account dashboard, where they can view their Profile, Bookings, Reviews, and Collections. 
+**User Profile:**
+On a successful login, the Login button changes to an **Account** button, which redirects the user to their Account dashboard, where they can view their **Profile**, **Bookings**, **Reviews**, and **Collections**. 
 
-On the Profile page, all users can view their first name, last name, username, and email, as well as the date that they joined and the last time they logged in. Users can also change their profile photo. 
+On the **Profile** page, all users can view their **first name**, **last name**, **username**, and **email**, as well as the **date that they joined** and the **date of their last login**. Users can also change their profile photo. 
 Note that users are given a default photo when their account is first made, once they change it, they cannot delete their photo or change it back to the default photo unless they delete their account. 
 Also note that users are not able to delete their account. 
+
+The **Current Bookings** page displays the user's current bookings. By default, if the user has no current bookings, then the page displays a panel that says, "No current loans."
+
+The **Reviews** page displays the user's reviews of hotels. By default, if the user has no reviews, then the page does not display anything.
+
+The **Reviews** page displays the user's reviews of hotels. By default, if the user has no reviews, then the page does not display anything.
 
 are four different user types you have to consider:
 Anonymous users: users that will go to your CLA that do not have accounts and want to look around with limited access
