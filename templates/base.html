@@ -1,5 +1,7 @@
 {% load static %}
+
 <!DOCTYPE html>
+
 <html lang="en" dir="ltr" prefix="og: https://ogp.me/ns#">
   <head>
     <meta charset="utf-8" />
@@ -325,7 +327,8 @@
     </a>
     
     <div class="dialog-off-canvas-main-canvas bg-primary" data-off-canvas-main-canvas>
-      <!-- Menu Overlay -->
+
+      <!-- menu overlay -->
       <div class="menu-overlay">
         <div class="menu-content">
           <div class="menu-header">
@@ -336,6 +339,7 @@
                 </svg>
               </div>
               <div class="global-navigation__logo">
+
                 <a href="{% url 'core:home' %}" title="Hootel">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 200" width="330" height="90">
                     <title>Hootel</title>
@@ -400,6 +404,7 @@
                 </ul>
               </div>
 
+              <!-- NOT USED!!!!! but scared to delete -->
               <!-- Column 2: Destinations submenu -->
               <div class="global-navigation__column" id="destinations-submenu">
                 <ul class="global-navigation__list">
@@ -427,16 +432,6 @@
                 </ul>
               </div>
             </div>
-
-            <!-- Featured section -->
-            <!-- <div class="global-featured">
-              <p class="global-featured__title">Discover Hootel in...</p>
-              <div class="global-featured__buttons">
-                <a href="#" class="button">USA & the Caribbean</a>
-                <a href="#" class="button">Europe & North Africa</a>
-                <a href="#" class="button">Asia</a>
-              </div>
-            </div> -->
           </div>
         </div>
       </div>
@@ -512,7 +507,7 @@
         <a id="main-content" tabindex="-1"></a>
         
         {% block content %}
-        <!-- Content will be inserted here -->
+          <!-- whatever content -->
         {% endblock %}
       </main>
       
@@ -522,7 +517,7 @@
           <div class="row py-5" style="background-color: #FFF !important;">
             <div class="col-md-4">
               <h3>Hootel Resorts</h3>
-              <p>Explore the world of Hootel. 35 luxury resorts, hotels & private residences in 20 countries.</p>
+              <p>Explore the world of Hootel. Luxury resorts, hotels & private residences on all continents.</p>
             </div>
             <div class="col-md-4">
               <h3>Company</h3>
@@ -548,20 +543,16 @@
             </div>
             <div class="col-md-6 text-md-end">
                 <p class="mb-0">No real information should be submitted to this domain.</p>
-                <p class="mb-0">For actual vacation rentals, please visit <a href="https://www.aman.com" target="_blank">aman.com</a></p>
+                <p class="mb-0">For actual vacation rentals, please visit <a href="https://www.google.com/travel/" target="_blank">google.com/travel</a></p>
             </div>
           </div>
         </div>
       </footer>
     </div>
 
-    <!-- Bootstrap JS with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JavaScript -->
     <script src="{% static 'js/main.js' %}"></script>
     
-    <!-- Menu JavaScript -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const menuOverlay = document.querySelector('.menu-overlay');
@@ -578,19 +569,19 @@
           }
         });
 
-        // Close menu when clicking the close button
+        //close by clicking close, think deprecated
         menuClose.addEventListener('click', function() {
           menuOverlay.classList.remove('active');
         });
 
-        // Close menu when clicking outside
+        //clicking outside of menu
         document.addEventListener('click', function(event) {
           if (event.target === menuOverlay) {
             menuOverlay.classList.remove('active');
           }
         });
 
-        // Close menu when pressing Escape key
+        //pressing escape
         document.addEventListener('keydown', function(event) {
           if (event.key === 'Escape') {
             menuOverlay.classList.remove('active');
