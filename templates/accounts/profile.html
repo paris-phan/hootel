@@ -297,42 +297,47 @@
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">
                             <h2 class="h4 mb-0">Reviews</h2>
+                            {% if not is_own_profile %}
+                                <p>Private Reviews not visible.</p>
+                            {% endif %}
                         </div>
                         <div class="card-body">
                             <div class="reviews-list">
                                 {% for review in reviews %}
-                                <div class="review-item mb-4 pb-4 {% if not forloop.last %}border-bottom{% endif %}">
-                                    <div class="d-flex align-items-start">
-                                        <div class="review-content flex-grow-1">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <h5 class="mb-0">
-                                                    <a href="{% url 'catalog:item_detail' item_title=review.item.title %}" class="text-decoration-none">
-                                                        {{ review.item.title }}
-                                                    </a>
-                                                </h5>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="rating me-3">
-                                                        {% for i in "12345"|make_list %}
-                                                            {% if forloop.counter <= review.rating %}
-                                                                <span class="text-black">☆</span>
-                                                            {% endif %}
-                                                        {% endfor %}
+
+                                    <div class="review-item mb-4 pb-4 {% if not forloop.last %}border-bottom{% endif %}">
+                                        <div class="d-flex align-items-start">
+                                            <div class="review-content flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <h5 class="mb-0">
+                                                        <a href="{% url 'catalog:item_detail' item_title=review.item.title %}" class="text-decoration-none">
+                                                            {{ review.item.title }}
+                                                        </a>
+                                                    </h5>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="rating me-3">
+                                                            {% for i in "12345"|make_list %}
+                                                                {% if forloop.counter <= review.rating %}
+                                                                    <span class="text-black">☆</span>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+                                                        {% if is_own_profile %}
+                                                        <form method="post" action="{% url 'catalog:delete_review' review.id %}" class="d-inline">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm" style="background-color: #9D5248; color: white;" onclick="return confirm('Are you sure you want to delete this review?')">
+                                                                <i class="fas fa-trash"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                        {% endif %}
                                                     </div>
-                                                    {% if is_own_profile %}
-                                                    <form method="post" action="{% url 'catalog:delete_review' review.id %}" class="d-inline">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm" style="background-color: #9D5248; color: white;" onclick="return confirm('Are you sure you want to delete this review?')">
-                                                            <i class="fas fa-trash"></i> Delete
-                                                        </button>
-                                                    </form>
-                                                    {% endif %}
                                                 </div>
+                                                <p class="review-text mb-2">{{ review.comment }}</p>
+                                                <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
                                             </div>
-                                            <p class="review-text mb-2">{{ review.comment }}</p>
-                                            <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
                                         </div>
                                     </div>
-                                </div>
+
                                 {% endfor %}
                             </div>
                         </div>
@@ -350,6 +355,9 @@
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-white d-flex justify-content-between align-items-center">
                             <h2 class="h4 mb-0">Collections</h2>
+                            {% if not is_own_profile %}
+                                <p>Private Collections not visible.</p>
+                            {% endif %}
                             {% if is_own_profile %}
                             <button type="button" class="button button--slim button--dark" id="openCreateCollectionModal">
                                 Create Collection
@@ -358,7 +366,7 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                {% for collection in user.collections_created.all %}
+                                {% for collection in user_collections %}
                                 <div class="col-md-6 mb-4">
                                     <div class="card h-100">
                                         <div class="card-body">
@@ -398,6 +406,7 @@
                     </div>
                     
                     <!-- Exclusive Access Section -->
+                    {% if is_own_profile %}
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">
                             <h2 class="h4 mb-0">Exclusive Access</h2>
@@ -478,6 +487,7 @@
                             {% endif %}
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

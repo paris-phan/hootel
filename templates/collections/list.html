@@ -29,6 +29,15 @@
     transform: translateY(-5px);
   }
   
+  /* Background colors for different collection types */
+  .collection-private .card {
+    background-color: #EDDDB8;
+  }
+  
+  .collection-region .card {
+    background-color: #C1C4A5;
+  }
+  
   .collection-card .card-body {
     flex: 1;
     padding: 1.5rem;
@@ -124,7 +133,7 @@
   
   <!-- Search Bar -->
   <div class="search-bar mb-4">
-    <input type="text" id="collectionSearch" class="form-control" placeholder="Search collections..." aria-label="Search collections">
+    <input type="text" id="collectionSearch" class="form-control" placeholder="Search collections by title..." aria-label="Search collections">
   </div>
 
 
@@ -133,7 +142,7 @@
 
         {% if collection.visibility == 0 or user.is_authenticated %}
 
-            <div class="collection-card">
+            <div class="collection-card {% if collection.visibility == 1 %}collection-private{% elif collection.is_region %}collection-region{% endif %}">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">
@@ -208,16 +217,13 @@
             let matchCount = 0;
             
             collectionCards.forEach(card => {
-                const title = card.querySelector('.card-title').textContent.toLowerCase();
-                const description = card.querySelector('.card-text:nth-of-type(2)').textContent.toLowerCase();
-                const creator = card.querySelector('small a').textContent.toLowerCase();
-                const items = Array.from(card.querySelectorAll('.list-unstyled li')).map(li => li.textContent.toLowerCase());
+                const titleElement = card.querySelector('.card-title');
+                if (!titleElement) return;
                 
-                // Check if any card content matches the search term
-                const matches = title.includes(searchTerm) || 
-                               //description.includes(searchTerm) || 
-                               //creator.includes(searchTerm) ||
-                               items.some(item => item.includes(searchTerm));
+                const title = titleElement.textContent.toLowerCase().trim();
+                
+                // Check if title matches the search term
+                const matches = title.includes(searchTerm);
                 
                 if (matches) {
                     card.style.display = '';

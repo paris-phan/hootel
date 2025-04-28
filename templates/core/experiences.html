@@ -145,7 +145,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    backdrop-filter: blur(1px);
+    backdrop-filter: blur(4px);
     background: linear-gradient(to bottom, 
                                rgba(255, 255, 255, 0) 0%, 
                                rgba(255, 255, 255, 0.5) 5%, 
@@ -400,7 +400,8 @@
         <button data-filter="collection-{{ collection.id }}" 
                 data-authorized="{{ collection.is_authorized|yesno:"true,false" }}"
                 data-title="{{ collection.title }}"
-                data-description="{{ collection.description }}">{{ collection.title }}</button>
+                data-description="{{ collection.description }}"
+                data-authorized-users="{{ collection.authorized_users|safe }}">{{ collection.title }}</button>
       {% endif %}
     {% endfor %}
   </div>
@@ -409,6 +410,10 @@
   <div id="selected-collection-info" class="selected-collection-info mb-4" style="display: none;">
     <h3 id="collection-title" class="heading-h--small mb-2"></h3>
     <p id="collection-description" class="mb-3"></p>
+    <div id="authorized-users-section">
+      <h4 class="mb-2">Authorized Users</h4>
+      <ul id="authorized-users-list" class="list-unstyled"></ul>
+    </div>
   </div>
 
 
@@ -500,6 +505,7 @@
     const selectedCollectionInfo = document.getElementById('selected-collection-info');
     const collectionTitle = document.getElementById('collection-title');
     const collectionDescription = document.getElementById('collection-description');
+    const authorizedUsersList = document.getElementById('authorized-users-list');
     let currentCollectionId = null;
     
     function filterDestinations() {
@@ -517,6 +523,35 @@
       if (collectionTitleText) {
         collectionTitle.textContent = collectionTitleText;
         collectionDescription.textContent = collectionDescText || 'No description available';
+        
+        // Display authorized users
+        const authorizedUsersData = activeFilterButton.getAttribute('data-authorized-users');
+        authorizedUsersList.innerHTML = ''; // Clear previous list
+        
+        if (authorizedUsersData) {
+          try {
+            const authorizedUsers = JSON.parse(authorizedUsersData.replace(/'/g, '"'));
+            if (authorizedUsers.length > 0) {
+              authorizedUsers.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = user.username;
+                authorizedUsersList.appendChild(li);
+              });
+              document.getElementById('authorized-users-section').style.display = 'block';
+            } else {
+              const li = document.createElement('li');
+              li.textContent = 'No authorized users yet';
+              authorizedUsersList.appendChild(li);
+              document.getElementById('authorized-users-section').style.display = 'block';
+            }
+          } catch (e) {
+            console.error('Error parsing authorized users data:', e);
+            document.getElementById('authorized-users-section').style.display = 'none';
+          }
+        } else {
+          document.getElementById('authorized-users-section').style.display = 'none';
+        }
+        
         selectedCollectionInfo.style.display = 'block';
       } else {
         selectedCollectionInfo.style.display = 'none';

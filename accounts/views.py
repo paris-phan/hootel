@@ -11,105 +11,158 @@ from core.views import is_librarian
 
 # Create your views here.
 
+
 @login_required
 def profile(request):
-    return redirect('accounts:user_profile', username=request.user.username)
+    return redirect("accounts:user_profile", username=request.user.username)
+
 
 @login_required
 def user_profile(request, username):
     user = get_object_or_404(get_user_model(), username=username)
     is_own_profile = request.user.is_authenticated and request.user == user
-    reviews = ItemReview.objects.filter(creator=user).select_related('item').order_by('-created_at')
-    loans = Loan.objects.filter(requester=user).select_related('item').order_by('-requested_at')
-    
-    # Get authorized collections and access requests
-    authorized_collections = CollectionAuthorizedUser.objects.filter(user=user).select_related('collection')
-    access_requests = AccessRequest.objects.filter(user=user).select_related('collection')
-    
-    # Combine data for exclusive access section
-    exclusive_access_data = {
-        'authorized': authorized_collections,
-        'requests': access_requests
-    }
-    
 
-    #gets all 'available to add' items for the collection creation modal if this is the user's own profile
+    # Filter reviews based on whether it's own profile or not
+    if is_own_profile or user.role == 1:
+        # Show all reviews if viewing own profile
+        reviews = (
+            ItemReview.objects.filter(creator=user)
+            .select_related("item")
+            .order_by("-created_at")
+        )
+    else:
+        # For other users' profiles, exclude reviews of items in private collections
+        private_collection_items = CollectionItems.objects.filter(
+            collection__visibility=1
+        ).values_list("item_id", flat=True)
+        
+        reviews = (
+            ItemReview.objects.filter(creator=user)
+            .exclude(item_id__in=private_collection_items)
+            .select_related("item")
+            .order_by("-created_at")
+        )
+    
+    loans = (
+        Loan.objects.filter(requester=user)
+        .select_related("item")
+        .order_by("-requested_at")
+    )
+
+    # Get authorized collections and access requests only for own profile
+    authorized_collections = None
+    access_requests = None
+    exclusive_access_data = {}
+    
+    if is_own_profile:
+        # Only fetch this data for the user's own profile
+        authorized_collections = CollectionAuthorizedUser.objects.filter(
+            user=user
+        ).select_related("collection")
+        access_requests = AccessRequest.objects.filter(user=user).select_related(
+            "collection"
+        )
+
+        # Combine data for exclusive access section
+        exclusive_access_data = {
+            "authorized": authorized_collections,
+            "requests": access_requests,
+        }
+
+    # Filter collections based on visibility for other users' profiles
+    if is_own_profile:
+        # If viewing own profile, fetch all collections
+        user_collections = user.collections_created.all()
+    else:
+        # If viewing someone else's profile, only show public collections
+        user_collections = user.collections_created.filter(visibility=0)
+
+    # gets all 'available to add' items for the collection creation modal if this is the user's own profile
     all_items = None
     if is_own_profile:
         all_items = Item.objects.exclude(
-            id__in=CollectionItems.objects.filter(
-                collection__visibility=1
-            ).values_list('item_id', flat=True)
+            id__in=CollectionItems.objects.filter(collection__visibility=1).values_list(
+                "item_id", flat=True
+            )
         )
-    
+
     context = {
-        'user': user,
-        'role_display': 'Patron' if user.role == 0 else 'Librarian',
-        'is_own_profile': is_own_profile,
-        'reviews': reviews,
-        'loans': loans,
-        'authorized_collections': authorized_collections,
-        'access_requests': access_requests,
-        'exclusive_access_data': exclusive_access_data,
-        'all_items': all_items
+        "user": user,
+        "role_display": "Patron" if user.role == 0 else "Librarian",
+        "is_own_profile": is_own_profile,
+        "reviews": reviews,
+        "loans": loans,
+        "authorized_collections": authorized_collections,
+        "access_requests": access_requests,
+        "exclusive_access_data": exclusive_access_data,
+        "user_collections": user_collections,
+        "all_items": all_items,
     }
-    return render(request, 'accounts/profile.html', context)
+    return render(request, "accounts/profile.html", context)
+
 
 @login_required
 def update_profile_photo(request):
-    if request.method == 'POST':
-        if 'profile_picture' in request.FILES:
+    if request.method == "POST":
+        if "profile_picture" in request.FILES:
             user = request.user
-            user.profile_picture = request.FILES['profile_picture']
+            user.profile_picture = request.FILES["profile_picture"]
             user.save()
-            messages.success(request, 'Profile picture updated successfully!')
+            messages.success(request, "Profile picture updated successfully!")
         else:
-            messages.error(request, 'No file was uploaded.')
-    return redirect('accounts:user_profile', username=request.user.username)
+            messages.error(request, "No file was uploaded.")
+    return redirect("accounts:user_profile", username=request.user.username)
+
 
 @login_required
 def cancel_access_request(request, request_id):
     """Cancel an access request made by the current user"""
-    if request.method == 'POST':
+    if request.method == "POST":
         access_request = get_object_or_404(AccessRequest, id=request_id)
-        
+
         # Ensure the request belongs to the current user
         if access_request.user != request.user:
-            return HttpResponseForbidden("You don't have permission to cancel this request")
-        
+            return HttpResponseForbidden(
+                "You don't have permission to cancel this request"
+            )
+
         # Only allow cancelling pending requests
-        if access_request.status != 'pending':
+        if access_request.status != "pending":
             messages.error(request, "Only pending requests can be cancelled")
-            return redirect('accounts:user_profile', username=request.user.username)
-        
+            return redirect("accounts:user_profile", username=request.user.username)
+
         # Delete the request
         access_request.delete()
         messages.success(request, "Access request cancelled successfully")
-        
-    return redirect('accounts:user_profile', username=request.user.username)
+
+    return redirect("accounts:user_profile", username=request.user.username)
+
 
 @login_required
 @user_passes_test(is_librarian)
 def toggle_user_role(request, user_id):
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
             import json
+
             data = json.loads(request.body)
             user = get_object_or_404(get_user_model(), id=user_id)
-            new_role = data.get('new_role')
-            
+            new_role = data.get("new_role")
+
             if new_role is None:
-                return JsonResponse({'success': False, 'message': 'New role not specified'})
-            
+                return JsonResponse(
+                    {"success": False, "message": "New role not specified"}
+                )
+
             new_role = int(new_role)
             if new_role not in [0, 1]:
-                return JsonResponse({'success': False, 'message': 'Invalid role value'})
-            
+                return JsonResponse({"success": False, "message": "Invalid role value"})
+
             user.role = new_role
             user.save()
-            
-            return JsonResponse({'success': True})
+
+            return JsonResponse({"success": True})
         except Exception as e:
-            return JsonResponse({'success': False, 'message': 'Invalid request method'})
-    
-    return JsonResponse({'success': False, 'message': 'Invalid request method'})
+            return JsonResponse({"success": False, "message": "Invalid request method"})
+
+    return JsonResponse({"success": False, "message": "Invalid request method"})
