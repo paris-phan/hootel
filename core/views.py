@@ -365,16 +365,15 @@ def handle_loan_action(request, action, loan_id):
 
         if action == "approve":
 
-
-            loan.status = 1  # Approved
-            loan.save()
-
             #deny all other loans for this item that overlap in time
             Loan.objects.filter(
                 item=loan.item,
                 start_date__lte=loan.end_date,
                 end_date__gte=loan.start_date
             ).update(status=2)
+
+            loan.status = 1  # Approved
+            loan.save()
 
             message = "Loan approved successfully"
 
