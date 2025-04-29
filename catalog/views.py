@@ -11,6 +11,9 @@ from PIL import Image
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
+import os
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 # Create your views here.
 
@@ -239,16 +242,153 @@ def update_item(request):
         item_id = request.POST.get("item_id")
         try:
             item = Item.objects.get(id=item_id)
+            old_title = item.title
+            old_hero_image_path = item.hero_image.name if item.hero_image else None
+            old_rep_image_path = item.representative_image.name if item.representative_image else None
+            
+            form = ItemForm(request.POST, request.FILES, instance=item)
+            if form.is_valid():
+                updated_item = form.save(commit=False)
+                
+                # Process images if they're uploaded
+                from PIL import Image
+                from io import BytesIO
+                from django.core.files.uploadedfile import InMemoryUploadedFile
+                import sys
+                
+                # Process hero_image if new one is uploaded
+                if 'hero_image' in request.FILES:
+                    hero_image = request.FILES['hero_image']
+                    # Maximum acceptable size for hero image: 600KB
+                    max_hero_size = 600 * 1024  # 600KB in bytes
+                    
+                    # Only resize if file exceeds maximum size
+                    if hero_image.size > max_hero_size:
+                        hero_img = Image.open(hero_image)
+                        # Target dimensions for hero image
+                        target_width, target_height = 2560, 1080
+                        
+                        # Calculate new dimensions while maintaining aspect ratio
+                        img_ratio = hero_img.width / hero_img.height
+                        target_ratio = target_width / target_height
+                        
+                        if img_ratio > target_ratio:
+                            # Image is wider than target ratio, adjust height
+                            new_width = target_width
+                            new_height = int(target_width / img_ratio)
+                        else:
+                            # Image is taller than target ratio, adjust width
+                            new_height = target_height
+                            new_width = int(target_height * img_ratio)
+                        
+                        # Resize image
+                        hero_img = hero_img.resize((new_width, new_height), Image.LANCZOS)
+                        
+                        # Create output buffer
+                        output = BytesIO()
+                        # Save resized image
+                        hero_img.save(output, format='JPEG', quality=90)
+                        output.seek(0)
+                        
+                        # Replace original file with resized version
+                        updated_item.hero_image = InMemoryUploadedFile(
+                            output, 
+                            'ImageField',
+                            f"{hero_image.name.split('.')[0]}-reduced.jpg",
+                            'image/jpeg',
+                            sys.getsizeof(output),
+                            None
+                        )
+                
+                # Process representative_image if new one is uploaded
+                if 'representative_image' in request.FILES:
+                    rep_image = request.FILES['representative_image']
+                    # Maximum acceptable size for representative image: 400KB
+                    max_rep_size = 400 * 1024  # 400KB in bytes
+                    
+                    # Only resize if file exceeds maximum size
+                    if rep_image.size > max_rep_size:
+                        rep_img = Image.open(rep_image)
+                        # Target dimensions for representative image
+                        target_width, target_height = 800, 600
+                        
+                        # Calculate new dimensions while maintaining aspect ratio
+                        img_ratio = rep_img.width / rep_img.height
+                        target_ratio = target_width / target_height
+                        
+                        if img_ratio > target_ratio:
+                            # Image is wider than target ratio, adjust height
+                            new_width = target_width
+                            new_height = int(target_width / img_ratio)
+                        else:
+                            # Image is taller than target ratio, adjust width
+                            new_height = target_height
+                            new_width = int(target_height * img_ratio)
+                        
+                        # Resize image
+                        rep_img = rep_img.resize((new_width, new_height), Image.LANCZOS)
+                        
+                        # Create output buffer
+                        output = BytesIO()
+                        # Save resized image
+                        rep_img.save(output, format='JPEG', quality=85)
+                        output.seek(0)
+                        
+                        # Replace original file with resized version
+                        updated_item.representative_image = InMemoryUploadedFile(
+                            output, 
+                            'ImageField',
+                            f"{rep_image.name.split('.')[0]}-reduced.jpg",
+                            'image/jpeg',
+                            sys.getsizeof(output),
+                            None
+                        )
+                
+                # Save the item first to get the new file paths
+                updated_item.save()
+                
+                # Handle title change - need to update file paths if title changed
+                if old_title != updated_item.title and (old_hero_image_path or old_rep_image_path):
+                    # Helper function to copy file to new path
+                    def copy_file_to_new_path(old_path, new_path):
+                        if old_path and default_storage.exists(old_path):
+                            # Read the old file
+                            file_content = default_storage.open(old_path).read()
+                            # Save to new path
+                            default_storage.save(new_path, ContentFile(file_content))
+                            # Delete the old file
+                            default_storage.delete(old_path)
+                    
+                    # Handle hero image
+                    if old_hero_image_path and updated_item.hero_image:
+                        # New path would already be correct in updated_item.hero_image.name
+                        # Only need to copy if we didn't upload a new image
+                        if 'hero_image' not in request.FILES:
+                            old_filename = os.path.basename(old_hero_image_path)
+                            new_path = f"items/{updated_item.title}/{old_filename}"
+                            copy_file_to_new_path(old_hero_image_path, new_path)
+                            # Update the path in the model
+                            updated_item.hero_image.name = new_path
+                    
+                    # Handle representative image
+                    if old_rep_image_path and updated_item.representative_image:
+                        # Only need to copy if we didn't upload a new image
+                        if 'representative_image' not in request.FILES:
+                            old_filename = os.path.basename(old_rep_image_path)
+                            new_path = f"items/{updated_item.title}/{old_filename}"
+                            copy_file_to_new_path(old_rep_image_path, new_path)
+                            # Update the path in the model
+                            updated_item.representative_image.name = new_path
+                    
+                    # Save again to update file paths
+                    updated_item.save()
+                
+                messages.success(request, "Item updated successfully!")
+                return JsonResponse({"success": True})
+            else:
+                return JsonResponse({"success": False, "errors": form.errors})
         except Item.DoesNotExist:
             return JsonResponse({"success": False, "message": "Item not found"})
-
-        form = ItemForm(request.POST, request.FILES, instance=item)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Item updated successfully!")
-            return JsonResponse({"success": True})
-        else:
-            return JsonResponse({"success": False, "errors": form.errors})
 
     return JsonResponse({"success": False, "message": "Invalid request method"})
 
