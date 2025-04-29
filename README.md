@@ -1,4 +1,4 @@
-# Hootel — An Ultra-Luxury Hospitality Agency
+# Hootel
 _Simulated luxury-hotel & resort booking site_
 
 > **Last updated:** April&nbsp;28,&nbsp;2025
