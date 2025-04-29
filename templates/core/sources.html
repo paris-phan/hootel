@@ -129,6 +129,36 @@
     letter-spacing: 0.1rem;
   }
   
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+  }
+  
+  table th, table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #dad9d7;
+  }
+  
+  table th {
+    font-weight: 500;
+  }
+  
+  blockquote {
+    background: #F7F5F1;
+    border-left: 4px solid #9D5248;
+    margin: 1.5rem 0;
+    padding: 1rem 1.5rem;
+  }
+  
+  hr {
+    border: 0;
+    height: 1px;
+    background: #dad9d7;
+    margin: 2rem 0;
+  }
+  
   @media (max-width: 768px) {
     .about-hero {
       height: 300px;
@@ -146,6 +176,11 @@
       width: 85%;
       margin-left: 2.5rem !important;
     }
+    
+    table {
+      display: block;
+      overflow-x: auto;
+    }
   }
 </style>
 {% endblock %}
@@ -154,11 +189,61 @@
 <section class="container container--spacer gutter">
   <header class="hgroup hgroup--limited text--centered">
     <p class="subtitle">Sources</p>
-    <h2 class="heading-h">Sources used in support of development of this website</h2>
+    <h2 class="heading-h">Sources & Attributions</h2>
     <div class="hgroup__intro">
-      <p>a lot.</p>
+      <p><em>(University of Virginia — CS 3240, Spring 2025)</em></p>
     </div>
   </header>
+  
+  <blockquote>
+    <p><strong>Non-commercial classroom prototype.</strong><br>
+    All trademarks, images, and brand names remain the property of their owners and are shown here only under <em>fair-use</em> for educational evaluation. The site is blocked from search engines (<code>robots.txt: Disallow /</code>) and protected with Basic Auth so only the instructor can access it.</p>
+  </blockquote>
+  
+  <hr>
+  
+  <h3>Design Inspiration</h3>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Brand</th>
+        <th>Borrowed elements</th>
+        <th>URL (accessed 29 Apr 2025)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Aman Resorts</td>
+        <td>Minimalist grid, full-bleed hero images</td>
+        <td><a href="https://www.aman.com" target="_blank">https://www.aman.com</a></td>
+      </tr>
+      <tr>
+        <td>Hermès</td>
+        <td>Warm earth-tone palette <code>#9D5248 #F7F5F1</code>, generous whitespace</td>
+        <td><a href="https://www.hermes.com/us/en/" target="_blank">https://www.hermes.com/us/en/</a></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <hr>
+  
+  <h3>Media Assets</h3>
+  
+  <p>A handful of hero and gallery photos were downloaded from Aman resort press pages to populate demo "Destination" entries.<br>
+  A manifest file—<code>docs/media_sources.csv</code>—lists every filename, original URL, and retrieval date. </p>
+
+  <p><b>All assets reside only in a private development bucket</b> and will be removed before any public release. They are not found anywhere in repositories or deployed code.</p>
+  
+  <hr>
+  
+  <h3>Naming Homage</h3>
+  
+  <p>Project slugs nod to Aman resorts (e.g., <strong>Telpulo → Amanpulo</strong>, <strong>Telkila → Amankila</strong>, full list in <code>fixtures/initial_data.json</code>). Names are placeholders only and do not imply endorsement or affiliation.</p>
+  
+  <hr>
+  
+  <p>This page documents every third-party influence or asset used, ensuring academic integrity for grading.</p>
   
   <div class="stats-container">
     <div class="stat-item">

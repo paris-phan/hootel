@@ -130,6 +130,26 @@
     letter-spacing: 0.1rem;
   }
   
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+  }
+  
+  .feature-item {
+    background: #F7F5F1;
+    padding: 2rem;
+    border-radius: 4px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+  
+  .feature-item h3 {
+    color: #9D5248;
+    margin-bottom: 1rem;
+    font-weight: 400;
+  }
+  
   @media (max-width: 768px) {
     .about-hero {
       height: 300px;
@@ -155,9 +175,38 @@
 <section class="container container--spacer gutter">
   <header class="hgroup hgroup--limited text--centered">
     <p class="subtitle">The Hootel Story</p>
-    <h2 class="heading-h">This website was created for CS 3240 @ UVA, in the Spring of 2025</h2>
+    <h2 class="heading-h">Redefining what 'above and beyond' means</h2>
     <div class="hgroup__intro">
-      <p>please give us a good grade.</p>
+      <p>Created for CS 3240 at the University of Virginia, Spring 2025</p>
+    </div>
+  </header>
+  
+  <div class="feature-grid">
+    <div class="feature-item">
+      <h3>Our Vision</h3>
+      <p>Hootel Resorts represents our vision of an ultra-luxury destination travel experiences company. We've crafted an immersive digital showcase that captures the essence of exceptional hospitality and curated experiences in the world's most remarkable destinations.</p>
+    </div>
+    
+    <div class="feature-item">
+      <h3>Design Philosophy</h3>
+      <p>Our design embraces minimalist aesthetics with warm earth tones and generous whitespace, creating a sense of tranquility and exclusivity. The home page draws inspiration from established luxury brands, while all other aspects of the site represent our original creative vision.</p>
+    </div>
+    
+    <div class="feature-item">
+      <h3>Technical Implementation</h3>
+      <p>Built with Django web framework and Bootstrap for responsive design, our platform is deployed on Heroku with AWS S3 for media storage. We've implemented Google API Auth for secure authentication, while leveraging specialized Django packages like Pillow for image processing and Flatpickr for date selection in our booking system.</p>
+    </div>
+  </div>
+  
+  <div class="text--centered" style="margin: 3rem 0; padding: 2rem; background: #F7F5F1; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+    <h3 style="color: #9D5248; margin-bottom: 1rem;">Custom Domain</h3>
+    <p>In addition to our Heroku deployment, we're proud to offer access through our custom domain: <a href="https://hoo-tels.com" target="_blank" style="color: #9D5248; font-weight: 500;">hoo-tels.com</a></p>
+  </div>
+  
+  <header class="hgroup hgroup--limited text--centered" style="margin-top: 4rem;">
+    <h2 class="heading-h">Our Team</h2>
+    <div class="hgroup__intro">
+      <p>The talented individuals behind Hootel Resorts</p>
     </div>
   </header>
   
@@ -186,6 +235,10 @@
       <div class="stat-number">David</div>
       <div class="stat-label">Team TA</div>
     </div>
+  </div>
+  
+  <div class="text--centered" style="margin-top: 2rem;">
+    <p><a href="/about/sources/" class="btn">View Our Sources & Attributions</a></p>
   </div>
 </section>
 {% endblock %}
