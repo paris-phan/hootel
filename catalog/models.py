@@ -37,7 +37,7 @@ class Item(models.Model):
         storage=default_storage,
         help_text="The main banner image for the item",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
     # If you want to track who created the item:
     created_by = models.ForeignKey(

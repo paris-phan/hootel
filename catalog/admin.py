@@ -22,7 +22,7 @@ class ItemAdmin(admin.ModelAdmin):
         ),
         ("Description", {"fields": ("description",)}),
         ("Images", {"fields": ("representative_image", "hero_image")}),
-        ("Metadata", {"fields": ("created_by",)}),
+        ("Metadata", {"fields": ("created_by", "created_at")}),
     )
 
 
