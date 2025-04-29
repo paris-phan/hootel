@@ -10,7 +10,12 @@ from django.contrib.auth import get_user_model
 import json
 from loans.models import Loan
 
-# Create your views here.
+#/***************************************************************************************
+#*  REFERENCES
+#*  Title: 
+#*     this was the worst page ever i omfg
+#*
+#***************************************************************************************/
 
 
 def handler404(request, exception):
@@ -25,11 +30,17 @@ def home(request):
     """
     Homepage view.
     """
+
+    # Get items that belong to region collections
+    region_items = Item.objects.filter(
+        collectionitems__collection__is_region=True
+    ).distinct()
+    
     # Get the first 2 items for featured destinations
-    featured_items = Item.objects.all()[:2]
+    featured_items = region_items[:2]
 
     # Get the next 3 items for experiences
-    experience_items = Item.objects.all()[2:5]
+    experience_items = region_items[2:5]
 
     # Format featured destinations
     featured_destinations = []
@@ -146,7 +157,9 @@ def destinations(request):
     }
     return render(request, "core/destinations.html", context)
 
-
+#/***************************************************************************************
+#*  clone of destinations()
+#***************************************************************************************/
 def experiences(request):
     """
     Experiences page view.
@@ -281,6 +294,7 @@ def sources(request):
 
 def is_librarian(user):
     return user.is_staff or user.is_superuser or user.role == 1
+
 
 
 @login_required

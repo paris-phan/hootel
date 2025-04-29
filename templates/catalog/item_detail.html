@@ -1,3 +1,21 @@
+<!-- {#
+  REFERENCES
+  Written For The Course: [CS 3240, Spring 2025]
+
+  © 2025 Paris Phan | SPDX-License-Identifier: MIT
+
+  Resource: Claude 3.7 Sonnet
+  Author: Anthropic
+  Date: Spring 2024
+  URL: https://claude.ai
+
+  - Visual-only snippets (CSS/layout) assisted by Claude 3.7 Sonnet (Anthropic).
+  - No multi-line algorithms or backend logic were AI-generated.
+  - Full provenance & prompt logs → _documentation/code_references.md
+
+  This reference acts as a record of LLM assistance for all html/css lines in this file.
+#} -->
+
 {% extends "base.html" %}
 {% load static %}
 
@@ -268,6 +286,16 @@
             <div class="d-flex align-items-center mb-2">
               <h5 class="mb-0 me-3"><a href="{% url 'accounts:user_profile' username=review.creator.username %}" class="text-decoration-none">{{ review.creator.username }}</a></h5>
               <div class="rating">
+                <!-- /***************************************************************************************
+                *  REFERENCES
+                *  Title: Claude 3.7 Sonnet
+                *  Author: Anthropic
+                *  Date: Spring 2024
+                *  URL: https://claude.ai
+                *
+                *  Prompt used: How do i implement a star rating system to display different numbers of stars
+                *
+                ***************************************************************************************/ -->
                 {% for i in "12345"|make_list %}
                   {% if forloop.counter <= review.rating %}
                     <span class="text-black">☆</span>

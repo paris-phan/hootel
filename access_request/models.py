@@ -4,7 +4,14 @@ from django.utils import timezone
 
 # Create your models here.
 
-
+#/***************************************************************************************
+#*  REFERENCES
+#*  Title: Django Allauth Google API Examples
+#*  Author: allauth.org
+#*  Date: Spring 2024
+#*  URL: https://docs.allauth.org/en/dev/installation/examples.html
+#*
+#***************************************************************************************/
 class AccessRequest(models.Model):
     STATUS_CHOICES = [
         ("pending", "Pending"),

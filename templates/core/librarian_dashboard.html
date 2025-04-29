@@ -1,3 +1,21 @@
+<!-- {#
+    REFERENCES
+    Written For The Course: [CS 3240, Spring 2025]
+  
+    © 2025 Paris Phan | SPDX-License-Identifier: MIT
+  
+    Resource: Claude 3.7 Sonnet
+    Author: Anthropic
+    Date: Spring 2024
+    URL: https://claude.ai
+  
+    - Visual-only snippets (CSS/layout) assisted by Claude 3.7 Sonnet (Anthropic).
+    - No multi-line algorithms or backend logic were AI-generated.
+    - Full provenance & prompt logs → _documentation/code_references.md
+  
+    This reference acts as a record of LLM assistance for all html/css lines in this file.
+  #} -->
+
 {% extends 'base.html' %}
 {% load static %}
 
@@ -564,6 +582,20 @@
     </div>
 </div>
 
+
+<!-- /***************************************************************************************
+*  REFERENCES
+*  Title: Claude 3.7 Sonnet
+*  Author: Anthropic
+*  Date: Spring 2024
+*  URL: https://claude.ai
+*
+*  Prompt used: 1) what are the elements that appear on top of everything with, for example, a form or some action the user must do, in the context of a website?
+*  Prompt used: 2) How can I implement a modal in a django template?
+*
+***************************************************************************************/ -->
+
+
 <!-- Custom Modal Implementation -->
 <div id="createItemModalOverlay" class="custom-modal-overlay"></div>
 <div id="createItemModalContent" class="custom-modal">
@@ -661,6 +693,17 @@
 
 {% block extra_js %}
 <script>
+// /***************************************************************************************
+// *  REFERENCES
+// *  Title: Claude 3.7 Sonnet
+// *  Author: Anthropic
+// *  Date: Spring 2024
+// *  URL: https://claude.ai
+// *
+// *  Prompt used: is there a way to use location.reload() to reload the page without losing the scroll position?
+// *
+// ***************************************************************************************/
+
 function scrollSavedReload() {
     const currentPos = window.scrollY || window.pageYOffset;
     sessionStorage.setItem('scrollPosition', currentPos);
@@ -797,6 +840,20 @@ document.addEventListener('DOMContentLoaded', function() {
             readURL(this, 'hero_image_preview');
         });
 
+
+// /***************************************************************************************
+// *  REFERENCES
+// *  Title: Claude 3.7 Sonnet
+// *  Author: Anthropic
+// *  Date: Spring 2024
+// *  URL: https://claude.ai
+// *
+// *  Prompt used: How can I implement AJAX in a django template?
+// *  Prompt used: How do I work with forms for AJAX in django?
+// *
+// ***************************************************************************************/
+
+
         // Handle form submission
         createItemForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -855,7 +912,19 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error('One or more modal elements not found');
     }
-    
+
+// /***************************************************************************************
+// *  REFERENCES
+// *  Title: Claude 3.7 Sonnet
+// *  Author: Anthropic
+// *  Date: Spring 2024
+// *  URL: https://claude.ai
+// *
+// *  Prompt used: How can I make event handlers in django templates
+//         (this was also the first time i used javascript, so i also had to learn as i went)
+// *
+// ***************************************************************************************/
+
     // Use event delegation for all action buttons
     document.addEventListener('click', function(e) {
 
@@ -1209,6 +1278,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+
+// /***************************************************************************************
+// *  REFERENCES
+// *  Title: Claude 3.7 Sonnet
+// *  Author: Anthropic
+// *  Date: Spring 2024
+// *  URL: https://claude.ai
+// *
+// *  Prompt used: is there a proper way to display status notifications in a website? How would i iplement this in a django template?
+// *
+// ***************************************************************************************/
+
     // Display notification
     function showNotification(message, type = 'info') {
         // Create notification element if it doesn't exist

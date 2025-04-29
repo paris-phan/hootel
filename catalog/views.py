@@ -70,6 +70,16 @@ def booking_view(request, item_title):
         item=item, status=1  # Approved status
     ).values_list("start_date", "end_date")
 
+    #/***************************************************************************************
+    #*  REFERENCES
+    #*  Title: Claude 3.7 Sonnet
+    #*  Author: Anthropic
+    #*  Date: Spring 2024
+    #*  URL: https://claude.ai
+    #*
+    #*  Prompt used: general guidance & assistance w/ using flatpickr
+    #*
+    #***************************************************************************************/
     # Convert dates to strings for JavaScript
     disabled_dates = []
     for start_date, end_date in existing_loans:
@@ -135,6 +145,21 @@ def create_item(request):
             from django.core.files.uploadedfile import InMemoryUploadedFile
             import sys
             
+
+            #/***************************************************************************************
+            #*  REFERENCES
+            #*  Title: Claude 3.7 Sonnet
+            #*  Author: Anthropic
+            #*  Date: Spring 2024
+            #*  URL: https://claude.ai
+            #*
+            #*  Prompt used: How can I reduce the size of an image before uploading it to S3?
+            #*  ---> told me to use pollow package
+
+            #*
+            #***************************************************************************************/
+
+
             # Process hero_image if present
             if 'hero_image' in request.FILES:
                 hero_image = request.FILES['hero_image']

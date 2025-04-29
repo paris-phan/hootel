@@ -1,18 +1,26 @@
-/**
- * Main JavaScript file for Hootel website
- */
+// <!-- {#
+//     REFERENCES
+//     Written For The Course: [CS 3240, Spring 2025]
+  
+//     © 2025 Paris Phan | SPDX-License-Identifier: MIT
+  
+//     Resource: Claude 3.7 Sonnet
+//     Author: Anthropic
+//     Date: Spring 2024
+//     URL: https://claude.ai
+  
+//     - Visual-only snippets (CSS/layout) assisted by Claude 3.7 Sonnet (Anthropic).
+//     - No multi-line algorithms or backend logic were AI-generated.
+//     - Full provenance & prompt logs → _documentation/code_references.md
+  
+//     This reference acts as a record of LLM assistance for all html/css lines in this file.
+//   #} -->
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize menu toggle functionality
-    initMenuToggle();
-    
-    // Initialize search toggle functionality
-    initSearchToggle();
-    
-    // Initialize video background autoplay
-    initVideoAutoplay();
 
-    // Initialize destinations menu toggle
+    initMenuToggle();
+    initSearchToggle();
+    initVideoAutoplay();
     initDestinationsMenuToggle();
 });
 
@@ -39,9 +47,7 @@ function initMenuToggle() {
     }
 }
 
-/**
- * Initialize search toggle functionality
- */
+
 function initSearchToggle() {
     const searchToggleBtn = document.querySelector('.search-sidebar__toggle-btn');
     const searchSidebar = document.querySelector('.search-sidebar');
@@ -73,9 +79,7 @@ function initSearchToggle() {
     }
 }
 
-/**
- * Initialize video autoplay
- */
+
 function initVideoAutoplay() {
     const videos = document.querySelectorAll('video');
     
@@ -91,9 +95,7 @@ function initVideoAutoplay() {
     });
 }
 
-/**
- * Reveal elements on scroll
- */
+//unused i think
 window.addEventListener('scroll', function() {
     const scrollElements = document.querySelectorAll('.scroll-reveal');
     
@@ -107,9 +109,6 @@ window.addEventListener('scroll', function() {
     });
 });
 
-/**
- * Utility functions
- */
 const HootelUtils = {
     /**
      * Get viewport width
@@ -138,9 +137,7 @@ const HootelUtils = {
     }
 };
 
-/**
- * Initialize destinations menu toggle functionality
- */
+
 function initDestinationsMenuToggle() {
     // Main Destinations toggle
     const destinationsToggle = document.querySelector('.toggle-link[data-toggle="destinations"]');
@@ -158,12 +155,10 @@ function initDestinationsMenuToggle() {
             if (destinationsToggle.classList.contains('active')) {
                 destinationsSubmenu.style.display = 'block';
                 
-                // Hide any continent submenu that might be open
                 document.getElementById('americas-submenu').style.display = 'none';
                 document.getElementById('asia-submenu').style.display = 'none';
                 document.getElementById('europe-submenu').style.display = 'none';
                 
-                // Remove active class from continent toggles
                 document.querySelectorAll('.toggle-link[data-toggle="americas"], .toggle-link[data-toggle="asia"], .toggle-link[data-toggle="europe"]').forEach(toggle => {
                     toggle.classList.remove('active');
                 });
@@ -179,10 +174,7 @@ function initDestinationsMenuToggle() {
     initContinentToggle('europe');
 }
 
-/**
- * Initialize toggle functionality for continent submenus
- * @param {string} continent - Continent identifier (americas, asia, europe)
- */
+
 function initContinentToggle(continent) {
     const continentToggle = document.querySelector(`.toggle-link[data-toggle="${continent}"]`);
     const continentSubmenu = document.getElementById(`${continent}-submenu`);
@@ -199,16 +191,13 @@ function initContinentToggle(continent) {
                 toggle.classList.remove('active');
             });
             
-            // Hide all continent submenus
             document.getElementById('americas-submenu').style.display = 'none';
             document.getElementById('asia-submenu').style.display = 'none';
             document.getElementById('europe-submenu').style.display = 'none';
             
             if (!wasActive) {
-                // Add active class back to this toggle
                 continentToggle.classList.add('active');
                 
-                // Show this continent's submenu
                 continentSubmenu.style.display = 'block';
             }
         });

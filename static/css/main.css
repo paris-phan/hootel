@@ -1,11 +1,25 @@
-/* 
-Main CSS file for Hootel website
-*/
+/* <!-- {#
+  REFERENCES
+  Written For The Course: [CS 3240, Spring 2025]
+
+  © 2025 Paris Phan | SPDX-License-Identifier: MIT
+
+  Resource: Claude 3.7 Sonnet
+  Author: Anthropic
+  Date: Spring 2024
+  URL: https://claude.ai
+
+  - Visual-only snippets (CSS/layout) assisted by Claude 3.7 Sonnet (Anthropic).
+  - No multi-line algorithms or backend logic were AI-generated.
+  - Full provenance & prompt logs → _documentation/code_references.md
+
+  This reference acts as a record of LLM assistance for all html/css lines in this file.
+#} --> */
 
 /* 
-===================================
+
 General Styles
-===================================
+
 */
 :root {
   --primary-bg-color: #F7F5F1;
@@ -82,9 +96,9 @@ a.underline:after {
 }
 
 /* 
-===================================
+
 Typography
-===================================
+
 */
 h1, h2, h3, h4, .h3 {
   font-family: 'Lyon Text Web', 'Lyon Display Web', 'Times New Roman', serif;
@@ -124,9 +138,9 @@ h2 {
 }
 
 /* 
-===================================
+
 Buttons
-===================================
+
 */
 a.button, button.button {
   display: inline-block;
@@ -153,9 +167,9 @@ a.button--slim, button.button--slim {
 }
 
 /* 
-===================================
+
 Header
-===================================
+
 */
 .main-header {
   position: relative;
@@ -230,9 +244,9 @@ Header
 }
 
 /* 
-===================================
+
 Main Content
-===================================
+
 */
 main {
   position: relative;
@@ -267,9 +281,9 @@ main {
 }
 
 /* 
-===================================
+
 Cards
-===================================
+
 */
 .card {
   display: inline-block;
@@ -354,15 +368,14 @@ Cards
   top: auto;
 }
 
-/* Override any Bootstrap or other framework backgrounds */
 .site-footer {
   background-color: var(--primary-bg-color) !important;
 }
 
 /* 
-===================================
+
 Media Queries
-===================================
+
 */
 @media screen and (max-width: 1100px) {
   .header__top {
@@ -462,9 +475,9 @@ Media Queries
 }
 
 /* 
-===================================
+
 Navigation Menu
-===================================
+
 */
 .global-navigation {
   position: relative;

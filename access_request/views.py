@@ -13,7 +13,14 @@ def is_librarian(user):
 
 # Create your views here.
 
-
+#/***************************************************************************************
+#*  REFERENCES
+#*  Title: Django Allauth Google API Examples
+#*  Author: allauth.org
+#*  Date: Spring 2024
+#*  URL: https://docs.allauth.org/en/dev/installation/examples.html
+#*
+#***************************************************************************************/
 @login_required
 @require_POST
 def create_access_request(request):

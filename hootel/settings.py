@@ -36,6 +36,19 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 ALLOWED_HOSTS = ["*"]
 
 
+#/***************************************************************************************
+#*  REFERENCES
+#*  Title: Claude 3.7 Sonnet
+#*  Author: Anthropic
+#*  Date: Spring 2024
+#*  URL: https://claude.ai
+#*
+#*  Prompt used: How can I enforce my Django Heroku app to use https?
+#*              * used as guide & assistance in creating security settings
+#*
+#***************************************************************************************/
+
+
 # Security Settings
 SECURE_SSL_REDIRECT = not DEBUG  # redirect all non-HTTPS requests to HTTPS
 SESSION_COOKIE_SECURE = not DEBUG  # only send session cookie over HTTPS
@@ -274,7 +287,16 @@ SOCIALACCOUNT_ADAPTER = "accounts.adapters.CustomSocialAccountAdapter"
 
 
 # /**----------------------------------------------------------------------**/#
-
+#/***************************************************************************************
+#*  REFERENCES
+#*  Title: Claude 3.7 Sonnet
+#*  Author: Anthropic
+#*  Date: Spring 2024
+#*  URL: https://claude.ai
+#*
+#*  Prompt used: *Created the entire logging LOGGING {...} after several prompts trying to figure out a bug*
+#*
+#***************************************************************************************/
 
 ##############################
 # Heroku settings

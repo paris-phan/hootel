@@ -1,3 +1,21 @@
+<!-- {#
+  REFERENCES
+  Written For The Course: [CS 3240, Spring 2025]
+
+  © 2025 Paris Phan | SPDX-License-Identifier: MIT
+
+  Resource: Claude 3.7 Sonnet
+  Author: Anthropic
+  Date: Spring 2024
+  URL: https://claude.ai
+
+  - Visual-only snippets (CSS/layout) assisted by Claude 3.7 Sonnet (Anthropic).
+  - No multi-line algorithms or backend logic were AI-generated.
+  - Full provenance & prompt logs → _documentation/code_references.md
+
+  This reference acts as a record of LLM assistance for all html/css lines in this file.
+#} -->
+
 {% extends "base.html" %}
 {% load static %}
 
@@ -361,6 +379,16 @@
 
 <!-- Intro Section -->
 
+
+<!-- /***************************************************************************************
+*  REFERENCES
+*  Date: Spring 2024
+*
+*  This page is like a clone of destinations.html
+*
+***************************************************************************************/ -->
+
+
 <section class="container container--spacer gutter">
   {% if user.is_authenticated %}
   <header class="hgroup hgroup--limited text--centered">
@@ -420,6 +448,18 @@
   {% endif %}
 </section>
 
+
+<!-- /***************************************************************************************
+*  REFERENCES
+*  Title: Claude 3.7 Sonnet
+*  Author: Anthropic
+*  Date: Spring 2024
+*  URL: https://claude.ai
+*
+*  Prompt used: What are the elements that blur content on a page behind a paywall called in the context of a website?
+*  Prompt used: How can I create a content curtain that only appears when a certain conditino is met?
+*
+***************************************************************************************/ -->
 {% if user.is_authenticated %}
 <!-- Content area that can be blurred -->
 <div class="content-area">
@@ -429,6 +469,8 @@
     <p>You need to be authorized to view this exclusive collection.</p>
     <button class="button request-access-btn">Request Access</button>
   </div>
+
+
 
   <!-- Search Bar -->
   <div class="search-bar mb-4">
@@ -696,6 +738,19 @@
       }
     });
     
+
+    /***************************************************************************************
+    *  REFERENCES
+    *  Title: Claude 3.7 Sonnet
+    *  Author: Anthropic
+    *  Date: Spring 2024
+    *  URL: https://claude.ai
+    *
+    *  Prompt used: How can I set up AJAX requests in a django template for a view?
+    *
+    ***************************************************************************************/
+
+
     // Helper function to get CSRF token
     function getCookie(name) {
       let cookieValue = null;

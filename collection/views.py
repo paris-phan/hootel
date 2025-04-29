@@ -10,6 +10,16 @@ from django.http import JsonResponse
 
 
 def collection_list(request):
+    #/***************************************************************************************
+    #*  REFERENCES
+    #*  Title: Claude 3.7 Sonnet
+    #*  Author: Anthropic
+    #*  Date: Spring 2024
+    #*  URL: https://claude.ai
+    #*
+    #*  Prompt used: How can I sort a queryset in python for a django view?
+    #*
+    #***************************************************************************************/
     collections = Collection.objects.annotate(
         display_order=Case(
             # 1. Public collections with is_region=False
@@ -97,7 +107,7 @@ def create_collection(request):
         )
         return redirect("collection:detail", collection_id=collection.id)
 
-    # If not a POST request, redirect to profile
+    #error handling
     return redirect("accounts:user_profile", username=request.user.username)
 
 
@@ -196,7 +206,16 @@ def remove_item(request, collection_id, item_id):
 def add_items(request, collection_id):
     collection = get_object_or_404(Collection, id=collection_id)
 
-    #console logs
+    #/***************************************************************************************
+    #*  REFERENCES
+    #*  Title: Claude 3.7 Sonnet
+    #*  Author: Anthropic
+    #*  Date: Spring 2024
+    #*  URL: https://claude.ai
+    #*
+    #*  Prompt used: Created print statements as logging to help debug the code at one point
+    #*
+    #***************************************************************************************/
     print(f"Collection: {collection}")
     print(f"Request: {request}")
     print(f"Using AJAX: {request.headers.get('X-Requested-With') == 'XMLHttpRequest'}")
@@ -314,7 +333,7 @@ def delete_collection(request, collection_id):
     if request.method == "POST":
         collection_title = collection.title
 
-        # Delete the collection (this will cascade delete CollectionItems due to FK)
+        # Delete the collection 
         collection.delete()
 
         success_message = f'Collection "{collection_title}" has been deleted.'
@@ -326,5 +345,5 @@ def delete_collection(request, collection_id):
         # Redirect to the collections list
         return redirect("collection:list")
 
-    # If not a POST request, redirect back to the collection detail page
+    #error
     return redirect("collection:detail", collection_id=collection_id)
