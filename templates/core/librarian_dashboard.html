@@ -9,7 +9,7 @@
     Date: Spring 2024
     URL: https://claude.ai
   
-    - Visual-only snippets (CSS/layout) assisted by Claude 3.7 Sonnet (Anthropic).
+    - Snippets (CSS/layout/handlers) assisted by Claude 3.7 Sonnet (Anthropic). Note: There were citations in  script areas, but removed due to concern of bugs and breaking during parsing
     - No multi-line algorithms or backend logic were AI-generated.
     - Full provenance & prompt logs → _documentation/code_references.md
   
@@ -693,16 +693,6 @@
 
 {% block extra_js %}
 <script>
-// /***************************************************************************************
-// *  REFERENCES
-// *  Title: Claude 3.7 Sonnet
-// *  Author: Anthropic
-// *  Date: Spring 2024
-// *  URL: https://claude.ai
-// *
-// *  Prompt used: is there a way to use location.reload() to reload the page without losing the scroll position?
-// *
-// ***************************************************************************************/
 
 function scrollSavedReload() {
     const currentPos = window.scrollY || window.pageYOffset;
@@ -841,19 +831,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
 
-// /***************************************************************************************
-// *  REFERENCES
-// *  Title: Claude 3.7 Sonnet
-// *  Author: Anthropic
-// *  Date: Spring 2024
-// *  URL: https://claude.ai
-// *
-// *  Prompt used: How can I implement AJAX in a django template?
-// *  Prompt used: How do I work with forms for AJAX in django?
-// *
-// ***************************************************************************************/
-
-
         // Handle form submission
         createItemForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -913,17 +890,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('One or more modal elements not found');
     }
 
-// /***************************************************************************************
-// *  REFERENCES
-// *  Title: Claude 3.7 Sonnet
-// *  Author: Anthropic
-// *  Date: Spring 2024
-// *  URL: https://claude.ai
-// *
-// *  Prompt used: How can I make event handlers in django templates
-//         (this was also the first time i used javascript, so i also had to learn as i went)
-// *
-// ***************************************************************************************/
 
     // Use event delegation for all action buttons
     document.addEventListener('click', function(e) {
@@ -1278,17 +1244,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-
-// /***************************************************************************************
-// *  REFERENCES
-// *  Title: Claude 3.7 Sonnet
-// *  Author: Anthropic
-// *  Date: Spring 2024
-// *  URL: https://claude.ai
-// *
-// *  Prompt used: is there a proper way to display status notifications in a website? How would i iplement this in a django template?
-// *
-// ***************************************************************************************/
 
     // Display notification
     function showNotification(message, type = 'info') {

@@ -9,7 +9,7 @@
 //     Date: Spring 2024
 //     URL: https://claude.ai
   
-//     - Visual-only snippets (CSS/layout) assisted by Claude 3.7 Sonnet (Anthropic).
+//     - Snippets (CSS/layout/handlers) assisted by Claude 3.7 Sonnet (Anthropic). Note: There were citations in  script areas, but removed due to concern of bugs and breaking during parsing
 //     - No multi-line algorithms or backend logic were AI-generated.
 //     - Full provenance & prompt logs → _documentation/code_references.md
   
