@@ -364,9 +364,20 @@ def handle_loan_action(request, action, loan_id):
         loan = get_object_or_404(Loan, id=loan_id)
 
         if action == "approve":
+
+
             loan.status = 1  # Approved
             loan.save()
+
+            #deny all other loans for this item that overlap in time
+            Loan.objects.filter(
+                item=loan.item,
+                start_date__lte=loan.end_date,
+                end_date__gte=loan.start_date
+            ).update(status=2)
+
             message = "Loan approved successfully"
+
         elif action == "return":
             loan.status = 3  # Returned
             loan.save()

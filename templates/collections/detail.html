@@ -284,7 +284,8 @@
         <h5 class="custom-modal-title">Add Items to Collection</h5>
         <button type="button" class="custom-modal-close" id="closeAddItemsModal">&times;</button>
     </div>
-    <form method="post" action="{% url 'collection:add_items' collection.id %}" id="addItemsForm">
+    <!-- <form method="post" action="{% url 'collection:add_items' collection.id %}" id="addItemsForm"> -->
+    <form id="addItemsForm" data-url="{% url 'collection:add_items' collection.id %}">
         {% csrf_token %}
         <div class="custom-modal-body">
             <div class="mb-3">
@@ -366,262 +367,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const addItemsModalOverlay = document.getElementById('addItemsModalOverlay');
     const addItemsModalContent = document.getElementById('addItemsModalContent');
     
-    // Add items form submission handling
-    const addItemsForm = document.getElementById('addItemsForm');
-    const submitAddItemsBtn = document.getElementById('submitAddItemsBtn');
-    
-    // Modify Details form
-    const modifyDetailsForm = document.getElementById('modifyDetailsForm');
-    
-    // Delete form
-    const deleteCollectionForm = document.getElementById('deleteCollectionForm');
-    
-    // AJAX form submissions
-    if (addItemsForm) {
-        addItemsForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const isPrivate = addItemsModalContent.dataset.collectionVisibility === "1";
-            // If this is a private collection, show confirmation
-            if (isPrivate) {
-                const checkedItems = document.querySelectorAll('#addItemsForm input[name="items"]:checked');
-                if (checkedItems.length > 0) {
-                    if (!confirm("Warning: Items in this private collection cannot exist in other collections. Adding items that are already in other collections will REMOVE them from those collections and add them to this one. Continue?")) {
-                        return false;
-                    }
-                }
-            }
-            
-            // Submit form via AJAX
-            const formData = new FormData(this);
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    let successMessage = data.message;
-                    
-                    // If items were moved from other collections
-                    if (data.items_moved && data.items_moved > 0) {
-                        showNotification(successMessage, 'success');
-                        
-                        // If both items were added and moved, display additional notification
-                        if (data.items_added && data.items_added > 0) {
-                            setTimeout(() => {
-                                showNotification(`${data.items_moved} items were automatically moved from other collections to this private collection.`, 'info');
-                            }, 1000);
-                        }
-                    } else {
-                        showNotification(successMessage, 'success');
-                    }
-                    
-                    closeAddItemsModal();
-                    // Update page content without reload
-                    updateCollectionItems();
-                } else {
-                    showNotification(data.message || 'Error adding items', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('An error occurred while processing your request', 'error');
-            });
-        });
-    }
-    
-    if (modifyDetailsForm) {
-        modifyDetailsForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Submit form via AJAX
-            const formData = new FormData(this);
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message || 'Collection details updated successfully', 'success');
-                    closeModifyDetailsModal();
-                    // Update collection info
-                    updateCollectionInfo(data.collection);
-                } else {
-                    showNotification(data.message || 'Error updating collection', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('An error occurred while processing your request', 'error');
-            });
-        });
-    }
-    
-    if (deleteCollectionForm) {
-        deleteCollectionForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!confirm('Are you sure you want to delete this collection? This action cannot be undone.!!!')) {
-                return false;
-            }
-            
-            // Submit form via AJAX
-            const formData = new FormData(this);
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message || 'Collection deleted successfully', 'success');
-                    // Redirect to collections list after deletion
-                    window.location.href = "{% url 'collection:list' %}";
-                } else {
-                    showNotification(data.message || 'Error deleting collection', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('An error occurred while processing your request', 'error');
-            });
-        });
-    }
-    
-    // Remove item form handling via event delegation
-    document.addEventListener('click', function(e) {
-        if (e.target.matches('form[action*="remove_item"] button[type="submit"]')) {
-            e.preventDefault();
-            const form = e.target.closest('form');
-            
-            if (!confirm('Are you sure you want to remove this item from the collection?')) {
-                return false;
-            }
-            
-            // Submit form via AJAX
-            const formData = new FormData(form);
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message || 'Item removed successfully', 'success');
-                    // Remove the item from the DOM
-                    const itemCard = e.target.closest('.slider-card');
-                    if (itemCard) {
-                        itemCard.remove();
-                    }
-                    
-                    // If no items left, show empty message
-                    const itemsContainer = document.querySelector('.destinations-grid');
-                    if (itemsContainer && !itemsContainer.querySelector('.slider-card')) {
-                        document.querySelector('.search-bar').style.display = 'none';
-                        const emptyMessage = document.createElement('div');
-                        emptyMessage.className = 'alert alert-info';
-                        emptyMessage.innerHTML = '<p>No items have been added to this collection yet.</p>' +
-                            '{% if is_creator %}<p>Click the "Add Items" button above to start adding items to your collection.</p>{% endif %}';
-                        document.querySelector('section.container').appendChild(emptyMessage);
-                    }
-                } else {
-                    showNotification(data.message || 'Error removing item', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('An error occurred while processing your request', 'error');
-            });
-        }
-    });
-    
-    // Helper function to update collection items
-    function updateCollectionItems() {
-        fetch(window.location.href, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Check if there are items
-            if (doc.querySelector('.destinations-grid')) {
-                // If we currently don't have the grid but should
-                if (!document.querySelector('.destinations-grid')) {
-                    // Replace entire content with new content
-                    document.querySelector('section.container').innerHTML = doc.querySelector('section.container').innerHTML;
-                } else {
-                    // Just update the grid
-                    document.querySelector('.destinations-grid').innerHTML = doc.querySelector('.destinations-grid').innerHTML;
-                    document.querySelector('.search-bar').style.display = 'block';
-                }
-            } else {
-                // No items, show empty message
-                const searchBar = document.querySelector('.search-bar');
-                if (searchBar) searchBar.style.display = 'none';
-                
-                const grid = document.querySelector('.destinations-grid');
-                if (grid) grid.remove();
-                
-                if (!document.querySelector('.alert.alert-info')) {
-                    const emptyMessage = document.createElement('div');
-                    emptyMessage.className = 'alert alert-info';
-                    emptyMessage.innerHTML = '<p>No items have been added to this collection yet.</p>' +
-                        '{% if is_creator %}<p>Click the "Add Items" button above to start adding items to your collection.</p>{% endif %}';
-                    document.querySelector('section.container').appendChild(emptyMessage);
-                }
-            }
-            
-            // Re-attach event listeners
-            attachEventListeners();
-        })
-        .catch(error => {
-            console.error('Error updating collection items:', error);
-        });
-    }
-    
-    // Helper function to update collection info
-    function updateCollectionInfo(collection) {
-        if (collection) {
-            const titleElement = document.querySelector('h2.heading-h');
-            const descriptionElement = document.querySelector('#selected-collection-info p:first-child');
-            const visibilityBadge = document.querySelector('.badge');
-            
-            if (titleElement) titleElement.textContent = collection.title;
-            if (descriptionElement) descriptionElement.textContent = collection.description;
-            if (visibilityBadge) {
-                visibilityBadge.textContent = collection.visibility_display;
-                visibilityBadge.classList.remove('bg-success', 'bg-warning');
-                visibilityBadge.classList.add(collection.visibility === 0 ? 'bg-success' : 'bg-warning');
-            }
-        }
-    }
-    
-    // Function to re-attach event listeners after DOM updates
-    function attachEventListeners() {
-        // Re-init search if needed
-        const searchInput = document.getElementById('destinationSearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', filterDestinations);
-        }
-    }
-    
     function filterDestinations() {
         const searchTerm = searchInput.value.toLowerCase();
         const destinations = document.querySelectorAll('.destinations-grid .slider-card');
@@ -663,6 +408,104 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Add items form submission handling
+    const addItemsForm = document.getElementById('addItemsForm');
+    const submitAddItemsBtn = document.getElementById('submitAddItemsBtn');
+    
+    // Modify Details form
+    const modifyDetailsForm = document.getElementById('modifyDetailsForm');
+    
+    // AJAX form submissions
+    if (addItemsForm && !addItemsForm.hasEventListener) {
+        addItemsForm.hasEventListener = true;
+        addItemsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const isPrivate = addItemsModalContent.dataset.collectionVisibility === "1";
+            // If this is a private collection, show confirmation
+            if (isPrivate) {
+                const checkedItems = document.querySelectorAll('#addItemsForm input[name="items"]:checked');
+                if (checkedItems.length > 0) {
+                    if (!confirm("Warning: Items in this private collection cannot exist in other collections. Adding items that are already in other collections will REMOVE them from those collections and add them to this one. Continue?")) {
+                        return false;
+                    }
+                }
+            }
+
+            
+            console.log("Running AJAX add items form submission...");
+            // Submit form via AJAX
+            const formData = new FormData(this);
+            fetch(this.dataset.url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let successMessage = data.message;
+                    
+                    // If items were moved from other collections
+                    if (data.items_moved && data.items_moved > 0) {
+                        showNotification(successMessage, 'success');
+                        
+                        // If both items were added and moved, display additional notification
+                        if (data.items_added && data.items_added > 0) {
+                            setTimeout(() => {
+                                showNotification(`${data.items_moved} items were automatically moved from other collections to this private collection.`, 'info');
+                            }, 1000);
+                        }
+                    } else {
+                        showNotification(successMessage, 'success');
+                    }
+                    
+                    closeAddItemsModal();
+                    // Update page content without reload
+                    updateCollectionItems();
+                } else {
+                    showNotification(data.message || 'Error adding items', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred while processing your request', 'error');
+            });
+        });
+    }
+
+    if (modifyDetailsForm) {
+        modifyDetailsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Submit form via AJAX
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message || 'Collection details updated successfully', 'success');
+                    closeModifyDetailsModal();
+                    // Update collection info
+                    updateCollectionInfo(data.collection);
+                } else {
+                    showNotification(data.message || 'Error updating collection', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred while processing your request', 'error');
+            });
+        });
+    }
+    
     // Modify Details Modal
     const openModifyDetailsModalBtn = document.getElementById('openModifyDetailsModal');
     const closeModifyDetailsModalBtn = document.getElementById('closeModifyDetailsModal');
@@ -736,6 +579,80 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModifyDetailsModal();
         }
     });
+
+    // Helper function to update collection items
+    function updateCollectionItems() {
+        fetch(window.location.href, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Check if there are items
+            if (doc.querySelector('.destinations-grid')) {
+                // If we currently don't have the grid but should
+                if (!document.querySelector('.destinations-grid')) {
+                    // Replace entire content with new content
+                    document.querySelector('section.container').innerHTML = doc.querySelector('section.container').innerHTML;
+                } else {
+                    // Just update the grid
+                    document.querySelector('.destinations-grid').innerHTML = doc.querySelector('.destinations-grid').innerHTML;
+                    document.querySelector('.search-bar').style.display = 'block';
+                }
+            } else {
+                // No items, show empty message
+                const searchBar = document.querySelector('.search-bar');
+                if (searchBar) searchBar.style.display = 'none';
+                
+                const grid = document.querySelector('.destinations-grid');
+                if (grid) grid.remove();
+                
+                if (!document.querySelector('.alert.alert-info')) {
+                    const emptyMessage = document.createElement('div');
+                    emptyMessage.className = 'alert alert-info';
+                    emptyMessage.innerHTML = '<p>No items have been added to this collection yet.</p>' +
+                        '{% if is_creator %}<p>Click the "Add Items" button above to start adding items to your collection.</p>{% endif %}';
+                    document.querySelector('section.container').appendChild(emptyMessage);
+                }
+            }
+            
+            // Re-attach event listeners
+            attachEventListeners();
+        })
+        .catch(error => {
+            console.error('Error updating collection items:', error);
+        });
+    }
+    
+    // Helper function to update collection info
+    function updateCollectionInfo(collection) {
+        if (collection) {
+            const titleElement = document.querySelector('h2.heading-h');
+            const descriptionElement = document.querySelector('#selected-collection-info p:first-child');
+            const visibilityBadge = document.querySelector('.badge');
+            
+            if (titleElement) titleElement.textContent = collection.title;
+            if (descriptionElement) descriptionElement.textContent = collection.description;
+            if (visibilityBadge) {
+                visibilityBadge.textContent = collection.visibility_display;
+                visibilityBadge.classList.remove('bg-success', 'bg-warning');
+                visibilityBadge.classList.add(collection.visibility === 0 ? 'bg-success' : 'bg-warning');
+            }
+        }
+    }
+    
+    // Function to re-attach event listeners after DOM updates
+    function attachEventListeners() {
+        // Re-init search if needed
+        const searchInput = document.getElementById('destinationSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterDestinations);
+        }
+    }
 });
 </script>
 {% endblock %}

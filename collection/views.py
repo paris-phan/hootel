@@ -49,6 +49,18 @@ def collection_detail(request, collection_id):
         if request.user == collection.creator or request.user.role == 1:
             is_creator = True
 
+    # Check if this is an AJAX request
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return render(
+            request,
+            "collections/detail.html",
+            {
+                "collection": collection,
+                "available_items": available_items,
+                "is_creator": is_creator,
+            },
+        )
+
     return render(
         request,
         "collections/detail.html",
@@ -184,6 +196,18 @@ def remove_item(request, collection_id, item_id):
 def add_items(request, collection_id):
     collection = get_object_or_404(Collection, id=collection_id)
 
+    #console logs
+    print(f"Collection: {collection}")
+    print(f"Request: {request}")
+    print(f"Using AJAX: {request.headers.get('X-Requested-With') == 'XMLHttpRequest'}")
+    print(f"User: {request.user}")
+    print(f"User Role: {request.user.role}")
+    print(f"User is Collection Creator: {request.user == collection.creator}")
+    print(f"User is Authenticated: {request.user.is_authenticated}")
+    print("Running add_items() in collection/views.py")
+
+
+
     # Check if user is the creator of the collection
     if request.user != collection.creator and request.user.role != 1:
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -195,28 +219,31 @@ def add_items(request, collection_id):
             )
         messages.error(request, "You don't have permission to modify this collection.")
         return redirect("collection:detail", collection_id=collection_id)
-
-    if request.method == "POST":
-        item_ids = request.POST.getlist("items")
-
+    
+    if request.method == 'POST':
+        item_ids = request.POST.getlist('items')
+        
         if item_ids:
             # Get existing item IDs in the collection
-            existing_item_ids = collection.collectionitems_set.values_list(
-                "item_id", flat=True
-            )
-
+            existing_item_ids = collection.collectionitems_set.values_list('item_id', flat=True)
+            
             # Add only new items to the collection
             items_added = 0
             items_moved = 0
             failed_items = []
-
+            
+            #for all items to add
             for item_id in item_ids:
+
+                #if item is not already in the collection
                 if int(item_id) not in existing_item_ids:
+
                     item = get_object_or_404(Item, id=item_id)
                     try:
                         # Try to add the item to the collection
                         CollectionItems.objects.create(collection=collection, item=item)
                         items_added += 1
+
                     except Exception as e:
                         # If it's a private collection and item is in other collections
                         if collection.visibility == 1:
@@ -239,57 +266,31 @@ def add_items(request, collection_id):
                         else:
                             # For other failures, add to failed items
                             failed_items.append((item.title, str(e)))
+            
+            ##DONE, return messages
 
-            if items_added > 0 or items_moved > 0:
-                success_message = []
-                if items_added > 0:
-                    success_message.append(
-                        f"{items_added} items added to the collection"
-                    )
-                if items_moved > 0:
-                    success_message.append(
-                        f"{items_moved} items moved from other collections"
-                    )
-                success_message = ". ".join(success_message) + "."
+            success_message = []
+            success_message.append(f"{items_added} items added to the collection\n")
+            success_message.append(f"{items_moved} items moved from other collections\n")
+            
+            num_failed = len(failed_items)
+            success_message.append(f"{num_failed} items failed to add\n")
 
-                messages.success(request, success_message)
-
-            if failed_items:
-                error_messages = []
-                for item_name, error in failed_items:
-                    error_message = f"Failed to add '{item_name}': {error}"
-                    messages.error(request, error_message)
-                    error_messages.append(error_message)
-
-            if items_added == 0 and items_moved == 0 and not failed_items:
-                info_message = "No new items were added to the collection."
-                messages.info(request, info_message)
-
-                if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                    return JsonResponse({"success": True, "message": info_message})
-
+            success_message = ". ".join(success_message) + "."
+            
+            # Check if this is an AJAX request
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return JsonResponse(
                     {
-                        "success": items_added > 0 or items_moved > 0,
-                        "message": (
-                            success_message
-                            if (items_added > 0 or items_moved > 0)
-                            else "Failed to add items"
-                        ),
+                        "success": True,
+                        "message": success_message,
                         "items_added": items_added,
-                        "items_moved": items_moved,
-                        "errors": (
-                            [err[1] for err in failed_items] if failed_items else []
-                        ),
+                        "items_moved": items_moved
                     }
                 )
-        else:
-            info_message = "No items were selected."
-            messages.info(request, info_message)
-
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return JsonResponse({"success": False, "message": info_message})
+            
+            # For regular form submission
+            messages.success(request, success_message)
 
     return redirect("collection:detail", collection_id=collection_id)
 
