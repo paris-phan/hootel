@@ -12,6 +12,7 @@ from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
 import os
+import random
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
@@ -140,6 +141,9 @@ def create_item(request):
                 # Maximum acceptable size for hero image: 600KB
                 max_hero_size = 600 * 1024  # 600KB in bytes
                 
+                # Generate random 3-digit number for filename
+                random_suffix = f"{random.randint(100, 999)}"
+                
                 # Only resize if file exceeds maximum size
                 if hero_image.size > max_hero_size:
                     hero_img = Image.open(hero_image)
@@ -172,17 +176,24 @@ def create_item(request):
                     item.hero_image = InMemoryUploadedFile(
                         output, 
                         'ImageField',
-                        f"{hero_image.name.split('.')[0]}-reduced.jpg",
+                        f"{hero_image.name.split('.')[0]}-{random_suffix}.jpg",
                         'image/jpeg',
                         sys.getsizeof(output),
                         None
                     )
+                else:
+                    # If no resizing needed, still add random suffix to filename
+                    name_parts = os.path.splitext(hero_image.name)
+                    hero_image.name = f"{name_parts[0]}-{random_suffix}{name_parts[1]}"
             
             # Process representative_image if present
             if 'representative_image' in request.FILES:
                 rep_image = request.FILES['representative_image']
                 # Maximum acceptable size for representative image: 200KB
                 max_rep_size = 400 * 1024  # 200KB in bytes
+                
+                # Generate random 3-digit number for filename
+                random_suffix = f"{random.randint(100, 999)}"
                 
                 # Only resize if file exceeds maximum size
                 if rep_image.size > max_rep_size:
@@ -216,11 +227,15 @@ def create_item(request):
                     item.representative_image = InMemoryUploadedFile(
                         output, 
                         'ImageField',
-                        f"{rep_image.name.split('.')[0]}-reduced.jpg",
+                        f"{rep_image.name.split('.')[0]}-{random_suffix}.jpg",
                         'image/jpeg',
                         sys.getsizeof(output),
                         None
                     )
+                else:
+                    # If no resizing needed, still add random suffix to filename
+                    name_parts = os.path.splitext(rep_image.name)
+                    rep_image.name = f"{name_parts[0]}-{random_suffix}{name_parts[1]}"
             
             item.created_by = request.user
             item.save()
@@ -258,9 +273,16 @@ def update_item(request):
                 
                 # Process hero_image if new one is uploaded
                 if 'hero_image' in request.FILES:
+                    # Delete old hero image from storage if it exists
+                    if old_hero_image_path and default_storage.exists(old_hero_image_path):
+                        default_storage.delete(old_hero_image_path)
+                        
                     hero_image = request.FILES['hero_image']
                     # Maximum acceptable size for hero image: 600KB
                     max_hero_size = 600 * 1024  # 600KB in bytes
+                    
+                    # Generate random 3-digit number for filename
+                    random_suffix = f"{random.randint(100, 999)}"
                     
                     # Only resize if file exceeds maximum size
                     if hero_image.size > max_hero_size:
@@ -294,17 +316,28 @@ def update_item(request):
                         updated_item.hero_image = InMemoryUploadedFile(
                             output, 
                             'ImageField',
-                            f"{hero_image.name.split('.')[0]}-reduced.jpg",
+                            f"{hero_image.name.split('.')[0]}-{random_suffix}.jpg",
                             'image/jpeg',
                             sys.getsizeof(output),
                             None
                         )
+                    else:
+                        # If no resizing needed, still add random suffix to filename
+                        name_parts = os.path.splitext(hero_image.name)
+                        hero_image.name = f"{name_parts[0]}-{random_suffix}{name_parts[1]}"
                 
                 # Process representative_image if new one is uploaded
                 if 'representative_image' in request.FILES:
+                    # Delete old representative image from storage if it exists
+                    if old_rep_image_path and default_storage.exists(old_rep_image_path):
+                        default_storage.delete(old_rep_image_path)
+                        
                     rep_image = request.FILES['representative_image']
                     # Maximum acceptable size for representative image: 400KB
                     max_rep_size = 400 * 1024  # 400KB in bytes
+                    
+                    # Generate random 3-digit number for filename
+                    random_suffix = f"{random.randint(100, 999)}"
                     
                     # Only resize if file exceeds maximum size
                     if rep_image.size > max_rep_size:
@@ -338,11 +371,15 @@ def update_item(request):
                         updated_item.representative_image = InMemoryUploadedFile(
                             output, 
                             'ImageField',
-                            f"{rep_image.name.split('.')[0]}-reduced.jpg",
+                            f"{rep_image.name.split('.')[0]}-{random_suffix}.jpg",
                             'image/jpeg',
                             sys.getsizeof(output),
                             None
                         )
+                    else:
+                        # If no resizing needed, still add random suffix to filename
+                        name_parts = os.path.splitext(rep_image.name)
+                        rep_image.name = f"{name_parts[0]}-{random_suffix}{name_parts[1]}"
                 
                 # Save the item first to get the new file paths
                 updated_item.save()
