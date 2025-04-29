@@ -662,7 +662,28 @@
 
 {% block extra_js %}
 <script>
+function saveScrollPosition() {
+    const currentPos = window.scrollY || window.pageYOffset;
+    sessionStorage.setItem('scrollPosition', currentPos);
+    console.log('Scroll position saved:', currentPos);
+    location.reload();
+}
+
+function scrollToSavedPosition() {
+    const savedPos = sessionStorage.getItem('scrollPosition');
+    if (savedPos) {
+        window.scrollTo(0, parseInt(savedPos));
+        console.log('Restored to position:', savedPos);
+        sessionStorage.removeItem('scrollPosition'); // Clear after use
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    scrollToSavedPosition();
+
+
+
+
     console.log('Initializing dashboard functionality');
     
     // Handle section navigation
@@ -838,6 +859,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Use event delegation for all action buttons
     document.addEventListener('click', function(e) {
+
+
+
+
+
+
+
         // Handle edit item buttons
         if (e.target.matches('.edit-item')) {
             e.preventDefault();
@@ -1102,7 +1130,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     if (newStatus) {
-                        updateRowStatus(row, newStatus, statusClass);
+                        saveScrollPosition();
+                        // updateRowStatus(row, newStatus, statusClass);
                         showNotification(`Loan ${action}d successfully`, 'success');
                     }
                 }
