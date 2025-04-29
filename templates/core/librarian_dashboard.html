@@ -662,7 +662,7 @@
 
 {% block extra_js %}
 <script>
-function saveScrollPosition() {
+function scrollSavedReload() {
     const currentPos = window.scrollY || window.pageYOffset;
     sessionStorage.setItem('scrollPosition', currentPos);
     console.log('Scroll position saved:', currentPos);
@@ -1121,17 +1121,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (action === 'approve') {
                         newStatus = 'Approved';
                         statusClass = 'bg-success';
+                        scrollSavedReload();
                     } else if (action === 'return') {
                         newStatus = 'Returned';
                         statusClass = 'bg-secondary';
+                        updateRowStatus(row, newStatus, statusClass);
                     } else if (action === 'deny') {
                         newStatus = 'Denied';
                         statusClass = 'bg-danger';
+                        updateRowStatus(row, newStatus, statusClass);
                     }
                     
                     if (newStatus) {
-                        saveScrollPosition();
-                        // updateRowStatus(row, newStatus, statusClass);
                         showNotification(`Loan ${action}d successfully`, 'success');
                     }
                 }

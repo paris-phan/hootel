@@ -7,6 +7,10 @@ from .forms import ItemForm
 from collection.models import CollectionItems
 from loans.models import Loan
 from datetime import datetime
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
 
 # Create your views here.
 
@@ -120,6 +124,101 @@ def create_item(request):
         form = ItemForm(request.POST, request.FILES)
         if form.is_valid():
             item = form.save(commit=False)
+            
+            # Process image files before saving
+            from PIL import Image
+            from io import BytesIO
+            from django.core.files.uploadedfile import InMemoryUploadedFile
+            import sys
+            
+            # Process hero_image if present
+            if 'hero_image' in request.FILES:
+                hero_image = request.FILES['hero_image']
+                # Maximum acceptable size for hero image: 600KB
+                max_hero_size = 600 * 1024  # 600KB in bytes
+                
+                # Only resize if file exceeds maximum size
+                if hero_image.size > max_hero_size:
+                    hero_img = Image.open(hero_image)
+                    # Target dimensions for hero image
+                    target_width, target_height = 2560, 1080
+                    
+                    # Calculate new dimensions while maintaining aspect ratio
+                    img_ratio = hero_img.width / hero_img.height
+                    target_ratio = target_width / target_height
+                    
+                    if img_ratio > target_ratio:
+                        # Image is wider than target ratio, adjust height
+                        new_width = target_width
+                        new_height = int(target_width / img_ratio)
+                    else:
+                        # Image is taller than target ratio, adjust width
+                        new_height = target_height
+                        new_width = int(target_height * img_ratio)
+                    
+                    # Resize image
+                    hero_img = hero_img.resize((new_width, new_height), Image.LANCZOS)
+                    
+                    # Create output buffer
+                    output = BytesIO()
+                    # Save resized image
+                    hero_img.save(output, format='JPEG', quality=90)
+                    output.seek(0)
+                    
+                    # Replace original file with resized version
+                    item.hero_image = InMemoryUploadedFile(
+                        output, 
+                        'ImageField',
+                        f"{hero_image.name.split('.')[0]}-reduced.jpg",
+                        'image/jpeg',
+                        sys.getsizeof(output),
+                        None
+                    )
+            
+            # Process representative_image if present
+            if 'representative_image' in request.FILES:
+                rep_image = request.FILES['representative_image']
+                # Maximum acceptable size for representative image: 200KB
+                max_rep_size = 400 * 1024  # 200KB in bytes
+                
+                # Only resize if file exceeds maximum size
+                if rep_image.size > max_rep_size:
+                    rep_img = Image.open(rep_image)
+                    # Target dimensions for representative image
+                    target_width, target_height = 800, 600
+                    
+                    # Calculate new dimensions while maintaining aspect ratio
+                    img_ratio = rep_img.width / rep_img.height
+                    target_ratio = target_width / target_height
+                    
+                    if img_ratio > target_ratio:
+                        # Image is wider than target ratio, adjust height
+                        new_width = target_width
+                        new_height = int(target_width / img_ratio)
+                    else:
+                        # Image is taller than target ratio, adjust width
+                        new_height = target_height
+                        new_width = int(target_height * img_ratio)
+                    
+                    # Resize image
+                    rep_img = rep_img.resize((new_width, new_height), Image.LANCZOS)
+                    
+                    # Create output buffer
+                    output = BytesIO()
+                    # Save resized image
+                    rep_img.save(output, format='JPEG', quality=85)
+                    output.seek(0)
+                    
+                    # Replace original file with resized version
+                    item.representative_image = InMemoryUploadedFile(
+                        output, 
+                        'ImageField',
+                        f"{rep_image.name.split('.')[0]}-reduced.jpg",
+                        'image/jpeg',
+                        sys.getsizeof(output),
+                        None
+                    )
+            
             item.created_by = request.user
             item.save()
             messages.success(request, "Item created successfully!")
