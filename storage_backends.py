@@ -5,9 +5,11 @@ Custom storage backend for Vercel Blob Storage
 import os
 import time
 import re
+import json
 import requests
 import mimetypes
 from io import BytesIO
+from pathlib import Path
 from django.core.files.base import ContentFile
 from django.core.files.storage import Storage
 from django.utils.deconstruct import deconstructible
@@ -25,12 +27,32 @@ class VercelBlobStorage(Storage):
     def __init__(self):
         self.token = os.getenv('VERCEL_BLOB_READ_WRITE_TOKEN')
         self.api_url = 'https://blob.vercel-storage.com'
-        self._blob_cache = {}  # Cache for blob URL mappings
-        self._cache_timestamp = 0
-        self._cache_duration = 300  # Cache for 5 minutes
+        self._cache_file = Path(settings.BASE_DIR) / '.vercel_blob_cache.json'
+        self._path_to_url = {}  # In-memory cache
 
         if not self.token:
             raise ValueError("VERCEL_BLOB_READ_WRITE_TOKEN is not set in environment variables")
+
+        # Load persistent cache from file
+        self._load_cache()
+
+    def _load_cache(self):
+        """Load URL mappings from persistent cache file"""
+        try:
+            if self._cache_file.exists():
+                with open(self._cache_file, 'r') as f:
+                    self._path_to_url = json.load(f)
+        except Exception as e:
+            print(f"Warning: Could not load Vercel Blob cache: {e}")
+            self._path_to_url = {}
+
+    def _save_cache(self):
+        """Save URL mappings to persistent cache file"""
+        try:
+            with open(self._cache_file, 'w') as f:
+                json.dump(self._path_to_url, f, indent=2)
+        except Exception as e:
+            print(f"Warning: Could not save Vercel Blob cache: {e}")
 
     def _save(self, name, content):
         """
@@ -47,25 +69,36 @@ class VercelBlobStorage(Storage):
         # Clean the name to be URL-safe but preserve path structure
         clean_name = self.get_valid_name(name)
 
-        # Upload to Vercel Blob with PUT request
-        # Using the PUT endpoint with pathname in URL to preserve the file path
+        # Upload to Vercel Blob using the PUT endpoint with pathname
+        # The PUT endpoint format preserves the pathname
         response = requests.put(
             f"{self.api_url}/{clean_name}",
             headers={
                 'Authorization': f'Bearer {self.token}',
-                'x-content-type': content_type,
-                'x-add-random-suffix': 'false',  # Prevent random suffix
+                'content-type': content_type,  # Use content-type not x-content-type
             },
             data=file_data
         )
 
-        if response.status_code != 200:
+        if response.status_code not in [200, 201]:
             raise Exception(f"Failed to upload file to Vercel Blob: {response.text}")
 
         result = response.json()
-        # Store the actual URL for later retrieval
-        # The pathname should match what we sent
-        return clean_name
+
+        # Store the actual URL returned by Vercel
+        actual_url = result.get('url', '')
+        pathname = result.get('pathname', clean_name)
+
+        if actual_url:
+            # Store mapping from both the original name and clean name to the URL
+            self._path_to_url[clean_name] = actual_url
+            self._path_to_url[name] = actual_url
+
+            # Save the cache to disk for persistence
+            self._save_cache()
+
+        # Return the pathname that Vercel stored it as
+        return pathname if pathname else clean_name
 
     def _open(self, name, mode='rb'):
         """
@@ -88,28 +121,17 @@ class VercelBlobStorage(Storage):
         """
         Delete file from Vercel Blob
         """
-        # List all blobs to find the one with matching pathname
-        list_response = requests.get(
-            f"{self.api_url}/list",
-            headers={
-                'Authorization': f'Bearer {self.token}',
-            }
-        )
+        clean_name = self.get_valid_name(name)
 
-        if list_response.status_code != 200:
-            raise Exception(f"Failed to list blobs: {list_response.text}")
+        # Get the URL from our cache
+        blob_url = None
+        if clean_name in self._path_to_url:
+            blob_url = self._path_to_url[clean_name]
+        elif name in self._path_to_url:
+            blob_url = self._path_to_url[name]
 
-        blobs = list_response.json()['blobs']
-
-        # Find the blob with matching pathname
-        blob_to_delete = None
-        for blob in blobs:
-            if blob['pathname'] == name:
-                blob_to_delete = blob
-                break
-
-        if not blob_to_delete:
-            # File doesn't exist, nothing to delete
+        if not blob_url:
+            # File doesn't exist in cache, assume it doesn't exist
             return
 
         # Delete the blob using its URL
@@ -119,12 +141,17 @@ class VercelBlobStorage(Storage):
                 'Authorization': f'Bearer {self.token}',
             },
             json={
-                'urls': [blob_to_delete['url']]
+                'urls': [blob_url]
             }
         )
 
-        if delete_response.status_code != 200:
+        if delete_response.status_code not in [200, 404]:
             raise Exception(f"Failed to delete file from Vercel Blob: {delete_response.text}")
+
+        # Remove from cache after deletion attempt (even if file was already gone)
+        self._path_to_url.pop(name, None)
+        self._path_to_url.pop(clean_name, None)
+        self._save_cache()
 
     def exists(self, name):
         """
@@ -133,42 +160,9 @@ class VercelBlobStorage(Storage):
         # Clean the name the same way we do when saving
         clean_name = self.get_valid_name(name)
 
-        # Refresh cache to get latest blob list
-        self._refresh_cache()
+        # Check if either the original name or clean name exists in persistent cache
+        return clean_name in self._path_to_url or name in self._path_to_url
 
-        # Check if either the original name or clean name exists in cache
-        return clean_name in self._blob_cache or name in self._blob_cache
-
-    def _refresh_cache(self):
-        """
-        Refresh the blob cache if needed
-        """
-        import time
-        current_time = time.time()
-        if current_time - self._cache_timestamp > self._cache_duration:
-            list_response = requests.get(
-                f"{self.api_url}/list",
-                headers={
-                    'Authorization': f'Bearer {self.token}',
-                },
-                params={
-                    'limit': 5000,  # Get more blobs in one request
-                }
-            )
-
-            if list_response.status_code == 200:
-                self._blob_cache = {}
-                blobs = list_response.json().get('blobs', [])
-                for blob in blobs:
-                    # Map both pathname and clean name to URL
-                    pathname = blob.get('pathname', '')
-                    url = blob.get('url', '')
-                    if pathname and url:
-                        self._blob_cache[pathname] = url
-                        # Also store with cleaned name
-                        clean_name = self.get_valid_name(pathname)
-                        self._blob_cache[clean_name] = url
-                self._cache_timestamp = current_time
 
     def url(self, name):
         """
@@ -177,18 +171,19 @@ class VercelBlobStorage(Storage):
         # Clean the name the same way we do when saving
         clean_name = self.get_valid_name(name)
 
-        # Check cache first
-        self._refresh_cache()
+        # Check direct path mapping first
+        if clean_name in self._path_to_url:
+            return self._path_to_url[clean_name]
+        if name in self._path_to_url:
+            return self._path_to_url[name]
 
-        # Try to find in cache
-        if clean_name in self._blob_cache:
-            return self._blob_cache[clean_name]
-        if name in self._blob_cache:
-            return self._blob_cache[name]
+        # For missing files, return a placeholder URL instead of raising an exception
+        # This prevents infinite loops when error pages try to load static files
+        print(f"Warning: Static file '{name}' not found in Vercel Blob cache. "
+              f"Run 'python manage.py collectstatic' to upload static files.")
 
-        # If not in cache, construct the URL directly
-        # Vercel Blob URLs are predictable when we know the pathname
-        return f"{self.api_url}/{clean_name}"
+        # Return a placeholder URL that won't break the page
+        return f"data:text/plain;charset=utf-8,Missing%20file%3A%20{name}"
 
     def size(self, name):
         """

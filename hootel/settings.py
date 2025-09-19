@@ -175,9 +175,26 @@ USE_TZ = True
 # Storage Settings
 ##############################
 
-# Use Vercel Blob for media files in production, local storage in development
-if DEBUG:
-    # Development: Use local file storage
+# Check if we have Vercel Blob token
+VERCEL_BLOB_TOKEN = os.getenv("VERCEL_BLOB_READ_WRITE_TOKEN")
+
+if VERCEL_BLOB_TOKEN:
+    # Use Vercel Blob for both static and media files in all environments
+    STORAGES = {
+        "default": {
+            "BACKEND": "storage_backends.VercelBlobStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "storage_backends.VercelBlobStorage",
+        },
+    }
+    # These URLs will be overridden by the storage backend's url() method
+    # But we set base URLs for reference
+    STATIC_URL = "https://blob.vercel-storage.com/"
+    MEDIA_URL = "https://blob.vercel-storage.com/"
+    MEDIA_ROOT = ""
+else:
+    # Fallback to local storage if no Vercel Blob token
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -186,23 +203,9 @@ if DEBUG:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
+    STATIC_URL = "/static/"
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
-    STATIC_URL = "/static/"
-else:
-    # Production: Use Vercel Blob for both media and static files
-    STORAGES = {
-        "default": {
-            "BACKEND": "storage_backends.VercelBlobStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "storage_backends.VercelBlobStorage",
-        },
-    }
-    # Vercel Blob provides direct URLs for files
-    MEDIA_URL = "https://blob.vercel-storage.com/"
-    MEDIA_ROOT = ""
-    STATIC_URL = "https://blob.vercel-storage.com/"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
