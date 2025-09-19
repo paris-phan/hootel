@@ -112,19 +112,24 @@ if "DATABASE_URL" in os.environ:
         "default": dj_database_url.config(
             conn_max_age=600,
             conn_health_checks=True,
+            ssl_require=True,  # Required for Supabase
         )
     }
 else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME", "hootel_db"),
-            "USER": os.getenv("DB_USER", "postgres"),
-            "PASSWORD": os.getenv("DB_PASSWORD", "postgres"),
-            "HOST": os.getenv("DB_HOST", "localhost"),
-            "PORT": os.getenv("DB_PORT", "5432"),
-        }
+    db_config = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME", "hootel_db"),
+        "USER": os.getenv("DB_USER", "postgres"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "postgres"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
     }
+
+    # Add SSL for Supabase (when host contains supabase.co)
+    if "supabase.co" in db_config.get("HOST", ""):
+        db_config["OPTIONS"] = {"sslmode": "require"}
+
+    DATABASES = {"default": db_config}
 
 
 # Password validation
