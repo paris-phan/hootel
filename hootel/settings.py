@@ -188,22 +188,22 @@ if DEBUG:
     }
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
+    STATIC_URL = "/static/"
 else:
-    # Production: Use Vercel Blob for media files
+    # Production: Use Vercel Blob for both media and static files
     STORAGES = {
         "default": {
             "BACKEND": "storage_backends.VercelBlobStorage",
         },
         "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            "BACKEND": "storage_backends.VercelBlobStorage",
         },
     }
     # Vercel Blob provides direct URLs for files
     MEDIA_URL = "https://blob.vercel-storage.com/"
     MEDIA_ROOT = ""
+    STATIC_URL = "https://blob.vercel-storage.com/"
 
-# Static files configuration (served locally or by Vercel's CDN)
-STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Add this line to tell Django where to find static files during development
