@@ -3,6 +3,8 @@ Custom storage backend for Vercel Blob Storage
 """
 
 import os
+import time
+import re
 import requests
 import mimetypes
 from io import BytesIO
@@ -23,6 +25,9 @@ class VercelBlobStorage(Storage):
     def __init__(self):
         self.token = os.getenv('VERCEL_BLOB_READ_WRITE_TOKEN')
         self.api_url = 'https://blob.vercel-storage.com'
+        self._blob_cache = {}  # Cache for blob URL mappings
+        self._cache_timestamp = 0
+        self._cache_duration = 300  # Cache for 5 minutes
 
         if not self.token:
             raise ValueError("VERCEL_BLOB_READ_WRITE_TOKEN is not set in environment variables")
@@ -39,15 +44,17 @@ class VercelBlobStorage(Storage):
         if not content_type:
             content_type = 'application/octet-stream'
 
-        # Upload to Vercel Blob
+        # Clean the name to be URL-safe but preserve path structure
+        clean_name = self.get_valid_name(name)
+
+        # Upload to Vercel Blob with PUT request
+        # Using the PUT endpoint with pathname in URL to preserve the file path
         response = requests.put(
-            f"{self.api_url}/upload",
+            f"{self.api_url}/{clean_name}",
             headers={
                 'Authorization': f'Bearer {self.token}',
                 'x-content-type': content_type,
-            },
-            params={
-                'pathname': name,
+                'x-add-random-suffix': 'false',  # Prevent random suffix
             },
             data=file_data
         )
@@ -56,8 +63,9 @@ class VercelBlobStorage(Storage):
             raise Exception(f"Failed to upload file to Vercel Blob: {response.text}")
 
         result = response.json()
-        # Return the pathname that Vercel Blob assigned
-        return result['pathname']
+        # Store the actual URL for later retrieval
+        # The pathname should match what we sent
+        return clean_name
 
     def _open(self, name, mode='rb'):
         """
@@ -122,50 +130,65 @@ class VercelBlobStorage(Storage):
         """
         Check if file exists in Vercel Blob
         """
-        # List all blobs and check if any match the pathname
-        list_response = requests.get(
-            f"{self.api_url}/list",
-            headers={
-                'Authorization': f'Bearer {self.token}',
-            }
-        )
+        # Clean the name the same way we do when saving
+        clean_name = self.get_valid_name(name)
 
-        if list_response.status_code != 200:
-            return False
+        # Refresh cache to get latest blob list
+        self._refresh_cache()
 
-        blobs = list_response.json()['blobs']
+        # Check if either the original name or clean name exists in cache
+        return clean_name in self._blob_cache or name in self._blob_cache
 
-        for blob in blobs:
-            if blob['pathname'] == name:
-                return True
+    def _refresh_cache(self):
+        """
+        Refresh the blob cache if needed
+        """
+        import time
+        current_time = time.time()
+        if current_time - self._cache_timestamp > self._cache_duration:
+            list_response = requests.get(
+                f"{self.api_url}/list",
+                headers={
+                    'Authorization': f'Bearer {self.token}',
+                },
+                params={
+                    'limit': 5000,  # Get more blobs in one request
+                }
+            )
 
-        return False
+            if list_response.status_code == 200:
+                self._blob_cache = {}
+                blobs = list_response.json().get('blobs', [])
+                for blob in blobs:
+                    # Map both pathname and clean name to URL
+                    pathname = blob.get('pathname', '')
+                    url = blob.get('url', '')
+                    if pathname and url:
+                        self._blob_cache[pathname] = url
+                        # Also store with cleaned name
+                        clean_name = self.get_valid_name(pathname)
+                        self._blob_cache[clean_name] = url
+                self._cache_timestamp = current_time
 
     def url(self, name):
         """
         Get public URL for file
         """
-        # List all blobs to find the one with matching pathname
-        list_response = requests.get(
-            f"{self.api_url}/list",
-            headers={
-                'Authorization': f'Bearer {self.token}',
-            }
-        )
+        # Clean the name the same way we do when saving
+        clean_name = self.get_valid_name(name)
 
-        if list_response.status_code != 200:
-            # Return a placeholder URL if we can't list blobs
-            return f"https://blob.vercel-storage.com/{name}"
+        # Check cache first
+        self._refresh_cache()
 
-        blobs = list_response.json()['blobs']
+        # Try to find in cache
+        if clean_name in self._blob_cache:
+            return self._blob_cache[clean_name]
+        if name in self._blob_cache:
+            return self._blob_cache[name]
 
-        # Find the blob with matching pathname
-        for blob in blobs:
-            if blob['pathname'] == name:
-                return blob['url']
-
-        # Return a placeholder URL if file not found
-        return f"https://blob.vercel-storage.com/{name}"
+        # If not in cache, construct the URL directly
+        # Vercel Blob URLs are predictable when we know the pathname
+        return f"{self.api_url}/{clean_name}"
 
     def size(self, name):
         """
@@ -201,9 +224,17 @@ class VercelBlobStorage(Storage):
     def get_valid_name(self, name):
         """
         Returns a filename suitable for use with Vercel Blob
+        Preserves directory structure for static files
         """
-        # Replace spaces with underscores and remove special characters
         import re
-        name = re.sub(r'[^\w\s\-\./]', '', name)
+        # Keep forward slashes for path structure, replace backslashes
+        name = name.replace('\\', '/')
+        # Remove any dangerous path elements
+        name = name.replace('..', '')
+        # Replace spaces with underscores
         name = name.replace(' ', '_')
+        # Keep alphanumeric, dash, underscore, dot, and forward slash
+        name = re.sub(r'[^\w\-\./]', '_', name)
+        # Remove leading slashes to prevent absolute paths
+        name = name.lstrip('/')
         return name
