@@ -15,8 +15,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
 
-import django_heroku
-
 # Load environment variables from .env file
 load_dotenv()
 
@@ -36,26 +34,12 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 ALLOWED_HOSTS = ["*"]
 
 
-#/***************************************************************************************
-#*  REFERENCES
-#*  Title: Claude 3.7 Sonnet
-#*  Author: Anthropic
-#*  Date: Spring 2024
-#*  URL: https://claude.ai
-#*
-#*  Prompt used: How can I enforce my Django Heroku app to use https?
-#*              * used as guide & assistance in creating security settings
-#*
-#***************************************************************************************/
 
 
-# Security Settings
-SECURE_SSL_REDIRECT = not DEBUG  # redirect all non-HTTPS requests to HTTPS
-SESSION_COOKIE_SECURE = not DEBUG  # only send session cookie over HTTPS
-CSRF_COOKIE_SECURE = not DEBUG  # only send CSRF cookie over HTTPS
-SECURE_HSTS_SECONDS = 31536000  # arbitrary large number
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# Security Settings (for local development)
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
@@ -298,13 +282,7 @@ SOCIALACCOUNT_ADAPTER = "accounts.adapters.CustomSocialAccountAdapter"
 #*
 #***************************************************************************************/
 
-##############################
-# Heroku settings
-##############################
-
-django_heroku.settings(locals())
-
-# After your current settings
+# Logging configuration
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
