@@ -1,0 +1,45 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django development files
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Django migrations (optional - uncomment if you don't want to deploy migrations)
+# */migrations/
+
+# Media files (if using local storage for development)
+media/
+
+# Static files collected locally
+staticfiles/
+
+# Vercel cache
+.vercel/
+.vercel_blob_cache.json
