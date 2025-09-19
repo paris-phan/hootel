@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     # third party apps
-    "storages",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -173,55 +172,38 @@ USE_TZ = True
 
 
 ##############################
-# AWS S3 Settings
+# Storage Settings
 ##############################
 
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
-            "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
-            "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
-            "region_name": os.getenv("AWS_S3_REGION_NAME"),
-            "default_acl": "public-read",
-            "file_overwrite": True,
+# Use Vercel Blob for media files in production, local storage in development
+if DEBUG:
+    # Development: Use local file storage
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
-    },
-    "staticfiles": {
-        "BACKEND": (
-            "django.contrib.staticfiles.storage.StaticFilesStorage"
-            if DEBUG
-            else "storages.backends.s3.S3Storage"
-        ),
-        "OPTIONS": {
-            **(
-                {"location": "static", "base_url": "/static/"}
-                if DEBUG
-                else {
-                    "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
-                    "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
-                    "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
-                    "region_name": os.getenv("AWS_S3_REGION_NAME"),
-                    "default_acl": "public-read",
-                    "file_overwrite": True,
-                    "location": "static",
-                }
-            )
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
-    },
-}
+    }
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
+else:
+    # Production: Use Vercel Blob for media files
+    STORAGES = {
+        "default": {
+            "BACKEND": "storage_backends.VercelBlobStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    # Vercel Blob provides direct URLs for files
+    MEDIA_URL = "https://blob.vercel-storage.com/"
+    MEDIA_ROOT = ""
 
-# Media files configuration
-MEDIA_URL = "https://%s.s3.amazonaws.com/media/" % os.getenv("AWS_STORAGE_BUCKET_NAME")
-MEDIA_ROOT = ""
-
-# Static files configuration
-STATIC_URL = (
-    "/static/"
-    if DEBUG
-    else "https://%s.s3.amazonaws.com/static/" % os.getenv("AWS_STORAGE_BUCKET_NAME")
-)
+# Static files configuration (served locally or by Vercel's CDN)
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Add this line to tell Django where to find static files during development
