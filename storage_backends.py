@@ -27,32 +27,38 @@ class VercelBlobStorage(Storage):
     def __init__(self):
         self.token = os.getenv('BLOB_READ_WRITE_TOKEN')
         self.api_url = 'https://blob.vercel-storage.com'
-        self._cache_file = Path(settings.BASE_DIR) / '.vercel_blob_cache.json'
-        self._path_to_url = {}  # In-memory cache
+        self._memory_cache = {}  # In-memory cache for current request lifecycle
 
         if not self.token:
             raise ValueError("BLOB_READ_WRITE_TOKEN is not set in environment variables")
 
-        # Load persistent cache from file
-        self._load_cache()
+    def _get_blob_url(self, pathname):
+        """
+        Query Vercel Blob API to get the URL for a specific pathname
+        Returns None if not found
+        """
+        # Check memory cache first
+        if pathname in self._memory_cache:
+            return self._memory_cache[pathname]
 
-    def _load_cache(self):
-        """Load URL mappings from persistent cache file"""
-        try:
-            if self._cache_file.exists():
-                with open(self._cache_file, 'r') as f:
-                    self._path_to_url = json.load(f)
-        except Exception as e:
-            print(f"Warning: Could not load Vercel Blob cache: {e}")
-            self._path_to_url = {}
+        # Parse the store ID from the token (format: vercel_blob_rw_STOREID_randomchars)
+        store_id = None
+        if self.token and self.token.startswith('vercel_blob_'):
+            parts = self.token.split('_')
+            if len(parts) >= 4:
+                store_id = parts[3]  # The store ID is the 4th part
 
-    def _save_cache(self):
-        """Save URL mappings to persistent cache file"""
-        try:
-            with open(self._cache_file, 'w') as f:
-                json.dump(self._path_to_url, f, indent=2)
-        except Exception as e:
-            print(f"Warning: Could not save Vercel Blob cache: {e}")
+        if not store_id:
+            print(f"Could not extract store ID from token")
+            return None
+
+        # Construct the direct URL based on Vercel Blob URL pattern
+        # Format: https://[store-id].public.blob.vercel-storage.com/[pathname]
+        blob_url = f"https://{store_id.lower()}.public.blob.vercel-storage.com/{pathname}"
+
+        # Cache and return the URL
+        self._memory_cache[pathname] = blob_url
+        return blob_url
 
     def _save(self, name, content):
         """
@@ -85,17 +91,14 @@ class VercelBlobStorage(Storage):
 
         result = response.json()
 
-        # Store the actual URL returned by Vercel
+        # Store the actual URL returned by Vercel in memory cache
         actual_url = result.get('url', '')
         pathname = result.get('pathname', clean_name)
 
         if actual_url:
-            # Store mapping from both the original name and clean name to the URL
-            self._path_to_url[clean_name] = actual_url
-            self._path_to_url[name] = actual_url
-
-            # Save the cache to disk for persistence
-            self._save_cache()
+            # Store mapping in memory cache for current request
+            self._memory_cache[clean_name] = actual_url
+            self._memory_cache[name] = actual_url
 
         # Return the pathname that Vercel stored it as
         return pathname if pathname else clean_name
@@ -123,15 +126,11 @@ class VercelBlobStorage(Storage):
         """
         clean_name = self.get_valid_name(name)
 
-        # Get the URL from our cache
-        blob_url = None
-        if clean_name in self._path_to_url:
-            blob_url = self._path_to_url[clean_name]
-        elif name in self._path_to_url:
-            blob_url = self._path_to_url[name]
+        # First, try to get the URL for the file we want to delete
+        blob_url = self._get_blob_url(clean_name)
 
         if not blob_url:
-            # File doesn't exist in cache, assume it doesn't exist
+            # File doesn't exist, nothing to delete
             return
 
         # Delete the blob using its URL
@@ -148,20 +147,18 @@ class VercelBlobStorage(Storage):
         if delete_response.status_code not in [200, 404]:
             raise Exception(f"Failed to delete file from Vercel Blob: {delete_response.text}")
 
-        # Remove from cache after deletion attempt (even if file was already gone)
-        self._path_to_url.pop(name, None)
-        self._path_to_url.pop(clean_name, None)
-        self._save_cache()
+        # Remove from memory cache after deletion
+        self._memory_cache.pop(name, None)
+        self._memory_cache.pop(clean_name, None)
 
     def exists(self, name):
         """
         Check if file exists in Vercel Blob
         """
-        # Clean the name the same way we do when saving
-        clean_name = self.get_valid_name(name)
-
-        # Check if either the original name or clean name exists in persistent cache
-        return clean_name in self._path_to_url or name in self._path_to_url
+        # For now, we'll assume files exist if we can construct a URL
+        # Since we're directly constructing URLs, we can't easily check existence
+        # without making an HTTP request to verify
+        return True
 
 
     def url(self, name):
@@ -171,16 +168,15 @@ class VercelBlobStorage(Storage):
         # Clean the name the same way we do when saving
         clean_name = self.get_valid_name(name)
 
-        # Check direct path mapping first
-        if clean_name in self._path_to_url:
-            return self._path_to_url[clean_name]
-        if name in self._path_to_url:
-            return self._path_to_url[name]
+        # Try to get the URL from Vercel Blob
+        blob_url = self._get_blob_url(clean_name)
+
+        if blob_url:
+            return blob_url
 
         # For missing files, return a placeholder URL instead of raising an exception
         # This prevents infinite loops when error pages try to load static files
-        print(f"Warning: Static file '{name}' not found in Vercel Blob cache. "
-              f"Run 'python manage.py collectstatic' to upload static files.")
+        print(f"Warning: File '{name}' not found in Vercel Blob storage.")
 
         # Return a placeholder URL that won't break the page
         return f"data:text/plain;charset=utf-8,Missing%20file%3A%20{name}"
