@@ -25,13 +25,13 @@ class VercelBlobStorage(Storage):
     """
 
     def __init__(self):
-        self.token = os.getenv('VERCEL_BLOB_READ_WRITE_TOKEN')
+        self.token = os.getenv('BLOB_READ_WRITE_TOKEN')
         self.api_url = 'https://blob.vercel-storage.com'
         self._cache_file = Path(settings.BASE_DIR) / '.vercel_blob_cache.json'
         self._path_to_url = {}  # In-memory cache
 
         if not self.token:
-            raise ValueError("VERCEL_BLOB_READ_WRITE_TOKEN is not set in environment variables")
+            raise ValueError("BLOB_READ_WRITE_TOKEN is not set in environment variables")
 
         # Load persistent cache from file
         self._load_cache()

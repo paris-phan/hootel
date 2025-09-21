@@ -176,7 +176,7 @@ USE_TZ = True
 ##############################
 
 # Check if we have Vercel Blob token
-VERCEL_BLOB_TOKEN = os.getenv("VERCEL_BLOB_READ_WRITE_TOKEN")
+VERCEL_BLOB_TOKEN = os.getenv("BLOB_READ_WRITE_TOKEN")
 
 if VERCEL_BLOB_TOKEN:
     # Use Vercel Blob for both static and media files in all environments
