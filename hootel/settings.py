@@ -190,8 +190,8 @@ if VERCEL_BLOB_TOKEN:
     }
     # These URLs will be overridden by the storage backend's url() method
     # But we set base URLs for reference
-    STATIC_URL = "https://blob.vercel-storage.com/"
-    MEDIA_URL = "https://blob.vercel-storage.com/"
+    STATIC_URL = "https://o1gzaxtsufvt1myt.public.blob.vercel-storage.com/"
+    MEDIA_URL = "https://o1gzaxtsufvt1myt.public.blob.vercel-storage.com/"
     MEDIA_ROOT = ""
 else:
     # Fallback to local storage if no Vercel Blob token
