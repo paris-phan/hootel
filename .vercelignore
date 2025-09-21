@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+node_modules/
+staticfiles_build/
+staticfiles/
+static/
+media/
+dist/
+build/
+.git/
