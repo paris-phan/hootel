@@ -100,7 +100,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "hootel.wsgi.app"
+WSGI_APPLICATION = "hootel.wsgi.application"
 
 
 # Database
