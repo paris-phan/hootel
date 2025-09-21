@@ -1,8 +1,6 @@
 {
+  "version": 2,
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "hootel/wsgi.py"
-    }
+    { "src": "/(.*)", "dest": "hootel/wsgi.py" }
   ]
 }
